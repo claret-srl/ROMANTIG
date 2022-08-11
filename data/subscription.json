@@ -1,0 +1,22 @@
+{
+	"description": "Test subscription",
+	"subject": {
+		"entities": [
+			{
+				"idPattern": ".*",
+				"type": "Device"
+			}
+		],
+		"condition": {
+			"attrs": ["processStatus"]
+		}
+	},
+	"notification": {
+		"http": {
+			"url": "http://quantumleap:8668/v2/notify"
+		},
+		"attrs": ["processStatus"],
+		"metadata": ["dateCreated", "dateModified"]
+	},
+	"throttling": 1
+}

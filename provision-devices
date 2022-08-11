@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+#  curl commands to reload the data
+#
+#
+
+set -e
+
+printf "⏳ Provisioning IoT devices "
+
+# ####################################################
+# #
+# # Create a Service Groups for all OPC-UA IoT devices
+##
+
+curl -s -o /dev/null -X POST \
+  "http://iot-agent:4001/iot/services" \
+  -H 'Content-Type: application/json' \
+  -H 'fiware-service: opcua_car' \
+  -H 'fiware-servicepath: /demo' \
+  -d '{
+ "services": [
+   {
+     "apikey":      "1068318794",
+     "cbroker":     "http://orion:1026",
+     "entity_type": "Device",
+     "resource":    "/iot/d"    
+   }
+ ]
+}'
+
+
+# ####################################################
+# #
+# # Provision subscriptions for QuantumLeap
+# #
+
+curl -s -o /dev/null -X POST \
+	'http://orion:1026/v2/subscriptions/' \
+	-H 'Content-Type: application/json' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' \
+	-d '{
+	"description": "Test subscription",
+	"subject": {
+		"entities": [
+			{
+				"idPattern": ".*",
+				"type": "Device"
+			}
+		],
+		"condition": {
+			"attrs": ["processStatus"]
+		}
+	},
+	"notification": {
+		"http": {
+			"url": "http://quantumleap:8668/v2/notify"
+		},
+		"attrs": ["processStatus"],
+		"metadata": ["dateCreated", "dateModified"]
+	},
+	"throttling": 1
+}'
+
+
+# ####################################################
+# #
+# # Provision Sensors
+# #
+
+
+echo -e " \033[1;32mdone\033[0m"
