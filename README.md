@@ -41,7 +41,7 @@ Run  `sudo ./services create` to create all images, then run `./services start` 
 
 Now you can open Grafana on `localhost:3000` and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana. Below an example:
 
-![grafana](https://user-images.githubusercontent.com/35039520/185966375-0316c0d1-de43-4d71-9dfa-6104a684da66.PNG)
+![grafana_oee](https://user-images.githubusercontent.com/35039520/185968614-68c018b5-cc67-4937-ac06-fb57a1ca944f.PNG)
 
 
 ## Example
