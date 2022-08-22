@@ -23,7 +23,7 @@ idealTime_ppm = 5 #The theoretical maximum piece per minute rate (integer) that 
 
 Be sure that the name of the states written in the config file perfectly match those that are written by your process to the CrateDB, so that the microservice can correctly identify them.
 
-##Setup
+## Setup
 
 navigate to oee-service folder and build the image for the OEE microservice:
 
@@ -41,7 +41,7 @@ Run  `sudo ./services create` to create all images, then run `./services start` 
 
 Now you can open Grafana on `localhost:3000` and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana.
 
-##Example
+## Example
 
 Our example use-case scenario is based on an automated welding robotic system which performs several tasks. At first, a stereometric scanner individuates the 3D pose estimate of target pipes, then the robot arm proceeds to pick those and place them in front of a torch, where they will be welded. Once welded, the system proceeds to perform a quality control check to validate the welding: if the check succeeds, the pipe is placed in the final bin; if the check fail, welding is performed again and the QC control the pipe a second time. If the check fails twice in a row, the pipe is discarded. 
 
