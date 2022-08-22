@@ -1,7 +1,7 @@
 # ROMANTING ROSE-AP OEE Calculator
 
 
-This ROSE-AP is intended as a microservice for automatic OEE, and related metrics, calculation. The service works by connecting to a Crate database on port 4200, where information about the status of your target process are stored by Orion and QuantumLeap services.
+This ROSE-AP is intended as a microservice for automatic OEE, and related metrics, calculation. The service works by connecting to a [Crate database](https://crate.io/) on port 4200, where information about the status of your target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) and [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) services.
 
 
 ## Configuration
@@ -10,11 +10,11 @@ In order to compute the OEE, the service must know if each possible process stat
 
 ```
 [PROCESS]
-upTimeStates = ["upTimeStateName1","upTimeStateName2",...] #These represents the states to be considered as up-time
-downTimeStates = ["downTimeStateName1","downTimeStateName2",...]#These represents the states to be considered as down-time
-endStates =["endStatesName1","endStatesName2",...] #These represents the possibly multiple final states of the process
-goodEnd =["goodEndStateName1","goodEndStateName2",...] #These represents the endStates in which an item is successfully created
-badEnd =["badEndStateName1","badEndStateName2",...] #These represents the endStates in which an item is defective or faulty and has to be discarded
+upTimeStates = ["upTimeStateName1","upTimeStateName2",...,"upTimeStateNameN"] #These represents the states to be considered as up-time
+downTimeStates = ["downTimeStateName1","downTimeStateName2",...,"downTimeStateNameN"]#These represents the states to be considered as down-time
+endStates =["upTimeStateNameN","downTimeStateNameN",...] #Subset of either upTimeStates, downTimeStates or both. These represents the possibly multiple final states of the process
+goodEnd =["endStatesName1",...] #Subset of endStates, these represents the final states in which an item is successfully created
+badEnd =["endStatesName2",...] #Subset of endStates, these represents the final states in which an item is defective or faulty and has to be discarded
 
 [OEE]
 timestep = 300 #The timestep granularity (integer) for the resulting OEE metrics, in seconds
@@ -49,4 +49,4 @@ The process cycle and the respective up and down time states are shown below:
 
 ![mockup_cycle](https://user-images.githubusercontent.com/35039520/185942765-a7667e8e-95bb-45d6-b462-54c7703aeb46.png)
 
-As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to Orion Context Broker through the IoT Agent for OPC-UA servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our OEE calculator. 
+As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to Orion Context Broker through the [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our OEE calculator. 
