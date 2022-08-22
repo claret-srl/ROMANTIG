@@ -176,7 +176,8 @@ services:
   oee-service:
     labels:
       org.fiware: 'claret-romantig'
-    image: rose-ap-oee
+    profiles: ['oee_service']
+    image: roseap_oee
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     container_name: 'oee-service'

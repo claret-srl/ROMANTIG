@@ -2,7 +2,6 @@
 #
 #  Command Line Interface to start all services
 #
-
 set -e
 
 dockerCmd="docker compose"
@@ -40,7 +39,7 @@ loadData () {
 		#  --entrypoint /bin/sh rose-ap-oee start-oee
 	# sleep 5
 	echo "STARTING OEE ROSE-AP"
-	docker exec -it oee-service python3 oee_service.py
+	docker exec -it -d oee-service python3 oee_service.py
 	echo ""
 }
 
@@ -158,7 +157,7 @@ case "${command}" in
 		echo -e "- \033[1mGrafana\033[0m is a time series analytics tool will visualise data from CrateDB."
 		echo -e "- \033[1mOEE-calculator\033[0m is a tool to calculate OEE data from CrateDB."
 		echo ""
-		${dockerCmd} up -d --remove-orphans 
+		${dockerCmd} --profile oee_service up -d --remove-orphans
 		loadData
 		displayServices
 		;;
@@ -172,8 +171,7 @@ case "${command}" in
 		export $(cat .env | grep "#" -v)
 		echo "Pulling Docker images"
 		docker pull curlimages/curl
-		${dockerCmd} pull 
-		# ${dockerCmd} build
+		${dockerCmd} pull	
 		;;
 	*)
 		echo "Command not Found."
