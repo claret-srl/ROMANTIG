@@ -6,7 +6,7 @@ This ROSE-AP is intended as a microservice for automatic OEE, and related metric
 
 ## Configuration
 
-In order to compute the OEE, the service must know if each possible process state that is found on CrateDB has to be considered an up-time or a down-time state. To do so, please change the `oee_conf.config` file, prior to building the image of the service. You have to set the following variables:
+In order to compute the OEE, the service must know if each possible process state that is found on CrateDB has to be considered an up-time or a down-time state. To do so, please change the `oee_conf.config` file found in the `oee_service` folder, prior to building the image of the service. You have to set the following variables:
 
 ```
 [PROCESS]
