@@ -30,7 +30,7 @@ navigate to oee-service folder and build the image for the OEE microservice:
 ```
   cd oee-service
 
-  docker build -t rose-ap-oee .
+  docker build -t roseap_oee .
 ```
 Go back to the main folder and make the `./services` script executable
 ```
