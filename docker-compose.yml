@@ -196,9 +196,6 @@ networks:
   default:
     labels:
       org.fiware: 'claret-romantig'
-    ipam:
-      config:
-        - subnet:  172.19.1.0/24
 
 volumes:
   mongo-db: ~
