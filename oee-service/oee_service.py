@@ -73,7 +73,7 @@ while True:
 
         start_time=datetime.now()
         # time.sleep(1)
-        end_block_time = end_time+timedelta(seconds=1)
+        end_block_time = end_time
 
         availability = total_upTime/(total_upTime+total_downTime)
         performance = total_produce/(total_upTime * idealTime)
