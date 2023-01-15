@@ -28,16 +28,19 @@ Be sure that the name of the states written in the config file perfectly match t
 navigate to oee-service folder and build the image for the OEE microservice:
 
 ```
-  cd oee-service
-
-  docker build -t roseap_oee .
+cd oee-service
+docker build -t roseap_oee .
 ```
 Go back to the main folder and make the `./services` script executable
 ```
-  cd ..
-  sudo chmod +x ./services
+cd ..
+sudo chmod +x ./services
 ```
-Run  `sudo ./services create` to create all images, then run `./services start` to start the containers.
+To create all images, and then start the containers run:
+```
+sudo ./services create
+./services start
+```
 
 Now you can open Grafana on `localhost:3000` and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana. Below an example:
 
@@ -55,3 +58,9 @@ The process cycle and the respective up and down time states are shown below:
 In general, we suggest you to adopt a state space representation similar to the one above for your target process, in order to clearly highlight every step in the cycle and attribute it the correct value for up or down time. The state representation (the onthology of the system) should not be too detailed (i.e. too many states) or too general (i.e. one or two states) because of unnecessary additional workload or possible loss of information.
 
 As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to Orion Context Broker through the [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our OEE calculator.  
+
+## Trubleshooting
+If the following error will appear, run the following command to convert the return character from DOS environment to Unix one:
+```
+dos2unix ./services ./.env
+```
