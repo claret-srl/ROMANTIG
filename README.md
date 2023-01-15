@@ -62,5 +62,5 @@ As it can be seen in the docker-compose file, the PLC responsible for controllin
 ## Trubleshooting
 If the following error will appear, run the following command to convert the return character from DOS environment to Unix one:
 ```
-dos2unix ./services ./.env
+dos2unix *
 ```
