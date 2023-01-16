@@ -59,8 +59,21 @@ In general, we suggest you to adopt a state space representation similar to the 
 
 As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to Orion Context Broker through the [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our OEE calculator.  
 
-## Trubleshooting
-If the following error will appear, run the following command to convert the return character from DOS environment to Unix one:
+## Troubleshooting
+If the following error will appear creating or starting the container
+```
+/bin/bash^M: bad interpreter: No such file or directory
+```
+Please use the utility `dos2unix` to convert the text files from DOS/Mac to Unix enviroment
+Install dos2unix on CentOS/Fedora/RHEL
+```
+sudo yum install dos2unix
+```
+Install dos2unix on Ubuntu/Debian
+```
+sudo apt install dos2unix
+```
+Then run the following command, in the root directory, to convert all the text files from DOS/Mac to Unix enviroment 
 ```
 dos2unix *
 ```
