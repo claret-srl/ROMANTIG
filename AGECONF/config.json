@@ -28,25 +28,12 @@
 			"subservice": "/demo",
 			"active": [
 				{
-					"name": "SECOND",
-					"type": "Integer"
-				},
-				{
 					"name": "processStatus",
 					"type": "String"
 				}
 			],
 			"lazy": [],
-			"commands": [
-				{
-					"name": "jog+",
-					"type": "Boolean"
-				},
-				{
-					"name": "jog-",
-					"type": "Boolean"
-				}
-			]
+			"commands": []
 		}
 	},
 	"browseServerOptions": null,
@@ -66,14 +53,6 @@
 			"polling": false,
 			"mappings": [
 				{
-					"ocb_id": "SECOND",
-					"opcua_id": "ns=4;i=34",
-					"object_id": null,
-					"inputArguments": [
-						null
-					]
-				},
-				{
 					"ocb_id": "processStatus",
 					"opcua_id": "ns=4;i=198",
 					"object_id": null,
@@ -88,24 +67,7 @@
 		{
 			"id": "age01_Car",
 			"type": "Device",
-			"mappings": [
-				{
-					"ocb_id": "jog+",
-					"opcua_id": "ns=4;i=160",
-					"object_id": "ns=4;i=1",
-					"inputArguments": [
-						null
-					]
-				},
-				{
-					"ocb_id": "jog-",
-					"opcua_id": "ns=4;i=161",
-					"object_id": "ns=4;i=1",
-					"inputArguments": [
-						null
-					]
-				}
-			]
+			"mappings": []
 		}
 	]
 }
