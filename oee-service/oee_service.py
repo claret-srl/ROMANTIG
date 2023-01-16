@@ -3,16 +3,18 @@ from datetime import datetime,timedelta
 import configparser
 import time
 
-
 config = configparser.ConfigParser()
 config.read('oee_conf.config')
+
+# PROCESS
 upTimeStates = config['PROCESS']['upTimeStates']
 downTimeStates = config['PROCESS']['downTimeStates']
 endStates = config['PROCESS']['endStates']
-
 goodEnd = config['PROCESS']['goodEnd']
 badEnd = config['PROCESS']['badEnd']
-idealTime = float(config['OEE']['idealTime_ppm'])/60
+
+# OEE
+idealTime = float(config['OEE']['idealTime_ppm']) / 60
 timestep = int(config['OEE']['timestep'])
 
 print('timestep is {} seconds'.format(timestep))
@@ -75,15 +77,15 @@ while True:
         # time.sleep(1)
         end_block_time = end_time
 
-        availability = total_upTime/(total_upTime+total_downTime)
-        performance = total_produce/(total_upTime * idealTime)
+        availability = total_upTime / (total_upTime + total_downTime)
+        performance = total_produce / (total_upTime * idealTime)
         try:
-            quality = total_good/total_produce
+            quality = total_good / total_produce
         except:
             print('no products in this period')
             quality = 1
 
-        oee = availability*performance*quality
+        oee = availability * performance * quality
         save_data = (begin_block_time.timestamp(),end_block_time.timestamp(),total_produce,total_good,total_bad,total_upTime,total_downTime,availability,performance,quality,oee)
 
         cursor_oee.execute("""INSERT INTO mtopcua_car.oee (start_date, end_date, num_prod,num_good,num_bad, up_time, down_time, availability, performance, quality, oee) VALUES (?, ?, ?, ?,?,?,?,?,?,?,?)""",
@@ -91,9 +93,9 @@ while True:
 
         # print("start block: {}, end block: {}, total upTime: {}, total downTime: {}, total produce: {}".format(begin_block_time,end_block_time,total_upTime,total_downTime,total_produce))
         
-        print("5-min Availability is {:.2f}%".format(availability*100))
-        print("5-min Performance is {:.2f}%".format(performance*100))
-        print("5-min Quality is {:.2f}%".format(quality*100)) 
-        print("5-min OEE is {:.2f}%".format(oee*100)) 
+        print("5-min Availability is {:.2f}%".format(availability * 100))
+        print("5-min Performance is {:.2f}%".format(performance * 100))
+        print("5-min Quality is {:.2f}%".format(quality * 100)) 
+        print("5-min OEE is {:.2f}%".format(oee * 100)) 
 
         
