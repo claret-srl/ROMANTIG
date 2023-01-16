@@ -24,16 +24,14 @@ idealTime_ppm = 5 #The theoretical maximum piece per minute rate (integer) that 
 Be sure that the name of the states written in the config file perfectly match those that are written by your process to the CrateDB, so that the microservice can correctly identify them.
 
 ## Setup
-
-navigate to oee-service folder and build the image for the OEE microservice:
-
+Navigate to oee-service folder and build the Docker image for the OEE microservice, than go back to the main folder:
 ```
 cd oee-service
 docker build -t roseap_oee .
-```
-Go back to the main folder and make the `./services` script executable
-```
 cd ..
+```
+Make the `./services` script executable
+```
 sudo chmod +x ./services
 ```
 To create all images, and then start the containers run:
@@ -41,8 +39,7 @@ To create all images, and then start the containers run:
 sudo ./services create
 ./services start
 ```
-
-Now you can open Grafana on `localhost:3000` and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana. Below an example:
+Now you can open Grafana on [localhost:3000](localhost:3000) (`user:admin` `password:admin`) and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana. Below an example:
 
 ![grafana_oee](https://user-images.githubusercontent.com/35039520/185968614-68c018b5-cc67-4937-ac06-fb57a1ca944f.PNG)
 
