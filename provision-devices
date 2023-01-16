@@ -41,7 +41,7 @@ curl -s -o /dev/null -X POST \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' \
 	-d '{
-	"description": "Test subscription",
+	"description": "Provision subscriptions for QuantumLeap",
 	"subject": {
 		"entities": [
 			{
