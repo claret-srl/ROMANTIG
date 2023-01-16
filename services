@@ -49,6 +49,10 @@ stoppingContainers () {
 		echo "Stopping containers"
 		docker rm -f $CONTAINERS || true
 	fi
+}
+
+deletingContainers () {
+	stoppingContainers
 	VOLUMES=$(docker volume ls -qf dangling=true) 
 	if [[ -n $VOLUMES ]]; then 
 		echo "Removing old volumes"
@@ -143,8 +147,16 @@ waitForCrateDB () {
 command="$1"
 case "${command}" in
 	"help")
-        echo "usage: services [create|start|stop]"
+        echo "usage: services [create|start|stop|delete]"
         ;;
+	"create")
+	 	sysctl vm.max_map_count=262144 # CrateDB
+		sysctl vm.overcommit_memory=1 # Redis
+		export $(cat .env | grep "#" -v)
+		echo "Pulling Docker images"
+		docker pull curlimages/curl
+		${dockerCmd} pull	
+		;;
 	 "start")		
 		export $(cat .env | grep "#" -v)
 		stoppingContainers
@@ -165,17 +177,13 @@ case "${command}" in
 		export $(cat .env | grep "#" -v)
 		stoppingContainers
 		;;
-	"create")
-	 	sysctl vm.max_map_count=262144 # CrateDB
-		sysctl vm.overcommit_memory=1 # Redis
+	"delete")
 		export $(cat .env | grep "#" -v)
-		echo "Pulling Docker images"
-		docker pull curlimages/curl
-		${dockerCmd} pull	
+		deletingContainers
 		;;
 	*)
 		echo "Command not Found."
-		echo "usage: services [create|start|stop]"
+		echo "usage: services [create|start|stop|delete]"
 		exit 127;
 		;;
 esac
