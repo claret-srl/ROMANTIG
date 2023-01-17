@@ -41,7 +41,7 @@ sudo ./services create
 ```
 Now you can open Grafana on [localhost:3000](localhost:3000) (`user:admin` `password:admin`) and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana. Below an example:
 
-![grafana_oee](https://user-images.githubusercontent.com/35039520/185968614-68c018b5-cc67-4937-ac06-fb57a1ca944f.PNG)
+![grafana_oee](img/dashboard.png)
 
 
 ## Example
@@ -50,7 +50,7 @@ Our example use-case scenario is based on an automated welding robotic system wh
 
 The process cycle and the respective up and down time states are shown below:
 
-![mockup_cycle](https://user-images.githubusercontent.com/35039520/185942765-a7667e8e-95bb-45d6-b462-54c7703aeb46.png)
+![mockup_cycle](img/mockup_cycle.png)
 
 In general, we suggest you to adopt a state space representation similar to the one above for your target process, in order to clearly highlight every step in the cycle and attribute it the correct value for up or down time. The state representation (the onthology of the system) should not be too detailed (i.e. too many states) or too general (i.e. one or two states) because of unnecessary additional workload or possible loss of information.
 
