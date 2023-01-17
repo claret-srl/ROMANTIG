@@ -13,7 +13,7 @@
 	- Provision the information about hte schedule production to know when in planned production on the microservice. (https://www.machinemetrics.com/blog/oee-ooe-teep)
 - [ ] Add information about reworks (parts and time).
 - [ ] Add information about total OEE stats for all the production.
-- [ ] Extend to Factory level
+- [ ] Extend to Factory level (e.g. un elemento nel contex broker che comunica lo scheduling dei turni di lavoro)
 
 
 
