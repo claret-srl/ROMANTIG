@@ -5,7 +5,7 @@
 - [ ] Make the PLC IP configurable
 ## Phase 3
 - [x] Github repository
-- [X] Step by Step Tutorial
+- [X] Step by Step Tutorial (specificare l'origine dei dati, procesStatus, e lo switch di eventual icomponenti spedcificando l'architettura)
 - [ ] NGSI-V2 Naming standard for procesStatus
 - [ ] ID and atribute following Smart Factory Demo (https://github.com/FcoMelendez/smart_factory_demo)
 ### ROSE-AP
