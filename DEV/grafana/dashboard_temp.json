@@ -40,7 +40,6 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
@@ -87,8 +86,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 18,
+        "h": 15,
+        "w": 24,
         "x": 0,
         "y": 0
       },
@@ -188,124 +187,25 @@
         "type": "postgres",
         "uid": "DoBGYczVz"
       },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "center",
-            "displayMode": "auto",
-            "filterable": false,
-            "inspect": false
+            "mode": "palette-classic"
           },
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeAsLocal"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 18,
-        "y": 0
-      },
-      "id": 13,
-      "options": {
-        "footer": {
-          "enablePagination": true,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "Time"
-          }
-        ]
-      },
-      "pluginVersion": "9.0.5",
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
-          },
-          "format": "time_series",
-          "group": [],
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT time_index AS \"time\", processstatus AS \"Proces Status\"\r\nFROM \"mtopcua_car\".\"etdevice\"\r\nORDER BY 1 DESC;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "timeColumn": "time",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "continuous-RdYlGr"
-          },
-          "decimals": 1,
-          "mappings": [],
-          "max": 1,
-          "min": 0,
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
+              },
               {
                 "color": "red",
-                "value": null
+                "value": 80
               }
             ]
           },
@@ -314,10 +214,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 8,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 15
       },
       "id": 7,
       "options": {
@@ -419,8 +319,117 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "text",
-            "mode": "fixed"
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 23
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.0.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "DoBGYczVz"
+          },
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  start_date AS \"time\",\n  num_prod AS \"Parts Produced\"\nFROM oee\nORDER BY 1 DESC",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "num_prod"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Parts Produced"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "num_good"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Parts Good"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "num_bad"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Parts Bad"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "table": "oee",
+          "timeColumn": "start_date",
+          "where": []
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "DoBGYczVz"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -434,44 +443,13 @@
           },
           "unit": "none"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Parts Good"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Parts Bad"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 5,
-        "w": 24,
-        "x": 0,
-        "y": 13
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 23
       },
       "id": 9,
       "options": {
@@ -500,7 +478,117 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  start_date AS \"time\",\n  num_prod AS \"Parts Produced\",\n  num_good AS \"Parts Good\",\n  num_bad AS \"Parts Bad\"\nFROM oee\nORDER BY 1",
+          "rawSql": "SELECT\n  start_date AS \"time\",\n  num_good AS \"Parts Good\"\nFROM oee\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "num_prod"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Parts Produced"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "num_good"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Parts Good"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "num_bad"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Parts Bad"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "table": "oee",
+          "timeColumn": "start_date",
+          "where": []
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "DoBGYczVz"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 23
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "9.0.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "DoBGYczVz"
+          },
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  start_date AS \"time\",\n  num_bad AS \"Parts Bad\"\nFROM oee\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -562,8 +650,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "text",
-            "mode": "fixed"
+            "mode": "thresholds"
           },
           "mappings": [],
           "min": 0,
@@ -578,44 +665,13 @@
           },
           "unit": "s"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time Up"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time Down"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 5,
-        "w": 24,
+        "h": 7,
+        "w": 8,
         "x": 0,
-        "y": 18
+        "y": 30
       },
       "id": 6,
       "options": {
@@ -644,7 +700,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  start_date AS \"time\",\n  up_time + down_time AS \"Time Total\",\n  up_time AS \"Time Up\",\n  down_time AS \"Time Down\"\nFROM oee\nORDER BY 1;",
+          "rawSql": "SELECT\n  start_date AS \"time\",\n  up_time + down_time AS \"Total\"\nFROM oee\nORDER BY 1;",
           "refId": "A",
           "select": [
             [
@@ -688,91 +744,47 @@
         "type": "postgres",
         "uid": "DoBGYczVz"
       },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "text",
-            "mode": "fixed"
-          },
-          "custom": {
-            "align": "center",
-            "displayMode": "auto",
-            "filterable": true,
-            "inspect": false
+            "mode": "thresholds"
           },
           "mappings": [],
+          "min": 0,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
                 "value": null
               }
             ]
-          }
+          },
+          "unit": "s"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeAsLocal"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "(OEE|Availability|Performance|Quality)"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percentunit"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "(Time Up|Time Down)"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dthms"
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 13,
-        "w": 24,
-        "x": 0,
-        "y": 23
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 30
       },
-      "id": 15,
+      "id": 11,
       "options": {
-        "footer": {
-          "enablePagination": true,
-          "fields": "",
-          "reducer": [
-            "sum"
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
           ],
-          "show": false
+          "fields": "",
+          "values": false
         },
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "Time"
-          }
-        ]
+        "textMode": "auto"
       },
       "pluginVersion": "9.0.5",
       "targets": [
@@ -783,32 +795,145 @@
           },
           "format": "time_series",
           "group": [],
+          "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\nstart_date AS \"time\",\r\nnum_prod AS \"Parts Produced\",\r\nnum_good AS \"Parts Good\",\r\nnum_bad AS \"Parts Bad\",\r\nup_time AS \"Time Up\",\r\ndown_time AS \"Time Down\",\r\noee AS \"OEE\",\r\navailability AS \"Availability\",\r\nperformance AS \"Performance\",\r\nquality AS \"Quality\"\r\nFROM \"mtopcua_car\".\"oee\"\r\nORDER BY 1 DESC\r\nLIMIT 100;",
+          "rawSql": "SELECT\n  start_date AS \"time\",\n  up_time AS \"Up\"\nFROM oee\nORDER BY 1;",
           "refId": "A",
           "select": [
             [
               {
                 "params": [
-                  "value"
+                  "up_time"
                 ],
                 "type": "column"
+              },
+              {
+                "params": [
+                  "Up"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "down_time"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Down"
+                ],
+                "type": "alias"
               }
             ]
           ],
-          "timeColumn": "time",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
+          "table": "oee",
+          "timeColumn": "start_date",
+          "where": []
         }
       ],
-      "title": "Data table",
-      "type": "table"
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "DoBGYczVz"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 30
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.0.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "DoBGYczVz"
+          },
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  start_date AS \"time\",\n  down_time AS \"Down\"\nFROM oee\nORDER BY 1;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "up_time"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Up"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "down_time"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Down"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "table": "oee",
+          "timeColumn": "start_date",
+          "where": []
+        }
+      ],
+      "type": "stat"
     }
   ],
   "refresh": "5s",
@@ -823,9 +948,9 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "browser",
+  "timezone": "",
   "title": "RomanTIG - Overall Equipment Effectiveness",
   "uid": "BDDTWez4z",
-  "version": 7,
+  "version": 4,
   "weekStart": ""
 }
