@@ -10,9 +10,12 @@
 - [ ] ID and atribute following Smart Factory Demo (https://github.com/FcoMelendez/smart_factory_demo)
 ### ROSE-AP
 - [ ] Add information on machine activation status (e.g. records and calculate OEE only when it's active).
+	- Provision the information about hte schedule production to know when in planned production on the microservice. (https://www.machinemetrics.com/blog/oee-ooe-teep)
 - [ ] Add information about reworks (parts and time).
 - [ ] Add information about total OEE stats for all the production.
 - [ ] Extend to Factory level
+
+
 
 ## RAMP in remoto
 - Connessione remota RAMP
