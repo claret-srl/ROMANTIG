@@ -78,6 +78,7 @@ services:
     volumes:
       - ./AGECONF:/opt/iotagent-opcua/conf
       - ./certificates:/opt/iotagent-opcua/certificates
+      # - ./conf/config.js:/opt/iotagent-opcua/conf/config.js # OPC_UA_VERSION=2.0.5
     environment:
       - IOTA_RELAX_TEMPLATE_VALIDATION=true
       - IOTA_CB_HOST=orion # name of the context broker to update context
