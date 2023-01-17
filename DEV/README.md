@@ -1,16 +1,18 @@
-# Phase 3
-
-- [x] Github repository
+## Misc
 - [x] CrateDB persistent (Splitted stop and delete case for services)
 - [x] Improve Grafana dashboard (https://github.blog/2022-05-19-math-support-in-markdown/)
-- [x] Update Grafana to latest
-- [ ] Step by Step Tutorial
+- [x] Update Grafana image to latest
 - [ ] Make the PLC IP configurable
-- [ ] NGSI-V2 Naming standard
+## Phase 3
+- [x] Github repository
+- [X] Step by Step Tutorial
+- [ ] NGSI-V2 Naming standard for procesStatus
 - [ ] ID and atribute following Smart Factory Demo (https://github.com/FcoMelendez/smart_factory_demo)
+### ROSE-AP
 - [ ] Add information on machine activation status (e.g. records and calculate OEE only when it's active).
 - [ ] Add information about reworks (parts and time).
 - [ ] Add information about total OEE stats for all the production.
+- [ ] Extend to Factory level
 
 ## RAMP in remoto
 - Connessione remota RAMP
