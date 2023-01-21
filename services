@@ -3,8 +3,20 @@
 #  Command Line Interface to start all services
 #
 
-# Set enviroment from .env file
 set -e
+
+buildRoseAp () {
+	cd oee-service
+	docker build -t roseap_oee .
+	cd ..
+}
+
+# Set enviroment from .env file
+setEnviroment () {
+	export $(cat .env | grep "#" -v)
+}
+
+setEnviroment
 
 usage="usage: services [create|start|stop|delete]"
 
@@ -42,7 +54,7 @@ loadData () {
 	# docker exec -it oee-service python3 oee_service.py
 		#  --entrypoint /bin/sh rose-ap-oee start-oee
 	# sleep 5
-	echo "STARTING OEE ROSE-AP"
+	echo -e  "\n⏳ Starting \033[1mOEE-Service\033[0m.\n"
 	docker exec -it -d oee-service python3 oee_service.py
 	echo ""
 }
@@ -121,7 +133,7 @@ waitForOrion () {
 
 	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-orion` == "healthy" ]
 	do
-	  echo -e "Context Broker HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:${ORION_PORT}/version'` " (waiting for 200)"
+	#   echo -e "Context Broker HTTP state: " `curl -s -o /dev/null -w %{http_code} "http://localhost:${ORION_PORT}/version"` " (waiting for 200)"
 	  sleep 1
 	done
 }
@@ -129,10 +141,9 @@ waitForOrion () {
 waitForIoTAgent () {
 	echo -e "\n⏳ Waiting for \033[1;36mIoT-Agent\033[0m to be available\n"
 	# while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-iot-agent` == "healthy" ]
-	while ! [ `curl -s -o /dev/null -w %{http_code} 'http://localhost:${IOTA_NORTH_PORT}/version'` == 200 ]
-
+	while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:${IOTA_NORTH_PORT}/version"` == 200 ]
 	do 
-	  echo -e "IoT Agent HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:${IOTA_NORTH_PORT}/version'` " (waiting for 200)"
+	#   echo -e "IoT Agent HTTP state: " `curl -s -o /dev/null -w %{http_code} "http://localhost:${IOTA_NORTH_PORT}/version"` " (waiting for 200)"
 	  sleep 1
 	done
 }
@@ -140,10 +151,10 @@ waitForIoTAgent () {
 waitForCrateDB () {
 	echo -e "\n⏳ Waiting for \033[1;36mCrateDB\033[0m to be available\n"
 	# while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-iot-agent` == "healthy" ]
-	while ! [ `curl -s -o /dev/null -w %{http_code} 'http://localhost:${CRATE_PORT_ADMIN}'` == 200 ]
+	while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:${CRATE_PORT_ADMIN}"` == 200 ]
 
 	do 
-	  echo -e "CrateDB HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:${CRATE_PORT_ADMIN}'` " (waiting for 200)"
+	#   echo -e "CrateDB HTTP state: " `curl -s -o /dev/null -w %{http_code} "http://localhost:${CRATE_PORT_ADMIN}"` " (waiting for 200)"
 	  sleep 1
 	done
 }
@@ -153,16 +164,21 @@ case "${command}" in
 	"help")
         echo "$usage"
         ;;
+	"build")
+		echo "Building Rose-AP Docker images"
+		buildRoseAp
+		echo "Done"
+	;;
 	"create")
 	 	sysctl vm.max_map_count=262144 # CrateDB
 		sysctl vm.overcommit_memory=1 # Redis
-		export $(cat .env | grep "#" -v)
+		setEnviroment
 		echo "Pulling Docker images"
 		docker pull curlimages/curl
 		${dockerCmd} pull	
 		;;
 	 "start")		
-		export $(cat .env | grep "#" -v)
+		setEnviroment
 		stoppingContainers
 		echo -e "Starting containers: \033[1;34mOrion\033[0m, \033[1;34mQuantumLeap\033[0m, \033[1;36mIoT-Agent\033[0m, \033[1mGrafana\033[0m, \033[1mCrate-DB\033[0m and \033[1mMongo-DB\033[0m."
 		echo -e "- FIWARE \033[1;34mOrion Context Broker\033[0m, configured for NGSI-v2."
@@ -178,11 +194,11 @@ case "${command}" in
 		displayServices
 		;;
 	"stop")
-		export $(cat .env | grep "#" -v)
+		setEnviroment
 		stoppingContainers
 		;;
 	"delete")
-		export $(cat .env | grep "#" -v)
+		setEnviroment
 		deletingContainers
 		;;
 	*)
