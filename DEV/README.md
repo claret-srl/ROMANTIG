@@ -2,6 +2,8 @@
 - [x] CrateDB persistent (Splitted stop and delete case for services)
 - [x] Improve Grafana dashboard (https://github.blog/2022-05-19-math-support-in-markdown/)
 - [x] Update Grafana image to latest
+- [x] Update IoT-Agent to latest
+- [x] Services port inherit from .env file
 - [ ] Make the PLC IP configurable
 ## Phase 3
 - [x] Github repository
