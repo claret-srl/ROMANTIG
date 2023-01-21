@@ -605,8 +605,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -708,8 +707,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -848,13 +846,13 @@
     "list": []
   },
   "time": {
-    "from": "2023-01-17T09:23:12.646Z",
-    "to": "2023-01-17T11:23:12.646Z"
+    "from": "now-1h",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "RomanTIG - Overall Equipment Effectiveness",
   "uid": "BDDTWez4z",
-  "version": 3,
+  "version": 1,
   "weekStart": ""
 }

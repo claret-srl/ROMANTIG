@@ -1,6 +1,7 @@
 from crate import client
 from datetime import datetime
 import configparser
+import time
 
 config = configparser.ConfigParser()
 config.read("oee_conf.config")
@@ -19,7 +20,11 @@ timestep = int(config["OEE"]["timestep"])
 print("timestep is {} seconds".format(timestep))
 
 print("preparing connection")
-connection_device = client.connect("crate-db:4200/")
+
+crateDBhost = "crate-db:4200"  # localhost
+
+connection_device = client.connect(crateDBhost)
+
 cursor_oee = connection_device.cursor()
 print("connection succesful")
 cursor_oee.execute(
@@ -28,11 +33,11 @@ cursor_oee.execute(
 # cursor_oee.arraysize = 20
 # get all records
 start_time = datetime.now()
-
 dt_obj = datetime.now()
 end_block_time = datetime.now()
 
 while True:
+    print("loop")
     now_time = datetime.now()
     if (now_time - end_block_time).seconds > timestep:
         # time.sleep(1)
@@ -120,3 +125,5 @@ while True:
         print("5-min Performance is {:.2f}%".format(performance * 100))
         print("5-min Quality is {:.2f}%".format(quality * 100))
         print("5-min OEE is {:.2f}%".format(oee * 100))
+
+    time.sleep(timestep / 100)
