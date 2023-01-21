@@ -14,7 +14,7 @@ printf "⏳ Provisioning IoT devices "
 ##
 
 curl -s -o /dev/null -X POST \
-  "http://iot-agent:4001/iot/services" \
+  "http://iot-agent:4041/iot/services" \
   -H 'Content-Type: application/json' \
   -H 'fiware-service: opcua_car' \
   -H 'fiware-servicepath: /demo' \

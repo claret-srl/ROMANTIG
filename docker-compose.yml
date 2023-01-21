@@ -71,31 +71,32 @@ services:
     networks:
       - default
     ports:
-      - "${IOTA_NORTH_PORT}:${IOTA_NORTH_PORT}" # localhost:4001
-      - "${IOTA_SOUTH_PORT}:8080" # localhost:4081
-    extra_hosts:
-      - iotcarsrv:10.0.7.236
+      - "${IOTA_NORTH_PORT}:4041" # localhost:4041
+      - "${IOTA_SOUTH_PORT}:9229" # localhost:4081
+    # extra_hosts:
+    #   - opcuaServerHostname:10.0.7.236
     volumes:
-      - ./AGECONF:/opt/iotagent-opcua/conf
-      - ./certificates:/opt/iotagent-opcua/certificates
-      # - ./conf/config.js:/opt/iotagent-opcua/conf/config.js # OPC_UA_VERSION=2.0.5
+      - ./conf/config.js:/opt/iotagent-opcua/conf/config.js # OPC_UA_VERSION=2.0.5
     environment:
-      - IOTA_RELAX_TEMPLATE_VALIDATION=true
-      - IOTA_CB_HOST=orion # name of the context broker to update context
-      - IOTA_CB_PORT=${ORION_PORT} # port the context broker listens on to update context
-      - IOTA_NORTH_PORT=${IOTA_NORTH_PORT}
-      # - IOTA_REGISTRY_TYPE=memory
-      - IOTA_REGISTRY_TYPE=mongodb #Whether to hold IoT device info in memory or in a database
-      - IOTA_LOG_LEVEL=DEBUG # The log level of the IoT Agent
-      - IOTA_TIMESTAMP=true # Supply timestamp information with each measurement
-      - IOTA_CB_NGSI_VERSION=v2 # use NGSIv2 when sending updates for active attributes
-      # - IOTA_MONGO_HOST=iot_mongo
-      - IOTA_MONGO_HOST=mongo-db # The host name of MongoDB
-      - IOTA_MONGO_PORT=${MONGO_DB_PORT} # The port mongoDB is listening on
-      # - IOTA_MONGO_DB=iotagentul # The name of the database used in mongoDB
-      - IOTA_MONGO_DB=iotagent_opcua
-      - IOTA_HTTP_PORT=${IOTA_SOUTH_PORT} # The port used for device traffic over HTTP
-      - IOTA_PROVIDER_URL=http://iot-agent:${IOTA_NORTH_PORT}
+      - "IOTA_CB_HOST=orion"								# Hostname of the context broker to update context
+      - "IOTA_CB_PORT=1026"									# Port that context broker listens on to update context
+      - "IOTA_NORTH_PORT=4041"								# Port used for configuring the IoT Agent and receiving context updates from the context broker
+      - "IOTA_REGISTRY_TYPE=mongodb"						# Whether to hold IoT device info in memory or in a database
+      - "IOTA_MONGO_HOST=mongo-db"							# The hostname of MongoDB - used for holding device and service information
+      - "IOTA_MONGO_PORT=27017"								# The port that MongoDB is listening on
+      - "IOTA_MONGO_DB=iotagent_opcua"						# The name of the database used in MongoDB
+      - "IOTA_PROVIDER_URL=http://iot-agent:4041"		# URL passed to the Context Broker when commands are registered, used as a forwarding URL location when the Context Broker issues a command to a device
+      - "IOTA_OPCUA_ENDPOINT=opc.tcp://10.0.7.236:4840/"	# Endpoint of OPC UA Server
+      - "IOTA_OPCUA_SECURITY_MODE=None"						# Security mode for OPC UA connection
+      - "IOTA_OPCUA_SECURITY_POLICY=None"					# Security policy for OPC UA connection, username, password
+      - "IOTA_OPCUA_SECURITY_USERNAME=null"
+      - "IOTA_OPCUA_SECURITY_PASSWORD=null"
+      - "IOTA_OPCUA_UNIQUE_SUBSCRIPTION=false"				# Boolean property to assess whether subscribe once for multiple OPC UA nodes or not
+      - "IOTA_OPCUA_MT_POLLING=true"						# Boolean property to assess whether enable polling in MappingTool or not
+      - "IOTA_OPCUA_MT_AGENT_ID=age01_"						# agentId prefix to be assigned to the newly generated entity from MappingTool execution
+      - "IOTA_OPCUA_MT_ENTITY_ID=age01_Car"					# entityId to be assigned to the newly generated entity from MappingTool execution
+      - "IOTA_OPCUA_MT_ENTITY_TYPE=Device"					# entityType to be assigned to the newly generated entity from MappingTool execution
+      - "IOTA_OPCUA_MT_NAMESPACE_IGNORE=null"			# Namespaces to ignore when crawling nodes from OPC UA Server
     healthcheck:
       interval: 5s
 

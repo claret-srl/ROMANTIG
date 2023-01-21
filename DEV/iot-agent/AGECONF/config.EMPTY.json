@@ -9,7 +9,7 @@
 		"subservice": "/demo"
 	},
 	"server": {
-		"port": 4001,
+		"port": 4041,
 		"baseRoot": "/"
 	},
 	"deviceRegistry": {
@@ -34,7 +34,7 @@
 	"browseServerOptions": null,
 	"service": "opcua_car",
 	"subservice": "/demo",
-	"providerUrl": "http://iotage:4001",
+	"providerUrl": "http://iotage:4041",
 	"pollingExpiration": 20000,
 	"pollingDaemonFrequency": 20000,
 	"deviceRegistrationDuration": "P1M",

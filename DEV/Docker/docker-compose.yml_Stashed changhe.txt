@@ -71,7 +71,7 @@ services:
     networks:
       - default
     ports:
-      - "${IOTA_NORTH_PORT}:${IOTA_NORTH_PORT}" # localhost:4001
+      - "${IOTA_NORTH_PORT}:${IOTA_NORTH_PORT}" # localhost:4041
       - "${IOTA_SOUTH_PORT}:8080" # localhost:4081
     extra_hosts:
       - iotcarsrv:10.0.7.236
@@ -281,7 +281,7 @@ services:
     networks:
       - default
     ports:
-      - "${IOTA_NORTH_PORT}:${IOTA_NORTH_PORT}" # localhost:4001
+      - "${IOTA_NORTH_PORT}:${IOTA_NORTH_PORT}" # localhost:4041
       - "${IOTA_SOUTH_PORT}:8080" # localhost:4081
     extra_hosts:
       - iotcarsrv:10.0.7.236

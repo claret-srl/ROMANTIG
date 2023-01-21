@@ -9,7 +9,7 @@
 		"subservice": "/demo"
 	},
 	"server": {
-		"port": 4001,
+		"port": 4041,
 		"baseRoot": "/"
 	},
 	"deviceRegistry": {
@@ -28,31 +28,18 @@
 			"subservice": "/demo",
 			"active": [
 				{
-					"name": "SECOND",
-					"type": "Integer"
-				},
-				{
 					"name": "processStatus",
 					"type": "String"
 				}
 			],
 			"lazy": [],
-			"commands": [
-				{
-					"name": "jog+",
-					"type": "Boolean"
-				},
-				{
-					"name": "jog-",
-					"type": "Boolean"
-				}
-			]
+			"commands": []
 		}
 	},
 	"browseServerOptions": null,
 	"service": "opcua_car",
 	"subservice": "/demo",
-	"providerUrl": "http://iotage:4001",
+	"providerUrl": "http://iotage:4041",
 	"pollingExpiration": 20000,
 	"pollingDaemonFrequency": 20000,
 	"deviceRegistrationDuration": "P1M",
@@ -65,14 +52,6 @@
 			"subservice": "/demo",
 			"polling": false,
 			"mappings": [
-				{
-					"ocb_id": "SECOND",
-					"opcua_id": "ns=4;i=34",
-					"object_id": null,
-					"inputArguments": [
-						null
-					]
-				},
 				{
 					"ocb_id": "processStatus",
 					"opcua_id": "ns=4;i=198",
@@ -88,24 +67,7 @@
 		{
 			"id": "age01_Car",
 			"type": "Device",
-			"mappings": [
-				{
-					"ocb_id": "jog+",
-					"opcua_id": "ns=4;i=160",
-					"object_id": "ns=4;i=1",
-					"inputArguments": [
-						null
-					]
-				},
-				{
-					"ocb_id": "jog-",
-					"opcua_id": "ns=4;i=161",
-					"object_id": "ns=4;i=1",
-					"inputArguments": [
-						null
-					]
-				}
-			]
+			"mappings": []
 		}
 	]
 }
