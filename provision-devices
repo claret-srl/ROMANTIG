@@ -13,21 +13,21 @@ printf "⏳ Provisioning IoT devices "
 # # Create a Service Groups for all OPC-UA IoT devices
 ##
 
-curl -s -o /dev/null -X POST \
-  "http://iot-agent:4041/iot/services" \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: opcua_car' \
-  -H 'fiware-servicepath: /demo' \
-  -d '{
- "services": [
-   {
-     "apikey":      "1068318794",
-     "cbroker":     "http://orion:1026",
-     "entity_type": "Device",
-     "resource":    "/iot/d"    
-   }
- ]
-}'
+# curl -s -o /dev/null -X POST \
+#   "http://iot-agent:4041/iot/services" \
+#   -H 'Content-Type: application/json' \
+#   -H 'fiware-service: opcua_car' \
+#   -H 'fiware-servicepath: /demo' \
+#   -d '{
+#  "services": [
+#    {
+#      "apikey":      "1068318794",
+#      "cbroker":     "http://orion:1026",
+#      "entity_type": "Device",
+#      "resource":    "/iot/d"    
+#    }
+#  ]
+# }'
 
 
 # ####################################################
