@@ -2,7 +2,11 @@
 #
 #  Command Line Interface to start all services
 #
+
+# Set enviroment from .env file
 set -e
+
+usage="usage: services [create|start|stop|delete]"
 
 dockerCmd="docker compose"
 if (( $# == 2 )); then
@@ -11,7 +15,7 @@ fi
 
 if (( $# < 1 )); then
     echo "Illegal number of parameters"
-    echo "usage: services [create|start|stop]"
+    echo "$usage"
     exit 1
 fi
 
@@ -117,7 +121,7 @@ waitForOrion () {
 
 	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-orion` == "healthy" ]
 	do
-	  echo -e "Context Broker HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:1026/version'` " (waiting for 200)"
+	  echo -e "Context Broker HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:${ORION_PORT}/version'` " (waiting for 200)"
 	  sleep 1
 	done
 }
@@ -125,10 +129,10 @@ waitForOrion () {
 waitForIoTAgent () {
 	echo -e "\n⏳ Waiting for \033[1;36mIoT-Agent\033[0m to be available\n"
 	# while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-iot-agent` == "healthy" ]
-	while ! [ `curl -s -o /dev/null -w %{http_code} 'http://localhost:4001/version'` == 200 ]
+	while ! [ `curl -s -o /dev/null -w %{http_code} 'http://localhost:${IOTA_NORTH_PORT}/version'` == 200 ]
 
 	do 
-	  echo -e "IoT Agent HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:4001/version'` " (waiting for 200)"
+	  echo -e "IoT Agent HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:${IOTA_NORTH_PORT}/version'` " (waiting for 200)"
 	  sleep 1
 	done
 }
@@ -136,10 +140,10 @@ waitForIoTAgent () {
 waitForCrateDB () {
 	echo -e "\n⏳ Waiting for \033[1;36mCrateDB\033[0m to be available\n"
 	# while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-iot-agent` == "healthy" ]
-	while ! [ `curl -s -o /dev/null -w %{http_code} 'http://localhost:4200'` == 200 ]
+	while ! [ `curl -s -o /dev/null -w %{http_code} 'http://localhost:${CRATE_PORT_ADMIN}'` == 200 ]
 
 	do 
-	  echo -e "CrateDB HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:4200'` " (waiting for 200)"
+	  echo -e "CrateDB HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:${CRATE_PORT_ADMIN}'` " (waiting for 200)"
 	  sleep 1
 	done
 }
@@ -147,7 +151,7 @@ waitForCrateDB () {
 command="$1"
 case "${command}" in
 	"help")
-        echo "usage: services [create|start|stop|delete]"
+        echo "$usage"
         ;;
 	"create")
 	 	sysctl vm.max_map_count=262144 # CrateDB
@@ -183,7 +187,7 @@ case "${command}" in
 		;;
 	*)
 		echo "Command not Found."
-		echo "usage: services [create|start|stop|delete]"
+		echo "$usage"
 		exit 127;
 		;;
 esac
