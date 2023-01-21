@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+#  Command Line Interface to start all services
+#
+set -e
+echo ${QUANTUMLEAP_PORT}
+
+# Set enviroment from .env file
+# export $(grep -v '^#' .env | xargs -d '\n')
+
+# printenv ORION_PORT
+
+# echo ${QUANTUMLEAP_PORT}
