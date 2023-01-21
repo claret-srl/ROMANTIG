@@ -9,6 +9,8 @@
 - [x] Update to Redis 7.0.8 (latest)
 - [x] Services port inherit from .env file
 - [ ] Make the PLC IP configurable
+- [ ] set .env in provision-device import-data
+- [ ] riscrivere lo script python
 ## Phase 3
 - [x] Github repository
 - [ ] Step by Step Tutorial (nuova build, specificare l'origine dei dati, procesStatus, e lo switch di eventual icomponenti spedcificando l'architettura)
@@ -20,7 +22,6 @@
 - [ ] Add information about reworks (parts and time).
 - [ ] Add information about total OEE stats for all the production.
 - [ ] Extend to Factory level (e.g. un elemento nel contex broker che comunica lo scheduling dei turni di lavoro)
-
 
 
 ## RAMP in remoto
