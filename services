@@ -180,8 +180,8 @@ case "${command}" in
 	sudo ./services start
 	;;
 	"create")
-	 	sysctl vm.max_map_count=262144 # CrateDB
-		sysctl vm.overcommit_memory=1 # Redis
+	 	sudo sysctl -w vm.max_map_count=262144 # CrateDB
+		sudo sysctl vm.overcommit_memory=1 # Redis
 		setEnviroment
 		echo "Pulling Docker images"
 		docker pull curlimages/curl
