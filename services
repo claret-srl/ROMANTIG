@@ -48,7 +48,8 @@ loadData () {
 		-e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
 		--entrypoint /bin/ash curlimages/curl provision-devices
 	
-	# waitForCrateDB
+	waitForCrateDB
+	waitForQuantumleap
 
 	# docker run --rm -v $(pwd)/start-oee:/oee-service/start-oee
 	# docker exec -it oee-service python3 oee_service.py
@@ -133,28 +134,32 @@ waitForOrion () {
 
 	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-orion` == "healthy" ]
 	do
-	#   echo -e "Context Broker HTTP state: " `curl -s -o /dev/null -w %{http_code} "http://localhost:${ORION_PORT}/version"` " (waiting for 200)"
+	  sleep 1
+	done
+}
+
+waitForQuantumleap () {
+	echo -e "\n⏳ Waiting for \033[1;34mQuantumleap\033[0m to be available\n"
+
+	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-quantumleap` == "healthy" ]
+	do
 	  sleep 1
 	done
 }
 
 waitForIoTAgent () {
 	echo -e "\n⏳ Waiting for \033[1;36mIoT-Agent\033[0m to be available\n"
-	# while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-iot-agent` == "healthy" ]
 	while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:${IOTA_NORTH_PORT}/version"` == 200 ]
 	do 
-	#   echo -e "IoT Agent HTTP state: " `curl -s -o /dev/null -w %{http_code} "http://localhost:${IOTA_NORTH_PORT}/version"` " (waiting for 200)"
 	  sleep 1
 	done
 }
 
 waitForCrateDB () {
 	echo -e "\n⏳ Waiting for \033[1;36mCrateDB\033[0m to be available\n"
-	# while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-iot-agent` == "healthy" ]
 	while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:${CRATE_PORT_ADMIN}"` == 200 ]
 
 	do 
-	#   echo -e "CrateDB HTTP state: " `curl -s -o /dev/null -w %{http_code} "http://localhost:${CRATE_PORT_ADMIN}"` " (waiting for 200)"
 	  sleep 1
 	done
 }
