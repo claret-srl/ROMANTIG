@@ -9,7 +9,7 @@
 - [x] Update to Redis 7.0.8 (latest)
 - [x] Services port inherit from .env file
 - [x] Add waitForQuantumleap
-- [x] Switc Base image of the OEE-Service to python:3.9.16-alpine3.17 (from 892.95MB to 59.35MB)
+- [x] Switch Base image of the OEE-Service to python:3.9.16-alpine3.17 (from 892.95MB to 59.35MB)
 - [ ] Make the PLC IP configurable
 - [ ] set .env in provision-device import-data
 - [ ] riscrivere lo script python
