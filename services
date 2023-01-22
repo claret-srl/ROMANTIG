@@ -18,7 +18,7 @@ setEnviroment () {
 
 setEnviroment
 
-usage="usage: services [create|start|stop|delete]"
+usage="usage: services [create|start|stop|remove|debug]"
 
 dockerCmd="docker compose"
 if (( $# == 2 )); then
@@ -169,6 +169,11 @@ case "${command}" in
 		buildRoseAp
 		echo "Done"
 	;;
+	"debug")
+	sudo ./services stop
+	sudo ./services build
+	sudo ./services start
+	;;
 	"create")
 	 	sysctl vm.max_map_count=262144 # CrateDB
 		sysctl vm.overcommit_memory=1 # Redis
@@ -197,7 +202,7 @@ case "${command}" in
 		setEnviroment
 		stoppingContainers
 		;;
-	"delete")
+	"remove")
 		setEnviroment
 		deletingContainers
 		;;
