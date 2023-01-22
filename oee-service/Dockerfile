@@ -1,10 +1,5 @@
 #Specifying the base image
-# FROM python:3.8.10
-# FROM python:3.9
-# FROM python:3.9.16
-# FROM python:3.9.16-slim
-FROM python:3.9.16-alpine3.17
-
+FROM python:3.8.10
 
 #here the dockerfile is pulling the python 3.10 from docker hub which already has python installed so we have all the things we need to have python in our container.
 
