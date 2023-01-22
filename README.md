@@ -65,10 +65,12 @@ If the following error will appear creating or starting the container
 Please use the utility `dos2unix` to convert the text files from DOS/Mac to Unix enviroment
 Install dos2unix on CentOS/Fedora/RHEL
 ```
+sudo yum update
 sudo yum install dos2unix
 ```
 Install dos2unix on Ubuntu/Debian
 ```
+sudo apt update
 sudo apt install dos2unix
 ```
 Then run the following command, in the root directory, to convert all the text files from DOS/Mac to Unix enviroment 
