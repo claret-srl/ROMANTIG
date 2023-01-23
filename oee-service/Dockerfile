@@ -5,18 +5,17 @@
 # FROM python:3.9.16-slim
 FROM python:3.9.16-alpine3.17
 
-
-#here the dockerfile is pulling the python 3.10 from docker hub which already has python installed so we have all the things we need to have python in our container.
-
 # #Here we added the python file that we want to run in docker and define its location.
 WORKDIR /oee-service
 
-# RUN 
-
-RUN pip install requests crate
+RUN apk add --no-cache openssl-dev curl-dev gcc g++ libgcc 
+# RUN apk add --no-cache gcc g++ python python-dev py-pip mysql-dev linux-headers libffi-dev openssl-dev 
+RUN pip install --upgrade pip
+RUN pip install pycurl crate requests
 #Here we installed the dependencies, we are using the crate library in our oee_calculator.py file so we have to use the pip command for installing the library
 
 COPY . .
 
 # CMD [ "python3", "./oee_service.py" ]
+CMD ["python3","-u","oee_service.py"]
 #lastly we specified the entry command this line is simply running python ./oee_calculator.py in our container terminal
