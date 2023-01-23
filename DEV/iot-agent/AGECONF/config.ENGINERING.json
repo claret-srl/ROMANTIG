@@ -23,7 +23,7 @@
         "retryTime": 5
     },
     "types": {
-        "Device": {
+        "PLC": {
             "service": "opcua_car",
             "subservice": "/demo",
             "active": [{
@@ -51,7 +51,7 @@
     "defaultType": null,
     "contexts": [{
             "id": "DIH_Welding",
-            "type": "Device",
+            "type": "PLC",
             "service": "opcua_car",
             "subservice": "/demo",
             "polling": false,
@@ -81,7 +81,7 @@
     ],
     "contextSubscriptions": [{
             "id": "DIH_Welding",
-            "type": "Device",
+            "type": "PLC",
             "mappings": [{
                     "ocb_id": "Automatic_Static_Step",
                     "opcua_id": "ns=4;i=130",

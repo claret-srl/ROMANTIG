@@ -23,7 +23,7 @@
 		"retryTime": 5
 	},
 	"types": {
-		"Device": {
+		"PLC": {
 			"service": "opcua_car",
 			"subservice": "/demo",
 			"active": [
@@ -47,7 +47,7 @@
 	"contexts": [
 		{
 			"id": "age01_Car",
-			"type": "Device",
+			"type": "PLC",
 			"service": "opcua_car",
 			"subservice": "/demo",
 			"polling": false,
@@ -66,7 +66,7 @@
 	"contextSubscriptions": [
 		{
 			"id": "age01_Car",
-			"type": "Device",
+			"type": "PLC",
 			"mappings": []
 		}
 	]

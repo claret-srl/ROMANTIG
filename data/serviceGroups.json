@@ -3,7 +3,7 @@
 		{
 			"apikey": "4jggokgpepnvsb2uv4s40d59ov",
 			"cbroker": "http://orion:$ORION_PORT",
-			"entity_type": "Device",
+			"entity_type": "PLC",
 			"resource": "/iot/d"
 		}
 	]

@@ -23,7 +23,7 @@
 		"retryTime": 5
 	},
 	"types": {
-		"Device": {
+		"PLC": {
 			"service": "opcua_car",
 			"subservice": "/demo",
 			"active": [],

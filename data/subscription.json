@@ -4,7 +4,7 @@
 		"entities": [
 			{
 				"idPattern": ".*",
-				"type": "Device"
+				"type": "PLC"
 			}
 		],
 		"condition": {

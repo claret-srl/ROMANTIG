@@ -178,7 +178,7 @@ config.iota = {
 	},
 	contexts: [
 		{
-			id: 'urn:ngsiv2:I40Asset:Workstation001',
+			id: 'urn:ngsiv2:I40Asset:PLC:001',
 			type: 'Device',
 			mappings: [
 				{

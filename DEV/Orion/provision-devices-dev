@@ -29,7 +29,7 @@ printf "⏳ Provisioning IoT devices "
 #  "services": [
 #    {
 #      "apikey":      "1068318794",
-#      "cbroker":     "http://orion:1026",
+#      "cbroker":     "http://localhost:1026",
 #      "entity_type": "PLC",
 #      "resource":    "/iot/d"    
 #    }
@@ -38,12 +38,20 @@ printf "⏳ Provisioning IoT devices "
 
 # ####################################################
 # #
-# # Provision devices for Orion
+# # Provision device for localhost
 # #
 
-## Area
+# curl -iX POST \
+#   'http://localhost:1026/v2/entities' \
+#   -H 'Content-Type: application/json' \
+#   -d '
+# {
+# 	"type": "PLC",
+# 	"id": "urn:ngsiv2:I40Asset:Area:001",
+# }'
+
 curl -iX POST \
-  'http://orion:1026/v2/entities' \
+  'http://localhost:1026/v2/entities' \
   -H 'Content-Type: application/json' \
   -d '
 {
@@ -51,9 +59,8 @@ curl -iX POST \
 	"id": "urn:ngsiv2:I40Asset:Area:001"
 }'
 
-## Workstation
 curl -iX POST \
-  'http://orion:1026/v2/entities' \
+  'http://localhost:1026/v2/entities' \
   -H 'Content-Type: application/json' \
   -d '
 {
@@ -61,41 +68,47 @@ curl -iX POST \
 	"id": "urn:ngsiv2:I40Asset:Workstation:001"
 }'
 
-## PLC
 curl -iX POST \
-  'http://orion:1026/v2/entities' \
+  'http://localhost:1026/v2/entities' \
   -H 'Content-Type: application/json' \
   -d '
 {
 	"type": "PLC",
 	"id": "urn:ngsiv2:I40Asset:PLC:001",
 	"Availability": {
-        "type": "Float",
+        "type": "Text",
         "value": null
     },
 	"Performance": {
-        "type": "Float",
+        "type": "Text",
         "value": null
     },
 	"Quality": {
-        "type": "Float",
+        "type": "Text",
         "value": null
     },
 	"OEE": {
-        "type": "Float",
+        "type": "Text",
         "value": null
     }
 }'
-
 
 # ####################################################
 # #
 # # Provision Relationship
 # #
 
-## Workstation hasParent Area
+curl -X GET \
+  'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Workstation:001&options=values&type=PLC'
+
+curl -X GET \
+  'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Workstation:001&options=values'
+
+curl -X GET \
+  'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Workstation:001' | jq
+
 curl -iX POST \
-  'http://orion:1026/v2/op/update' \
+  'http://localhost:1026/v2/op/update' \
   -H 'Content-Type: application/json' \
   -d '{
   "actionType": "APPEND",
@@ -111,9 +124,8 @@ curl -iX POST \
   ]
 }'
 
-## PLC hasParent Workstation
 curl -iX POST \
-  'http://orion:1026/v2/op/update' \
+  'http://localhost:1026/v2/op/update' \
   -H 'Content-Type: application/json' \
   -d '{
   "actionType": "APPEND",
@@ -129,14 +141,13 @@ curl -iX POST \
   ]
 }'
 
-
 # ####################################################
 # #
 # # Provision subscriptions for QuantumLeap
 # #
 
 curl -s -o /dev/null -X POST \
-	'http://orion:1026/v2/subscriptions/' \
+	'http://localhost:1026/v2/subscriptions/' \
 	-H 'Content-Type: application/json' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' \
@@ -161,6 +172,61 @@ curl -s -o /dev/null -X POST \
 		"metadata": ["dateCreated", "dateModified"]
 	},
 	"throttling": 1
+}'
+
+# ####################################################
+# #
+# # Altering Content
+# #
+
+{
+	"id": "urn:ngsiv2:I40Asset:PLC:001",
+	"type": "PLC",
+	"Availability": {
+        "type": "Float",
+        "value": null
+    },
+	"Performance": {
+        "type": "Float",
+        "value": null
+    },
+	"Quality": {
+        "type": "Float",
+        "value": null
+    },
+	"OEE": {
+        "type": "Float",
+        "value": null
+    }
+}'
+
+curl -iX POST \
+  --url 'http://localhost:1026/v2/op/update' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "actionType": "append",
+  "entities": [
+    {
+      "id": "urn:ngsiv2:I40Asset:PLC:001",
+      "type": "PLC",
+      "Availability": {
+        "type": "Float",
+        "value": null
+      },
+      "Performance": {
+        "type": "Float",
+        "value": null
+      },
+      "Quality": {
+        "type": "Float",
+        "value": null
+      },
+      "OEE": {
+        "type": "Float",
+        "value": null
+      }
+    }
+  ]
 }'
 
 

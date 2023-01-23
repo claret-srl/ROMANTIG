@@ -1,24 +1,26 @@
-# Creating a Service Group
+# CRUD Action
+## Service Group
+### Creating a Service Group
 curl -iX POST \
 	'http://localhost:4041/iot/services' \
 	-H 'Content-Type: application/json' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' \
-	-d '{"services": [{"apikey": "4jggokgpepnvsb2uv4s40d59ov","cbroker": "http://orion:1026","entity_type": "Device","resource": "/iot/d"}]}'
+	-d '{"services": [{"apikey": "4jggokgpepnvsb2uv4s40d59ov","cbroker": "http://orion:1026","entity_type": "PLC","resource": "/iot/d"}]}'
 
-# List all Service Groups
+### List all Service Groups
 curl -X GET \
 	'http://localhost:4041/iot/services' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-# Read Service Group Details
+### Read Service Group Details
 curl -X GET \
 	'http://localhost:4041/iot/services?resource=/iot/d' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-# Delete service group
+### Delete service group
 curl -iX DELETE \
 	'http://localhost:4041/iot/services/?resource=/iot/d&apikey=4jggokgpepnvsb2uv4s40d59ov' \
 	-H 'fiware-service: opcua_car' \
@@ -28,8 +30,8 @@ curl -iX DELETE \
 	'http://localhost:4041/iot/services/?resource=/iot/opcua&apikey=iot' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo'
-
-# Creating a Provisioned Device
+## Device
+### Creating a Provisioned Device
 curl -iX POST \
 	'http://localhost:4041/iot/devices' \
 	-H 'Content-Type: application/json' \
@@ -54,14 +56,13 @@ curl -iX POST \
         }
     ]
 }'
-
-# List all Device
+### List all Device
 curl -X GET \
 	'http://localhost:4041/iot/devices' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-# Delete a Provisioned Device
+### Delete a Provisioned Device
 curl -iX DELETE \
 	'http://localhost:4041/iot/devices/plc001' \
 	-H 'fiware-service: opcua_car' \
@@ -71,3 +72,105 @@ curl -iX DELETE \
 	'http://localhost:4041/iot/devices/age01_Car' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo'
+## Orion
+### Version
+curl -X GET \
+	'http://localhost:1026/version'
+### Find By relation "hasParentI40Asset" vith value "urn:ngsiv2:I40Asset:Workstation:001"
+curl -X GET \
+  'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Workstation:001' | jq
+
+### Find By relation "hasParentI40Asset" vith value "urn:ngsiv2:I40Asset:Area:001"
+curl -X GET \
+  'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Area:001' | jq
+
+curl -iX POST \
+	'http://localhost:1026/v2/entities' \
+	-H 'Content-Type: application/json' \
+	-d '
+{
+	"type": "PLC",
+	"id": "urn:ngsiv2:I40Asset:PLC:001",
+	"Availability": {
+        "type": "Text",
+        "value": null
+    },
+	"Performance": {
+        "type": "Text",
+        "value": null
+    },
+	"Quality": {
+        "type": "Text",
+        "value": null
+    },
+	"OEE": {
+        "type": "Text",
+        "value": null
+    }
+}'
+
+curl -G -X GET \
+	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001' \
+	-d 'options=keyValues'
+
+curl -iX POST \
+	--url 'http://localhost:1026/v2/subscriptions' \
+	--header 'content-type: application/json' \
+	--data '{
+	"description": "Notify me of all OEE changes",
+	"subject": {
+		"entities": [{"idPattern": ".*", "type": "Product"}],
+		"condition": {
+			"attrs": [ "Availability", "Performance", "Quality", "OEE" ]
+			]
+		}
+	},
+	"notification": {
+		"http": {
+			"url": "http://tutorial:3000/subscription/oee-change"
+		}
+	}
+}'
+
+
+
+
+
+
+
+
+
+
+
+
+http://orion:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs?type=Device
+
+curl -X GET \
+  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:010?type=Product'
+curl -X GET \
+  --url 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001?type=Device'
+
+curl -X GET \
+  --url 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001'
+
+curl -X GET \
+  --url 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs?type=Device'
+
+/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs?type=Device
+
+
+curl -iX PUT \
+  --url 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/processStatus/value' \
+  --header 'Content-Type: text/plain' \
+  --data "Sto Cazzo"
+
+curl -iX PATCH \
+  --url 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs' \
+  --header 'Content-Type: application/json' \
+  --data ' {
+      "processStatus": {"type":"Text", "value": "Un Grande Processo"}
+}'
+
+
+curl -X GET \
+  --url 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs?type=Device'
