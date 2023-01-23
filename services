@@ -35,11 +35,13 @@ loadData () {
 	waitForMongo
 	addDatabaseIndex
 	waitForOrion
+
 	docker run --rm -v $(pwd)/import-data:/import-data \
 		--network fiware_default \
 		-e ORION_PORT="${ORION_PORT}" \
 		--entrypoint /bin/ash curlimages/curl import-data
 	waitForIoTAgent
+
 	docker run --rm -v $(pwd)/provision-devices:/provision-devices \
 		--network fiware_default \
 		-e ORION_PORT="${ORION_PORT}" \
@@ -55,9 +57,9 @@ loadData () {
 	# docker exec -it oee-service python3 oee_service.py
 		#  --entrypoint /bin/sh rose-ap-oee start-oee
 	# sleep 5
-	echo -e  "\n⏳ Starting \033[1mOEE-Service\033[0m.\n"
-	docker exec -it -d oee-service python3 oee_service.py
-	echo ""
+	# echo -e  "\n⏳ Starting \033[1mOEE-Service\033[0m.\n"
+	# docker exec -it -d oee-service python3 oee_service.py
+	# echo ""
 }
 
 stoppingContainers () {
@@ -83,13 +85,15 @@ deletingContainers () {
 }
 
 displayServices () {
-	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter name=fiware-*
+	# docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter name=fiware-*
+	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter "label=org.fiware=claret-romantig"
 	(gp ports list 2> /dev/null) || true 
 	echo ""
 }
 
 addDatabaseIndex () {
 	printf "Adding appropriate \033[1mMongo-DB\033[0m indexes for \033[1;34mOrion\033[0m  ..."
+
 	docker exec  db-mongo mongo --eval '
 	conn = new Mongo();db.createCollection("orion");
 	db = conn.getDB("orion");
@@ -105,9 +109,11 @@ addDatabaseIndex () {
 	db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
 	db.entities.createIndex({"_id.type": 1}); 
 	db.entities.createIndex({"_id.id": 1});' > /dev/null
+
 	echo -e " \033[1;32mdone\033[0m"
 
 	printf "Adding appropriate \033[1mMongo-DB\033[0m indexes for \033[1;36mIoT-Agent\033[0m  ..."
+
 	docker exec  db-mongo mongo --eval '
 	conn = new Mongo();
 	db = conn.getDB("iotagentul");
@@ -118,6 +124,7 @@ addDatabaseIndex () {
 	db.createCollection("groups");
 	db.groups.createIndex({"_id.resource": 1, "_id.apikey": 1, "_id.service": 1});
 	db.groups.createIndex({"_id.type": 1});' > /dev/null
+
 	echo -e " \033[1;32mdone\033[0m"
 }
 
@@ -131,7 +138,6 @@ waitForMongo () {
 
 waitForOrion () {
 	echo -e "\n⏳ Waiting for \033[1;34mOrion\033[0m to be available\n"
-
 	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-orion` == "healthy" ]
 	do
 	  sleep 1
@@ -140,7 +146,6 @@ waitForOrion () {
 
 waitForQuantumleap () {
 	echo -e "\n⏳ Waiting for \033[1;34mQuantumleap\033[0m to be available\n"
-
 	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-quantumleap` == "healthy" ]
 	do
 	  sleep 1
@@ -157,8 +162,7 @@ waitForIoTAgent () {
 
 waitForCrateDB () {
 	echo -e "\n⏳ Waiting for \033[1;36mCrateDB\033[0m to be available\n"
-	while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:${CRATE_PORT_ADMIN}"` == 200 ]
-
+	while ! [ `docker inspect --format='{{.State.Health.Status}}' db-crate` == "healthy" ]
 	do 
 	  sleep 1
 	done
@@ -172,7 +176,7 @@ case "${command}" in
 	"build")
 		echo "Building Rose-AP Docker images"
 		buildRoseAp
-		echo "Done"
+		echo -e " \033[1;32mdone\033[0m"
 	;;
 	"debug")
 	sudo ./services stop
@@ -180,9 +184,9 @@ case "${command}" in
 	sudo ./services start
 	;;
 	"create")
+		setEnviroment
 	 	sudo sysctl -w vm.max_map_count=262144 # CrateDB
 		sudo sysctl vm.overcommit_memory=1 # Redis
-		setEnviroment
 		echo "Pulling Docker images"
 		docker pull curlimages/curl
 		${dockerCmd} pull	

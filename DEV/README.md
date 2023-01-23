@@ -10,9 +10,24 @@
 - [x] Services port inherit from .env file
 - [x] Add waitForQuantumleap
 - [x] Switch Base image of the OEE-Service to python:3.9.16-alpine3.17 (from 892.95MB to 59.35MB)
-- [ ] Make the PLC IP configurable
+- [ ] Make the PLC IP configurable in the same file as the .config of the ROSE-AP
 - [ ] set .env in provision-device import-data
+- [ ] set .env clenaup in services
 - [ ] riscrivere lo script python
+- [ ] mettere tutte le variabili dell .env nel docker-compsoe
+- [ ] si possono rimuovere i WaitForCotiners visto che adesso startano in ordine?
+## ROSE-AP
+- [x] Removed the absurd necessity to re-build in case of .config update, (update .config > restart the container)
+- [ ] Pushing the img to docker hub
+- [ ] L'oee va calcolato on deamand ad ogni prodotto completato, per poi visualizzare a piacimento i dati potendo filtrare per prodotto, lotto, ora/giorno/mese/anno (websocket?)
+- [ ] Bisogna scambiare i dati di prodotto, lotto e turno di produzione
+- [ ] Ciclo tempo non prevede l'evenienza che non entri nel ciclo la prima volta
+- [ ] Division by 0
+- [ ] Ciclo tempo assurdo
+- [ ] Division by 0
+- [ ] Non gestite le eccezzioni di connessione
+- [ ] Non gestite le eccezzioni di inserimento con key duplicata
+
 ## Phase 3
 - [x] Github repository
 - [ ] Step by Step Tutorial (nuova build, specificare l'origine dei dati, procesStatus, e lo switch di eventual icomponenti spedcificando l'architettura)

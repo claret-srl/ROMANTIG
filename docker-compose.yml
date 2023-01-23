@@ -27,7 +27,8 @@ services:
     hostname: orion
     container_name: fiware-orion
     depends_on:
-      - mongo-db
+      mongo-db:
+        condition: service_healthy
     networks:
       - default
     expose:
@@ -49,8 +50,10 @@ services:
     ports:
       - "${QUANTUMLEAP_PORT}:8668"
     depends_on:
-      - crate-db
-      - redis-db
+      crate-db:
+        condition: service_healthy
+      redis-db:
+        condition: service_started
     environment:
       - CRATE_HOST=crate-db
       - REDIS_HOST=redis-db
@@ -58,6 +61,7 @@ services:
       - LOGLEVEL=DEBUG
     healthcheck:
       test: curl --fail -s http://quantumleap:${QUANTUMLEAP_PORT}/version || exit 1
+      interval: 5s
 
   # IoT-Agent
   iot-agent:
@@ -97,8 +101,10 @@ services:
       - "IOTA_OPCUA_MT_ENTITY_ID=age01_Car"					# entityId to be assigned to the newly generated entity from MappingTool execution
       - "IOTA_OPCUA_MT_ENTITY_TYPE=Device"					# entityType to be assigned to the newly generated entity from MappingTool execution
       - "IOTA_OPCUA_MT_NAMESPACE_IGNORE=null"			# Namespaces to ignore when crawling nodes from OPC UA Server
-    healthcheck:
-      interval: 5s
+    # curl: not found in the image
+    # healthcheck:
+    #   test: curl --fail -s http://iot-agent:${IOTA_NORTH_PORT}/version || exit 1
+    #   interval: 5s
 
   # Databases
   mongo-db:
@@ -162,7 +168,8 @@ services:
     image: grafana/grafana:${GRAFANA_VERSION}
     container_name: grafana
     depends_on:
-      - crate-db
+      crate-db:
+        condition: service_healthy
     ports:
       - "${GRAFANA_PORT}:3000"
     # environment:
@@ -178,21 +185,23 @@ services:
   oee-service:
     labels:
       org.fiware: 'claret-romantig'
-    profiles: ['oee_service']
+    # profiles: ['oee_service']
     image: roseap_oee
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     container_name: 'oee-service'
     # build: ./oee-service/.
     depends_on:
-      - crate-db
+      crate-db:
+        condition: service_healthy
     volumes:
-      - ./oee-service:/oee-service
+      - ./oee-service/oee_conf.config:/oee-service/oee_conf.config
     # links:
     #   - 'crate-db'
     # networks:
     #   - default
     # restart: 'always'
+    
 
 networks:
   default:
@@ -204,6 +213,6 @@ volumes:
   crate-db: ~
   redis-db: ~
   grafana: ~
-  oee-service: ~
+  # oee-service: ~
   mysql-db: ~
   # superset: ~
