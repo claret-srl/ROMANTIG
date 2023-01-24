@@ -169,7 +169,7 @@ config.iota = {
 			active: [
 				{
 					name: 'processStatus',
-					type: 'String'
+					type: 'Text'
 				}
 			],
 			lazy: [],
