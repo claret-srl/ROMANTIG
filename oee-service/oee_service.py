@@ -53,10 +53,10 @@ while True:
     now_time = datetime.now()
     if (now_time - end_block_time).seconds > timestep:
 
-        query_wakeup = "SELECT time_index, processstatus FROM mtopcua_car.etdevice"
+        query_wakeup = "SELECT time_index, processstatus FROM mtopcua_car.etplc"
         cursor.execute(query_wakeup)
         
-        query = "SELECT time_index, processstatus FROM mtopcua_car.etdevice WHERE time_index BETWEEN {} and {} ORDER BY time_index ASC LIMIT 100;".format(
+        query = "SELECT time_index, processstatus FROM mtopcua_car.etplc WHERE time_index BETWEEN {} and {} ORDER BY time_index ASC LIMIT 100;".format(
             end_block_time.timestamp(),
             datetime.now().timestamp()
         )

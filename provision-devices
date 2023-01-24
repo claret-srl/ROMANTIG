@@ -30,11 +30,13 @@ printf "⏳ Provisioning IoT devices "
 #    {
 #      "apikey":      "1068318794",
 #      "cbroker":     "http://orion:1026",
-#      "entity_type": "PLC",
+#      "entity_type": "Device",
 #      "resource":    "/iot/d"    
 #    }
 #  ]
 # }'
+
+# "entity_type": "PLC",
 
 # ####################################################
 # #

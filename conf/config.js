@@ -165,7 +165,7 @@ config.iota = {
      *      https://github.com/Engineering-Research-and-Development/iotagent-opcua#type-configuration
      */
     types: {
-		Device: {
+		PLC: {
 			active: [
 				{
 					name: 'processStatus',
@@ -179,7 +179,7 @@ config.iota = {
 	contexts: [
 		{
 			id: 'urn:ngsiv2:I40Asset:PLC:001',
-			type: 'Device',
+			type: 'PLC',
 			mappings: [
 				{
 					ocb_id: 'processStatus',

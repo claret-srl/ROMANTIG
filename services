@@ -203,7 +203,8 @@ case "${command}" in
 		echo -e "- \033[1mGrafana\033[0m is a time series analytics tool will visualise data from CrateDB."
 		echo -e "- \033[1mOEE-calculator\033[0m is a tool to calculate OEE data from CrateDB."
 		echo ""
-		${dockerCmd} --profile oee_service up -d --remove-orphans
+		${dockerCmd} up -d --remove-orphans
+		# ${dockerCmd} --profile oee_service up -d --remove-orphans
 		loadData
 		displayServices
 		;;
@@ -213,7 +214,20 @@ case "${command}" in
 		;;
 	"remove")
 		setEnviroment
-		deletingContainers
+		read -p "This operation will erase also the data stored in the database, continue (y/n)?" choice
+		case "$choice" in 
+			y|Y|[yY][eE][sS] )
+				echo "Deleting..."
+				deletingContainers
+			;;
+			n|N|[nN][oO] )
+				echo "Continer removal skipped."
+			;;
+			* )
+				echo "Invalid"
+			;;
+		esac
+		
 		;;
 	*)
 		echo "Command not Found."

@@ -661,7 +661,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT time_index AS \"time\", processstatus AS \"Proces Status\"\r\nFROM \"mtopcua_car\".\"etdevice\"\r\nORDER BY 1 DESC;",
+          "rawSql": "SELECT time_index AS \"time\", processstatus AS \"Proces Status\"\r\nFROM \"mtopcua_car\".\"etplc\"\r\nORDER BY 1 DESC;",
           "refId": "A",
           "select": [
             [
