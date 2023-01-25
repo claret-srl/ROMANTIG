@@ -1,6 +1,7 @@
 # CRUD Action
-## Service Group
-### Creating a Service Group
+## IoT-Agent
+### Service Group
+#### Creating a Service Group
 curl -iX POST \
 	'http://localhost:4041/iot/services' \
 	-H 'Content-Type: application/json' \
@@ -8,19 +9,19 @@ curl -iX POST \
 	-H 'fiware-servicepath: /demo' \
 	-d '{"services": [{"apikey": "4jggokgpepnvsb2uv4s40d59ov","cbroker": "http://orion:1026","entity_type": "PLC","resource": "/iot/d"}]}'
 
-### List all Service Groups
+#### List all Service Groups
 curl -X GET \
 	'http://localhost:4041/iot/services' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-### Read Service Group Details
+#### Read Service Group Details
 curl -X GET \
 	'http://localhost:4041/iot/services?resource=/iot/d' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-### Delete service group
+#### Delete service group
 curl -iX DELETE \
 	'http://localhost:4041/iot/services/?resource=/iot/d&apikey=4jggokgpepnvsb2uv4s40d59ov' \
 	-H 'fiware-service: opcua_car' \
@@ -30,8 +31,8 @@ curl -iX DELETE \
 	'http://localhost:4041/iot/services/?resource=/iot/opcua&apikey=iot' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo'
-## Device
-### Creating a Provisioned Device
+### Device
+#### Creating a Provisioned Device
 curl -iX POST \
 	'http://localhost:4041/iot/devices' \
 	-H 'Content-Type: application/json' \
@@ -56,15 +57,21 @@ curl -iX POST \
         }
     ]
 }'
-### List all Device
+#### List all Devices
 curl -X GET \
 	'http://localhost:4041/iot/devices' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-### Delete a Provisioned Device
+#### Read Device Details
+curl -X GET \
+	'http://localhost:4041/iot/devices/urn:ngsiv2:I40Asset:PLC:001' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' | jq
+
+#### Delete a Provisioned Device
 curl -iX DELETE \
-	'http://localhost:4041/iot/devices/plc001' \
+	'http://localhost:4041/iot/devices/urn:ngsiv2:I40Asset:PLC:001' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo'
 
@@ -72,6 +79,7 @@ curl -iX DELETE \
 	'http://localhost:4041/iot/devices/age01_Car' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo'
+
 ## Orion
 ### Version
 curl -X GET \
@@ -84,6 +92,7 @@ curl -X GET \
 curl -X GET \
   'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Area:001' | jq
 
+### Provison an entity
 curl -iX POST \
 	'http://localhost:1026/v2/entities' \
 	-H 'Content-Type: application/json' \
@@ -109,10 +118,46 @@ curl -iX POST \
     }
 }'
 
+### Read Entity details
 curl -G -X GET \
 	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001' \
-	-d 'options=keyValues'
+	-d 'options=keyValues' | jq
 
+### Read Entity details, where attributes type is PLC
+curl -G -X GET \
+	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs?type=PLC' \
+	-d 'options=keyValues' | jq
+
+### Provision a subscription notification to Quantumleap
+curl -s -o /dev/null -X POST \
+	'http://orion:1026/v2/subscriptions/' \
+	-H 'Content-Type: application/json' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' \
+	-d '{
+	"description": "Provision subscriptions for QuantumLeap",
+	"subject": {
+		"entities": [
+			{
+				"idPattern": ".*",
+				"type": "PLC"
+			}
+		],
+		"condition": {
+			"attrs": ["processStatus"]
+		}
+	},
+	"notification": {
+		"http": {
+			"url": "http://quantumleap:8668/v2/notify"
+		},
+		"attrs": ["processStatus"],
+		"metadata": ["dateCreated", "dateModified"]
+	},
+	"throttling": 1
+}'
+
+### Provision a subscription notification to http://tutorial:3000/subscription/oee-change
 curl -iX POST \
 	--url 'http://localhost:1026/v2/subscriptions' \
 	--header 'content-type: application/json' \
@@ -132,14 +177,25 @@ curl -iX POST \
 	}
 }'
 
-
-
-
-
-
-
-
-
+### Provision a subscription notification to python
+curl -iX POST \
+	--url 'http://localhost:1026/v2/subscriptions' \
+	--header 'content-type: application/json' \
+	--data '{
+	"description": "Notify me of all OEE changes",
+	"subject": {
+		"entities": [{"idPattern": ".*", "type": "Product"}],
+		"condition": {
+			"attrs": [ "Availability", "Performance", "Quality", "OEE" ]
+			]
+		}
+	},
+	"notification": {
+		"http": {
+			"url": "http://localhost:3000/python_websocket_test/"
+		}
+	}
+}'
 
 
 
