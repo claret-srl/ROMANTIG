@@ -190,7 +190,20 @@ config.iota = {
 			]
 		}
 	],
-	contextSubscriptions: [],
+	contextSubscriptions: [
+		{
+			id: 'urn:ngsiv2:I40Asset:PLC:001',
+			type: 'PLC',
+			mappings: [
+				{
+					ocb_id: 'processStatus',
+					opcua_id: 'ns=4;i=198',
+					object_id: 'ns=4;i=198',
+					inputArguments: []
+				}
+			]
+		}
+	],
     /**
      * Default service, for IoT Agent installations that won't require preregistration.
      */
