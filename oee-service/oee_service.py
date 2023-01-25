@@ -1,22 +1,33 @@
 from crate import client
 from datetime import datetime
+from datetime import timedelta
 import configparser
 import time
 import pycurl
 
 config = configparser.ConfigParser()
-config.read("oee_conf.config")
+config.read("oee-service//oee_conf.config")
 
 # PROCESS
-upTimeStates = config["PROCESS"]["upTimeStates"]
-downTimeStates = config["PROCESS"]["downTimeStates"]
-endStates = config["PROCESS"]["endStates"]
-goodEnd = config["PROCESS"]["goodEnd"]
-badEnd = config["PROCESS"]["badEnd"]
+upTimeStates = config["PROCESS"]["upTimeStates"].split(",")
+downTimeStates = config["PROCESS"]["downTimeStates"].split(",")
+endStates = config["PROCESS"]["endStates"].split(",")
+startStates = config["PROCESS"]["startStates"].split(",")
+goodEnd = config["PROCESS"]["goodEnd"].split(",")
+badEnd = config["PROCESS"]["badEnd"].split(",")
+
+
+statesTs = [[[upTimeStates[i]],[0],[0],[timedelta(0)]] for i in range(len(upTimeStates))]
+statesTs = statesTs + [[[downTimeStates[i]],[0],[0],[timedelta(0)]] for i in range(len(downTimeStates))]
+
+
 
 # OEE
 idealTime = float(config["OEE"]["idealTime_ppm"]) / 60
 timestep = int(config["OEE"]["timestep"])
+
+totalGood = 0
+totalBad = 0
 
 # ####################################################
 # #
@@ -32,8 +43,8 @@ print("Connection to CrateDB in progress.")
 # #
 # # HOST OVERRIDE
 # #
-# crateDBhost = "localhost"
-crateDBhost = "crate-db"
+crateDBhost = "localhost"
+# crateDBhost = "crate-db"
 
 connection_device = client.connect(crateDBhost + ":" + "4200", error_trace=True)
 cursor = connection_device.cursor()
@@ -47,6 +58,97 @@ dt_obj = datetime.now()
 end_block_time = datetime.now()
 end_time = datetime.now() # Aggiunto perchè viene dichiarato nel ciclo IF, e se non entra da errore.
 begin_block_time = datetime.now() # Aggiunto perchè viene dichiarato nel ciclo IF, e se non entra da errore.
+oldStatus = ""
+
+
+nowT = time.time()
+timerA = time.time()
+
+#for i in range (len(statesTs)):
+
+
+
+
+
+
+while True:
+    #print("Loop")
+    nowT = time.time()
+    if ((nowT - timerA)  > 0.500):
+        
+
+        query = "SELECT time_index, processstatus FROM mtopcua_car.etplc ORDER BY time_index DESC LIMIT 1;"
+
+
+        cursor.execute(query)
+        records = cursor.fetchall()
+        tS = records[0][0]
+        actStatus = records[0][1]
+        tS = datetime.fromtimestamp(tS/1e3)
+
+        
+
+
+        if actStatus!=oldStatus:  
+
+            print(nowT - timerA, records, tS)    
+            print("cambio")
+
+            for i in range(len(statesTs)):
+             
+                if statesTs[i][0][0] == actStatus:
+                    index = i
+                    statesTs[index][1][0] = tS
+
+            for i in range(len(statesTs)):
+           
+                if statesTs[i][0][0] == oldStatus:
+                    index = i
+                    statesTs[index][2][0] = tS
+                    statesTs[index][3][0] = statesTs[index][2][0]-statesTs[index][1][0]
+                    print(statesTs[index][3][0])
+
+                 
+            if actStatus in goodEnd:
+                totalGood = totalGood + 1
+
+            if actStatus in badEnd:
+                totalBad = totalBad + 1
+
+            if actStatus in startStates :
+                print("inizio ciclo")
+      
+
+            if oldStatus in endStates:
+                upTime=0.0
+                downTime = 0.0
+                totalTime = 0.0
+                for i in range(len(statesTs)):
+                    
+                    if statesTs[i][0][0] in upTimeStates:
+                        upTime = upTime + statesTs[i][3][0].total_seconds() 
+                    if statesTs[i][0][0] in downTimeStates:
+                        downTime = downTime + statesTs[i][3][0].total_seconds() 
+
+                    totalTime = totalTime + statesTs[i][3][0].total_seconds() 
+                
+                print("fine ciclo")
+                print("DT",downTime,"UT", upTime,"TT",totalTime, "TG",totalGood,"TB",totalBad)
+
+                  
+
+
+
+
+        
+
+        oldStatus  = actStatus
+        oldTs = tS
+        timerA = time.time()
+    
+
+
+
 
 while True:
     print("Loop")
@@ -152,8 +254,8 @@ while True:
 		# #
 		# # LOCALHOST OVERRIDE
 		# #
-        # crl.setopt(crl.URL,"http://localhost:1026/v2/op/update")
-        crl.setopt(crl.URL,"http://orion:1026/v2/op/update")
+        crl.setopt(crl.URL,"http://localhost:1026/v2/op/update")
+        # crl.setopt(crl.URL,"http://orion:1026/v2/op/update")
         crl.setopt(crl.CUSTOMREQUEST, "POST")
         crl.setopt(crl.HTTPHEADER, ['Content-Type: application/json'])
         crl.setopt(crl.POSTFIELDS, jsonData)
