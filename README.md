@@ -24,17 +24,15 @@ idealTime_ppm = 5 #The theoretical maximum piece per minute rate (integer) that 
 Be sure that the name of the states written in the config file perfectly match those that are written by your process to the CrateDB, so that the microservice can correctly identify them.
 
 ## Setup
-Navigate to oee-service folder and build the Docker image for the OEE microservice, than go back to the main folder:
+Build the Docker image for the OEE microservice:
 ```
-cd oee-service
-docker build -t roseap_oee .
-cd ..
+sudo ./services build
 ```
 Make the `./services` script executable
 ```
 sudo chmod +x ./services
 ```
-To create all images, and then start the containers run:
+To pull all images, apply settings and then start the containers run:
 ```
 sudo ./services create
 ./services start
