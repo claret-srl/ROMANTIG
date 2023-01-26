@@ -16,6 +16,7 @@
 - [ ] riscrivere lo script python
 - [ ] mettere tutte le variabili dell .env nel docker-compsoe
 - [ ] si possono rimuovere i WaitForCotiners visto che adesso startano in ordine?
+- [ ] Rimuovere pull remoto docker img rose ap, e ripristinarlo in produzione
 ## ROSE-AP
 - [x] Removed the absurd necessity to re-build in case of .config update, (update .config > restart the container)
 - [ ] Pushing the img to docker hub
