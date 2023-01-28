@@ -1,6 +1,10 @@
+
 # CRUD Action
+
 ## IoT-Agent
+
 ### Service Group
+
 #### Creating a Service Group
 curl -iX POST \
 	'http://localhost:4041/iot/services' \
@@ -9,17 +13,20 @@ curl -iX POST \
 	-H 'fiware-servicepath: /demo' \
 	-d '{"services": [{"apikey": "4jggokgpepnvsb2uv4s40d59ov","cbroker": "http://orion:1026","entity_type": "PLC","resource": "/iot/d"}]}'
 
+
 #### List all Service Groups
 curl -X GET \
 	'http://localhost:4041/iot/services' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
+
 #### Read Service Group Details
 curl -X GET \
 	'http://localhost:4041/iot/services?resource=/iot/d' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
+
 
 #### Delete service group
 curl -iX DELETE \
@@ -31,7 +38,9 @@ curl -iX DELETE \
 	'http://localhost:4041/iot/services/?resource=/iot/opcua&apikey=iot' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo'
+
 ### Device
+
 #### Creating a Provisioned Device
 curl -iX POST \
 	'http://localhost:4041/iot/devices' \
@@ -57,17 +66,20 @@ curl -iX POST \
         }
     ]
 }'
+
 #### List all Devices
 curl -X GET \
 	'http://localhost:4041/iot/devices' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
+
 #### Read Device Details
 curl -X GET \
 	'http://localhost:4041/iot/devices/urn:ngsiv2:I40Asset:PLC:001' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
+
 
 #### Delete a Provisioned Device
 curl -iX DELETE \
@@ -80,17 +92,47 @@ curl -iX DELETE \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo'
 
+
 ## Orion
+
 ### Version
 curl -X GET \
 	'http://localhost:1026/version'
+
+### Get entities
+curl -X GET \
+	--url 'http://localhost:1026/v2/entities' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' | jq
+
+### Get types
+curl -X GET \
+	--url 'http://localhost:1026/v2/types' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' | jq
+
+### Get subscriptions
+curl -X GET \
+	--url 'http://localhost:1026/v2/subscriptions' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' | jq
+
+### Get registrations
+curl -X GET \
+	--url 'http://localhost:1026/v2/registrations' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' | jq
+
+
 ### Find By relation "hasParentI40Asset" vith value "urn:ngsiv2:I40Asset:Workstation:001"
 curl -X GET \
   'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Workstation:001' | jq
 
+
 ### Find By relation "hasParentI40Asset" vith value "urn:ngsiv2:I40Asset:Area:001"
 curl -X GET \
   'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Area:001' | jq
+
 
 ### Provison an entity
 curl -iX POST \
@@ -118,15 +160,18 @@ curl -iX POST \
     }
 }'
 
+
 ### Read Entity details
 curl -G -X GET \
 	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001' \
 	-d 'options=keyValues' | jq
 
+
 ### Read Entity details, where attributes type is PLC
 curl -G -X GET \
 	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs?type=PLC' \
 	-d 'options=keyValues' | jq
+
 
 ### Provision a subscription notification to Quantumleap
 curl -s -o /dev/null -X POST \
@@ -157,6 +202,7 @@ curl -s -o /dev/null -X POST \
 	"throttling": 1
 }'
 
+
 ### Provision a subscription notification to http://tutorial:3000/subscription/oee-change
 curl -iX POST \
 	--url 'http://localhost:1026/v2/subscriptions' \
@@ -176,6 +222,7 @@ curl -iX POST \
 		}
 	}
 }'
+
 
 ### Provision a subscription notification to python
 curl -iX POST \
@@ -198,6 +245,12 @@ curl -iX POST \
 }'
 
 
+
+<!-- ### Get quantumleap subscriptions
+curl -X GET \
+	--url 'http://localhost:8668/v2/subscriptions' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' | jq -->
 
 http://orion:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs?type=Device
 
