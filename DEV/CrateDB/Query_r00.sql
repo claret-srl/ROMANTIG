@@ -26,6 +26,16 @@ lag(time_index, +1, time_index) OVER (ORDER BY time_index DESC) - time_index AS 
 FROM mtopcua_car.etplc newDataTable
 WHERE NOT EXISTS (SELECT time_index FROM mtopcua_car.process_status WHERE time_index = newDataTable.time_index);
 
+
+-- Crea la vista con la durata dei processi
+CREATE VIEW mtopcua_car.process_status_view AS
+SELECT
+processstatus,
+time_index,
+lag(time_index, +1, time_index) OVER (ORDER BY time_index DESC) - time_index AS duration
+FROM mtopcua_car.etplc
+ORDER BY time_index DESC;
+
 -- Seleziona i Process Status, la loro durata, e il loro numero raggruppati per tipo
 SELECT
 processstatus,
@@ -34,7 +44,17 @@ count(duration) AS total_count
 FROM mtopcua_car.process_status
 GROUP BY processstatus;
 
+-- Creo una tabella con  la seleziona dei Process Status, la loro durata, e il loro numero raggruppati per tipo
 CREATE TABLE mtopcua_car.process_status_duration AS
+SELECT
+processstatus,
+sum(duration) AS total_duration,
+count(duration) AS total_count
+FROM mtopcua_car.process_status
+GROUP BY processstatus;
+
+-- Creo una tabella con  la seleziona dei Process Status, la loro durata, e il loro numero raggruppati per tipo
+CREATE VIEW mtopcua_car.process_status_duration_view AS
 SELECT
 processstatus,
 sum(duration) AS total_duration,
@@ -256,8 +276,8 @@ SELECT
 	(time_up + time_down) AS time_toal
 FROM (
 	SELECT
-	(SELECT sum(total_duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('In Picking', 'In Welding', 'In QC', 'In Placing')) AS time_up,
-	(SELECT sum(total_duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('Idle', 'In Reworking', 'In QC from rework', 'In Trashing')) AS time_down
+	(SELECT sum(duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('In Picking', 'In Welding', 'In QC', 'In Placing')) AS time_up,
+	(SELECT sum(duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('Idle', 'In Reworking', 'In QC from rework', 'In Trashing')) AS time_down
 ) alias_for_subquery;
 
 -- parts_good	parts_bad	parts_total	quality		time_up		time_down	time_toal	aviability
@@ -276,8 +296,8 @@ FROM (
 SELECT 
 	(SELECT count(*) FROM mtopcua_car.process_status WHERE processstatus IN ('In Placing')) AS parts_good,
 	(SELECT count(*) FROM mtopcua_car.process_status WHERE processstatus IN ('In Trashing')) AS parts_bad,
-	(SELECT sum(total_duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('In Picking', 'In Welding', 'In QC', 'In Placing')) AS time_up,
-	(SELECT sum(total_duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('Idle', 'In Reworking', 'In QC from rework', 'In Trashing')) AS time_down
+	(SELECT sum(duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('In Picking', 'In Welding', 'In QC', 'In Placing')) AS time_up,
+	(SELECT sum(duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('Idle', 'In Reworking', 'In QC from rework', 'In Trashing')) AS time_down
 ) alias_for_subquery;
 
 
@@ -318,8 +338,40 @@ FROM (
 SELECT 
 	(SELECT count(*) FROM mtopcua_car.process_status WHERE processstatus IN ('In Placing')) AS parts_good,
 	(SELECT count(*) FROM mtopcua_car.process_status WHERE processstatus IN ('In Trashing')) AS parts_bad,
-	(SELECT sum(total_duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('In Picking', 'In Welding', 'In QC', 'In Placing')) AS time_up,
-	(SELECT sum(total_duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('Idle', 'In Reworking', 'In QC from rework', 'In Trashing')) AS time_down
+	(SELECT sum(duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('In Picking', 'In Welding', 'In QC', 'In Placing')) AS time_up,
+	(SELECT sum(duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('Idle', 'In Reworking', 'In QC from rework', 'In Trashing')) AS time_down
 ) alias_for_subquery_01
 ) alias_for_subquery_02
 ) alias_for_subquery_03;
+
+-- Contracted form of the precedent query
+
+SELECT
+*,
+performance * quality * aviability AS oee
+FROM (
+SELECT
+*,
+60 * 1000 * parts_total / time_total::DECIMAL AS performance,
+parts_good / parts_total::DECIMAL AS quality,
+time_up / time_total::DECIMAL AS aviability
+FROM (
+SELECT
+	*,
+	(parts_good + parts_bad) AS parts_total,
+	time_up + time_down AS time_total
+FROM (
+SELECT 
+	(SELECT count(*) FROM mtopcua_car.process_status WHERE processstatus IN ('In Placing')) AS parts_good,
+	(SELECT count(*) FROM mtopcua_car.process_status WHERE processstatus IN ('In Trashing')) AS parts_bad,
+	(SELECT sum(duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('In Picking', 'In Welding', 'In QC', 'In Placing')) AS time_up,
+	(SELECT sum(duration) FROM mtopcua_car.process_status_duration WHERE processstatus IN ('Idle', 'In Reworking', 'In QC from rework', 'In Trashing')) AS time_down
+) alias_for_subquery_01
+) alias_for_subquery_02
+) alias_for_subquery_03;
+
+
+SELECT FROM ()
+
+SELECT date_bin('1 day'::INTERVAL, time_index, 0) AS time_frame, 
+ GROUP BY time_frame ORDER BY time_frame DESC

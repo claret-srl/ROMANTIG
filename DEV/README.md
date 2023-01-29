@@ -17,6 +17,8 @@
 - [ ] mettere tutte le variabili dell .env nel docker-compsoe
 - [ ] si possono rimuovere i WaitForCotiners visto che adesso startano in ordine?
 - [ ] Rimuovere pull remoto docker img rose ap, e ripristinarlo in produzione
+- [ ] WARN[0000] The "host" variable is not set. Defaulting to a blank string.
+- [ ] job-working-directory: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
 ## ROSE-AP
 - [x] Removed the absurd necessity to re-build in case of .config update, (update .config > restart the container)
 - [ ] Pushing the img to docker hub
@@ -34,6 +36,8 @@
 - [ ] Step by Step Tutorial (nuova build, specificare l'origine dei dati, procesStatus, e lo switch di eventual icomponenti spedcificando l'architettura)
 - [ ] NGSI-V2 Naming standard for procesStatus
 - [ ] ID and atribute following Smart Factory Demo (https://github.com/FcoMelendez/smart_factory_demo)
+- [ ] Modificare il provisioning dei device e relashhionship con gli header corretti di service e servicepath
+
 ### ROSE-AP
 - [ ] Add information on machine activation status (e.g. records and calculate OEE only when it's active).
 	- Provision the information about hte schedule production to know when in planned production on the microservice. (https://www.machinemetrics.com/blog/oee-ooe-teep)

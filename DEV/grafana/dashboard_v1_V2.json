@@ -354,7 +354,7 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 16,
+        "w": 24,
         "x": 0,
         "y": 13
       },
@@ -467,203 +467,6 @@
         }
       ],
       "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Parts Bad"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 4,
-        "x": 16,
-        "y": 13
-      },
-      "id": 19,
-      "options": {
-        "displayLabels": [],
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "pieType": "donut",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "9.3.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\"\r\nFROM \"mtopcua_car\".\"process_status_oee\"\r\nORDER BY 1 DESC\r\nLIMIT 10;",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee"
-        }
-      ],
-      "type": "piechart"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": [],
-          "unit": "ms"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time Down"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 4,
-        "x": 20,
-        "y": 13
-      },
-      "id": 20,
-      "options": {
-        "displayLabels": [],
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "pieType": "donut",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "9.3.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\"\r\nFROM \"mtopcua_car\".\"process_status_oee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee"
-        }
-      ],
-      "type": "piechart"
     },
     {
       "datasource": {
@@ -898,7 +701,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "(Time Up|Time Down|Time Total)"
+              "options": "(Time Up|Time Down)"
             },
             "properties": [
               {
@@ -1012,6 +815,435 @@
       "pluginVersion": "9.3.2",
       "title": "Documentation",
       "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "DoBGYczVz"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 10,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 54
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.0.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "DoBGYczVz"
+          },
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": false,
+          "rawSql": "SELECT\n  start_date AS \"time\",\n  oee AS \"OEE\",\n  availability AS \"Availability\",\n  performance AS \"Performance\",\n  quality AS \"Quality\"\nFROM oee\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "oee"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "OEE"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "availability"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Availability"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "performance"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Performance"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "quality"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Quality"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "table": "oee",
+          "timeColumn": "start_date",
+          "where": []
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "DoBGYczVz"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 65
+      },
+      "id": 19,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "DoBGYczVz"
+          },
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  start_date AS \"time\",\n  oee AS \"OEE\",\n  availability AS \"Availability\",\n  performance AS \"Performance\",\n  quality AS \"Quality\"\nFROM oee\nORDER BY 1 DESC\nLIMIT 1;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "oee"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "OEE"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "availability"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Availability"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "performance"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Performance"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "quality"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Quality"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "table": "oee",
+          "timeColumn": "start_date",
+          "where": []
+        }
+      ],
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "DoBGYczVz"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "custom": {
+            "align": "center",
+            "displayMode": "auto",
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "(OEE|Availability|Performance|Quality)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "(Time Up|Time Down)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dthms"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 71
+      },
+      "id": 20,
+      "options": {
+        "footer": {
+          "enablePagination": true,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Time"
+          }
+        ]
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "DoBGYczVz"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\nstart_date AS \"time\",\r\noee AS \"OEE\",\r\navailability AS \"Availability\",\r\nperformance AS \"Performance\",\r\nquality AS \"Quality\",\r\nnum_prod AS \"Parts Total\",\r\nnum_good AS \"Parts Good\",\r\nnum_bad AS \"Parts Bad\",\r\nup_time AS \"Time Up\",\r\ndown_time AS \"Time Down\"\r\nFROM \"mtopcua_car\".\"oee\"\r\nORDER BY 1 DESC\r\nLIMIT 100;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Data table",
+      "type": "table"
     }
   ],
   "refresh": "5s",
@@ -1029,6 +1261,6 @@
   "timezone": "browser",
   "title": "RomanTIG - Overall Equipment Effectiveness",
   "uid": "BDDTWez4z",
-  "version": 1,
+  "version": 3,
   "weekStart": ""
 }

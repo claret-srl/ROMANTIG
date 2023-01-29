@@ -111,12 +111,6 @@ curl -X GET \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-### Get subscriptions
-curl -X GET \
-	--url 'http://localhost:1026/v2/subscriptions' \
-	-H 'fiware-service: opcua_car' \
-	-H 'fiware-servicepath: /demo' | jq
-
 ### Get registrations
 curl -X GET \
 	--url 'http://localhost:1026/v2/registrations' \
@@ -164,21 +158,44 @@ curl -iX POST \
 ### Read Entity details
 curl -G -X GET \
 	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' \
 	-d 'options=keyValues' | jq
 
 
 ### Read Entity details, where attributes type is PLC
 curl -G -X GET \
 	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs?type=PLC' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' \
 	-d 'options=keyValues' | jq
 
+### Get all subscriptions (endpoint: /v2/subscriptions/)
+curl -X GET \
+	--url 'http://localhost:1026/v2/subscriptions' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' | jq
+
+### Read the detail of a Subscription (endpoint: /v2/subscriptions/<subscription-id>)
+curl -X GET \
+	--url 'http://localhost:1026/v2/subscriptions/63d62efe603056276828003b' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' | jq
+
+### Edit am Orion Subscription to Quantumleap
+curl -iX PATCH \
+	--url 'http://localhost:1026/v2/subscriptions/63d62efe603056276828003b' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' \
+	-H 'content-type: application/json' \
+	-d '{"id": "123456789"}'
 
 ### Provision a subscription notification to Quantumleap
 curl -s -o /dev/null -X POST \
 	'http://orion:1026/v2/subscriptions/' \
-	-H 'Content-Type: application/json' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' \
+	-H 'Content-Type: application/json' \
 	-d '{
 	"description": "Provision subscriptions for QuantumLeap",
 	"subject": {
@@ -206,9 +223,9 @@ curl -s -o /dev/null -X POST \
 ### Provision a subscription notification to http://tutorial:3000/subscription/oee-change
 curl -iX POST \
 	--url 'http://localhost:1026/v2/subscriptions' \
-	--header 'content-type: application/json' \
 	--data '{
 	"description": "Notify me of all OEE changes",
+	-H 'content-type: application/json' \
 	"subject": {
 		"entities": [{"idPattern": ".*", "type": "Product"}],
 		"condition": {
@@ -227,9 +244,9 @@ curl -iX POST \
 ### Provision a subscription notification to python
 curl -iX POST \
 	--url 'http://localhost:1026/v2/subscriptions' \
-	--header 'content-type: application/json' \
 	--data '{
 	"description": "Notify me of all OEE changes",
+	-H 'content-type: application/json' \
 	"subject": {
 		"entities": [{"idPattern": ".*", "type": "Product"}],
 		"condition": {
@@ -270,14 +287,14 @@ curl -X GET \
 
 curl -iX PUT \
   --url 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/processStatus/value' \
-  --header 'Content-Type: text/plain' \
   --data "Sto Cazzo"
 
+  -H 'Content-Type: text/plain' \
 curl -iX PATCH \
   --url 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs' \
-  --header 'Content-Type: application/json' \
   --data ' {
       "processStatus": {"type":"Text", "value": "Un Grande Processo"}
+  -H 'Content-Type: application/json' \
 }'
 
 

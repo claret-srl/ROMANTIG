@@ -2,8 +2,14 @@ import requests
 r = requests.get('http://localhost:8668/v2/notify')
 
 url = 'http://localhost:8668/v2/notify'
-payload = {'some': 'data'}
-headers = {'content-type': 'application/json'}
+
+headers = {
+    'content-type': 'application/json',
+    'fiware-service': 'opcua_car',
+    'fiware-servicepath': '/demo'
+    }
+
+# payload = {'some': 'data'}
 
 # r = requests.options(url, headers=headers)
 r = requests.post(url, headers=headers)
