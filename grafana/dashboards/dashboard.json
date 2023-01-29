@@ -89,7 +89,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 13,
+        "h": 12,
         "w": 20,
         "x": 0,
         "y": 0
@@ -248,7 +248,7 @@
         ]
       },
       "gridPos": {
-        "h": 13,
+        "h": 12,
         "w": 4,
         "x": 20,
         "y": 0
@@ -354,16 +354,16 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 16,
+        "w": 24,
         "x": 0,
-        "y": 13
+        "y": 12
       },
       "id": 7,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "firstNotNull"
           ],
           "fields": "",
           "values": false
@@ -476,6 +476,179 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "(Time Up|Time Down|Time Total)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "(Parts Bad|Time Down)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "(Parts Good|Time Up)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 9,
+        "x": 0,
+        "y": 18
+      },
+      "hideTimeOverride": false,
+      "id": 24,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "firstNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "DoBGYczVz"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\ntime_frame AS \"time\",\nparts_good AS \"Parts Good\",\nparts_bad AS \"Parts Bad\",\nparts_total AS \"Parts Total\"\nFROM \"mtopcua_car\".\"process_status_oee\"\nORDER BY 1 DESC\nLIMIT 100;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "num_prod"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Parts Produced"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "num_good"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Parts Good"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "num_bad"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "Parts Bad"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "oee",
+          "timeColumn": "start_date",
+          "where": []
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "DoBGYczVz"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
             "mode": "palette-classic"
           },
           "custom": {
@@ -507,9 +680,9 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 16,
-        "y": 13
+        "w": 3,
+        "x": 9,
+        "y": 18
       },
       "id": 19,
       "options": {
@@ -522,7 +695,7 @@
         "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "firstNotNull"
           ],
           "fields": "",
           "values": false
@@ -543,105 +716,6 @@
           "format": "table",
           "rawQuery": true,
           "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\"\r\nFROM \"mtopcua_car\".\"process_status_oee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee"
-        }
-      ],
-      "type": "piechart"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": [],
-          "unit": "ms"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time Down"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 4,
-        "x": 20,
-        "y": 13
-      },
-      "id": 20,
-      "options": {
-        "displayLabels": [],
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "pieType": "donut",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "9.3.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\"\r\nFROM \"mtopcua_car\".\"process_status_oee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -735,12 +809,12 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 24,
-        "x": 0,
-        "y": 19
+        "w": 9,
+        "x": 12,
+        "y": 18
       },
       "hideTimeOverride": false,
-      "id": 9,
+      "id": 23,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -748,7 +822,7 @@
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "firstNotNull"
           ],
           "fields": "",
           "values": false
@@ -768,7 +842,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\nparts_good AS \"Parts Good\",\nparts_bad AS \"Parts Bad\",\nparts_total AS \"Parts Total\",\ntime_up AS \"Time Up\",\ntime_down AS \"Time Down\",\ntime_total AS \"Time Total\"\nFROM \"mtopcua_car\".\"process_status_oee\"\nORDER BY 1 DESC\nLIMIT 1;",
+          "rawSql": "SELECT\ntime_frame AS \"time\",\ntime_up AS \"Time Up\",\ntime_down AS \"Time Down\",\ntime_total AS \"Time Total\"\nFROM \"mtopcua_car\".\"process_status_oee\"\nORDER BY 1 DESC\nLIMIT 60;",
           "refId": "A",
           "select": [
             [
@@ -846,6 +920,105 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time Down"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 21,
+        "y": 18
+      },
+      "id": 20,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "firstNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "DoBGYczVz"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\"\r\nFROM \"mtopcua_car\".\"process_status_oee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "oee"
+        }
+      ],
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "DoBGYczVz"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
             "fixedColor": "text",
             "mode": "fixed"
           },
@@ -860,7 +1033,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -912,7 +1086,7 @@
         "h": 13,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 24
       },
       "id": 15,
       "options": {
@@ -996,7 +1170,7 @@
         "h": 16,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 37
       },
       "id": 17,
       "options": {
