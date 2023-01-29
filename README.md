@@ -9,6 +9,7 @@ This ROSE-AP is intended as a microservice for automatic OEE, and related metric
 - [Install](#install)
 - [Usage](#usage)
 - [Example](#example)
+- [Troubleshooting](#troubleshooting)
 
 ## Background
 OEE (Overall Equipment Effectiveness) is a metric used in industrial applications to measure the effectiveness and efficiency of a manufacturing process. It is calculated by multiplying the three factors of Availability, Performance, and Quality.
@@ -68,7 +69,6 @@ In general, we suggest you to adopt a state space representation similar to the 
 As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to Orion Context Broker through the [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our OEE calculator.  
 
 ## Troubleshooting
-### /bin/bash^M: bad interpreter: No such file or directory
 If the following error will appear creating or starting the container
 ```
 /bin/bash^M: bad interpreter: No such file or directory
