@@ -191,16 +191,13 @@ services:
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     container_name: 'oee-service'
-    # build: ./oee-service/.
     depends_on:
       crate-db:
         condition: service_healthy
     volumes:
       - ./oee-service/oee_conf.config:/oee-service/oee_conf.config
-    # links:
-    #   - 'crate-db'
-    # networks:
-    #   - default
+    networks:
+      - default
     # restart: 'always'
     
 
