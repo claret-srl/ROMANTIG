@@ -3,8 +3,21 @@
 
 This ROSE-AP is intended as a microservice for automatic OEE, and related metrics, calculation. The service works by connecting to a [Crate database](https://crate.io/) on port 4200, where information about the status of your target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) and [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) services.
 
+## Table of Contents
 
-## Configuration
+- [Background](#background)
+- [Install](#install)
+- [Usage](#usage)
+- [Example](#example)
+
+## Background
+OEE (Overall Equipment Effectiveness) is a metric used in industrial applications to measure the effectiveness and efficiency of a manufacturing process. It is calculated by multiplying the three factors of Availability, Performance, and Quality.
+
+Availability refers to the percentage of time a machine is available to run, taking into account scheduled and unscheduled downtime. Performance measures the actual output of the machine versus its maximum potential output. Quality assesses the percentage of good product produced versus the total number of products produced.
+
+Measuring OEE is important in industrial applications as it provides a comprehensive view of the efficiency of the manufacturing process. By understanding the factors that contribute to inefficiencies, organizations can identify areas for improvement, increase production, and reduce costs. Additionally, OEE is a key indicator of the overall competitiveness of a company, as it is directly tied to production output and profitability.
+
+## Install
 
 In order to compute the OEE, the service must know if each possible process state that is found on CrateDB has to be considered an up-time or a down-time state. To do so, please change the `oee_conf.config` file found in the `oee_service` folder, prior to building the image of the service. You have to set the following variables:
 
@@ -23,14 +36,14 @@ idealTime_ppm = 5 #The theoretical maximum piece per minute rate (integer) that 
 
 Be sure that the name of the states written in the config file perfectly match those that are written by your process to the CrateDB, so that the microservice can correctly identify them.
 
-## Setup
-Build the Docker image for the OEE microservice:
-```
-sudo ./services build
-```
+## Usage
 Make the `./services` script executable
 ```
 sudo chmod +x ./services
+```
+Build the Docker image for the OEE microservice:
+```
+sudo ./services build
 ```
 To pull all images, apply settings and then start the containers run:
 ```
