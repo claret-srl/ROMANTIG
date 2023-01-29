@@ -47,6 +47,8 @@ printf "⏳ Provisioning IoT devices "
 curl -iX POST \
   'http://orion:1026/v2/entities' \
   -H 'Content-Type: application/json' \
+  -H 'fiware-service: opcua_car' \
+  -H 'fiware-servicepath: /demo' \
   -d '
 {
 	"type": "Area",
@@ -57,36 +59,50 @@ curl -iX POST \
 curl -iX POST \
   'http://orion:1026/v2/entities' \
   -H 'Content-Type: application/json' \
+  -H 'fiware-service: opcua_car' \
+  -H 'fiware-servicepath: /demo' \
   -d '
 {
 	"type": "Workstation",
 	"id": "urn:ngsiv2:I40Asset:Workstation:001"
 }'
 
-## PLC
+# ## PLC - Should be already provisioned by the IoT Agent
+
+# curl -iX POST \
+#   'http://orion:1026/v2/entities' \
+#   -H 'fiware-service: opcua_car' \
+#   -H 'fiware-servicepath: /demo' \
+#   -H 'Content-Type: application/json' \
+#   -d '
+# {
+# 	"type": "PLC",
+# 	"id": "urn:ngsiv2:I40Asset:PLC:001"
+# }'
+
+## PLC - Add OEE attributes
 curl -iX POST \
-  'http://orion:1026/v2/entities' \
+  'http://orion:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs' \
   -H 'Content-Type: application/json' \
-  -d '
-{
-	"type": "PLC",
-	"id": "urn:ngsiv2:I40Asset:PLC:001",
+  -H 'fiware-service: opcua_car' \
+  -H 'fiware-servicepath: /demo' \
+  -d '{
 	"Availability": {
-        "type": "Float",
-        "value": null
-    },
+		"type": "Float",
+		"value": null
+	},
 	"Performance": {
-        "type": "Float",
-        "value": null
-    },
+		"type": "Float",
+		"value": null
+	},
 	"Quality": {
-        "type": "Float",
-        "value": null
-    },
+		"type": "Float",
+		"value": null
+	},
 	"OEE": {
-        "type": "Float",
-        "value": null
-    }
+		"type": "Float",
+		"value": null
+	}
 }'
 
 
@@ -99,6 +115,8 @@ curl -iX POST \
 curl -iX POST \
   'http://orion:1026/v2/op/update' \
   -H 'Content-Type: application/json' \
+  -H 'fiware-service: opcua_car' \
+  -H 'fiware-servicepath: /demo' \
   -d '{
   "actionType": "APPEND",
   "entities": [
@@ -117,6 +135,8 @@ curl -iX POST \
 curl -iX POST \
   'http://orion:1026/v2/op/update' \
   -H 'Content-Type: application/json' \
+  -H 'fiware-service: opcua_car' \
+  -H 'fiware-servicepath: /demo' \
   -d '{
   "actionType": "APPEND",
   "entities": [
