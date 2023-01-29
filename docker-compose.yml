@@ -203,7 +203,8 @@ services:
       - ./grafana/configuration/custom.ini:/etc/grafana/grafana.ini
 
       # /usr/share/grafana/conf
-      # /usr/local/etc/grafana       
+      # /usr/local/etc/grafana
+      
   oee-service:
     labels:
       org.fiware: 'claret-romantig'
