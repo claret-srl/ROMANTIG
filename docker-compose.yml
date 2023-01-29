@@ -148,28 +148,6 @@ services:
       test: curl --fail -s http://crate-db:4200/ || exit 1
       interval: 5s
 
-  # timescale-db:
-  #   labels:
-  #     org.fiware: 'claret-romantig'
-  #   image: timescale/timescaledb:${TIMESCALE_VERSION}
-  #   hostname: timescale-db
-  #   container_name: db-timescale
-  #   ports:
-  #     # Admin UI
-  #     - "${CRATE_PORT_ADMIN}:4200"
-  #     # Transport protocol
-  #     - "${CRATE_PORT_TRANSPORT_PROTOCOL}:4300"
-  #     - 5432:5432
-  #   command: crate -Cauth.host_based.enabled=false  -Ccluster.name=rampcluster -Chttp.cors.enabled=false -Chttp.cors.allow-origin="*"
-  #   environment:
-  #     - CRATE_HEAP_SIZE=2g # see https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
-  #   volumes:
-  #     - crate-db:/data
-  #   healthcheck:
-  #     test: curl --fail -s http://crate-db:4200/ || exit 1
-  #     interval: 5s
-
-
   redis-db:
     labels:
       org.fiware: 'claret-romantig'
