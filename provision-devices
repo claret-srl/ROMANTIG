@@ -163,26 +163,68 @@ curl -s -o /dev/null -X POST \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' \
 	-d '{
-	"description": "Provision subscriptions for QuantumLeap",
-	"subject": {
-		"entities": [
-			{
-				"idPattern": ".*",
-				"type": "PLC"
-			}
-		],
-		"condition": {
-			"attrs": ["processStatus"]
-		}
-	},
-	"notification": {
-		"http": {
-			"url": "http://quantumleap:8668/v2/notify"
-		},
-		"attrs": ["processStatus"],
-		"metadata": ["dateCreated", "dateModified"]
-	},
-	"throttling": 1
+  "description": "Orion notify Quantumleap",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "PLC"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "processStatus"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://quantumleap:8668/v2/notify"
+    },
+    "attrs": [
+      "processStatus"
+    ],
+    "metadata": [
+      "dateCreated",
+      "dateModified"
+    ]
+  },
+  "throttling": 1
+}'
+
+curl -s -o /dev/null -X POST \
+	'http://orion:1026/v2/subscriptions/' \
+	-H 'Content-Type: application/json' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' \
+	-d '{
+  "description": "Orion notify the oee-service",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "PLC"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "processStatus"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://oee-service:8008/"
+    },
+    "attrs": [
+      "processStatus"
+    ],
+    "metadata": [
+      "dateCreated",
+      "dateModified"
+    ]
+  },
+  "throttling": 1
 }'
 
 
