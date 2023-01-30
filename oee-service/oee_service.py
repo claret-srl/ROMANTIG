@@ -1,266 +1,292 @@
-from crate import client
-from datetime import datetime
-from datetime import timedelta
 import configparser
-import time
+from crate import client
 import pycurl
+import os
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from sys import argv
+# import json
+from dotenv import load_dotenv
+
+
+script_dir = os.path.dirname(__file__)
+
+# <-- .env
+
+load_dotenv(script_dir + "//" + ".env")
+
+FIWARE_SERVICE = os.getenv('FIWARE_SERVICE')
+FIWARE_SERVICEPATH = os.getenv('FIWARE_SERVICEPATH')
+CONTEXTS_ID = os.getenv('CONTEXTS_ID')
+CONTEXTS_TYPE = os.getenv('CONTEXTS_TYPE')
+# ROSEAP_OEE_CONTAINER = os.getenv('ROSEAP_OEE_CONTAINER')
+# .env -->
+# <-- Docker
+
+Docker = True
+
+if Docker == False:
+	orionHost = crateHost = BIND_HOST = 'localhost'
+else:
+	orionHost = "orion"
+	crateHost = "crate-db"
+	BIND_HOST = '0.0.0.0'
+
+PORT = 8008
+
+orionPort = str(1026)
+cratePort = str(4200)
+
+# Docker -->
+# <-- Main Variables
+
+if len(argv) > 1:
+	arg = argv[1].split(':')
+	BIND_HOST = arg[0]
+	PORT = int(arg[1])
+
+sql = ['''SELECT
+		oee,
+		availability,
+		performance,
+		quality
+	FROM
+	"mtopcua_car"."process_status_oee"
+	LIMIT 1;''']
+ 
+jsonDataTemplate = '''{
+  "actionType": "append",
+  "entities": [
+	{
+	  "id": "urn:ngsiv2:I40Asset:PLC:001",
+	  "type": "PLC",
+	  "OEE": {
+		"type": "Float",
+		"value": "%s"
+	  },
+	  "Availability": {
+		"type": "Float",
+		"value": "%s"
+	  },
+	  "Performance": {
+		"type": "Float",
+		"value": "%s"
+	  },
+	  "Quality": {
+		"type": "Float",
+		"value": "%s"
+	  }
+	}
+  ]
+}'''
+
+# Main Variables -->
+# print("[INFO]" + "[WebServer]" + self.headers)
+# TypeError: can only concatenate str (not "HTTPMessage") to str
+# <-- nickjj Web server https://github.com/nickjj/webserver
+
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+	def write_response(self, content):
+		self.send_response(200)
+		self.end_headers()
+		self.wfile.write(content)
+		updateContexBroker(sql, jsonDataTemplate)
+		print("[INFO]" + "[WebServer]" + "Headers:" + "\n")
+		print(self.headers)
+		print("[INFO]" + "[WebServer]" + "Content:" + "\n")
+		# print(json.dumps(content.decode('utf-8'), indent=1))
+		print(content.decode('utf-8'))
+  
+  
+	def do_GET(self):
+		self.write_response(b'')
+
+	def do_POST(self):
+		content_length = int(self.headers.get('content-length', 0))
+		body = self.rfile.read(content_length)
+		self.write_response(body)
+
+
+def httpWebServer (_BIND_HOST = '0.0.0.0', _PORT = 8008):
+	try:
+		httpd = HTTPServer((_BIND_HOST, _PORT), SimpleHTTPRequestHandler)
+		print("[INFO]" + "[WebServer]" + f"Listening on http://{_BIND_HOST}:{_PORT}\n")
+		httpd.serve_forever()
+	except Exception as e:
+		print("[ERROR]" + "[WebServer]" + f"Fail on http://{_BIND_HOST}:{_PORT}\n" + str(e) + "\n")
+
+# nickjj Web server > https://github.com/nickjj/webserver -->
+# <-- Crate-DB
+
+def query_CrateDB(_sqlCommands):
+	try:
+		print("[INFO]" + "[CrateDB]" + "Connecting...")
+		connection = client.connect(crateHost + ":" + cratePort, error_trace=True)
+		print("[INFO]" + "[CrateDB]" + "Connection Successful.")
+		try:
+			cursor = connection.cursor()
+			print("[INFO]" + "[CrateDB]" + "Cursor created." + "\n")
+			# print(_sqlCommands)
+			for command in _sqlCommands:
+				# print(command)
+				try:
+					cursor.execute(command)
+					if command.startswith('SELECT'):
+						records = cursor.fetchall()
+						return records
+					print("[INFO]" + "[CrateDB]" + "Exectuded query -->\n")
+				except Exception as e:
+					print("[ERROR]" + "[CrateDB]" + "Error in query execution:\n" + str(e) + "\n")
+				print(command + "\n")
+				print("#####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####  ##### \n")
+		except Exception as e:
+			print("[ERROR]" + "[CrateDB]" + "Error in cursor creation:\n" + str(e) + "\n")
+		finally:
+			cursor.close()
+			print("[INFO]" + "[CrateDB]" + "Cursor Closed.")
+			connection.close()
+			print("[INFO]" + "[CrateDB]" + "Connection Closed.")
+	except Exception as e:
+		print("[ERROR]" + "[CrateDB]" + "Connection fail:\n" + str(e) + "\n")
+
+# Crate-DB -->
+# <-- Units to Seconds
+
+SECONDS_PER_UNIT = {"second":1, "minute":60, "hour":60*60, "day":60*60*24, "week":60*60*24*7, "month":60*60*24*7*30, "year":60*60*24*7*365}
+
+def convert_to_seconds(s):
+	s = s.split(" ")
+	return int(s[0]) * SECONDS_PER_UNIT[s[1]]
+
+# Units to Seconds -->
+# <-- Update Orion Contex Broker
+
+def updateContexBroker(_sql, _jsonObject):
+	data = query_CrateDB(_sql)
+	jsonObjectData = _jsonObject % tuple(data[0])
+
+	c = pycurl.Curl()
+
+	method = "POST"
+	url = f"http://{orionHost}:{orionPort}/v2/op/update"
+	header = ["Content-Type: application/json", f"fiware-service: {FIWARE_SERVICE}", f"fiware-servicepath: {FIWARE_SERVICEPATH}"]
+
+	print(url)
+	# print("\n ##### A ##### \n")
+
+	c.setopt(c.URL, url)
+	c.setopt(c.CUSTOMREQUEST, method)
+	c.setopt(c.HTTPHEADER, header)
+	c.setopt(c.POSTFIELDS, jsonObjectData)
+	c.perform()
+	c.reset()
+
+
+	method = "GET"
+	url = f"http://{orionHost}:{orionPort}/v2/entities/urn:ngsiv2:I40Asset:PLC:001"
+	header = [f"fiware-service: {FIWARE_SERVICE}", f"fiware-servicepath: {FIWARE_SERVICEPATH}"]
+
+	print(url)
+	# print("\n ##### B ##### \n")
+	
+	c.setopt(c.URL, url)
+	c.setopt(c.CUSTOMREQUEST, method)
+	c.setopt(c.HTTPHEADER, header)
+	# c.setopt(c.POSTFIELDS, None)
+	# c.unsetopt(c.POSTFIELDS)
+	c.perform()
+	c.reset()
+ 	
+
+	c.close()
+
+
+# Update Orion Contex Broker -->
+# <-- Configuration
+
+def arrayToString(_Array):
+	_Array = _Array.split(",")
+	output = str()
+	spacing = ", "
+	spacingLen = len(spacing)
+	for element in _Array:
+		# output = element
+		output += f"'{element}'" + spacing
+	# return (f"({output})")
+	if output[-spacingLen:] == spacing:
+		return output[:-spacingLen]
+
+	else:
+		return output
 
 config = configparser.ConfigParser()
-config.read("oee-service//oee_conf.config")
+config.read(script_dir + "//" + "oee_conf.config")
 
-# PROCESS
-upTimeStates = config["PROCESS"]["upTimeStates"].split(",")
-downTimeStates = config["PROCESS"]["downTimeStates"].split(",")
-endStates = config["PROCESS"]["endStates"].split(",")
-startStates = config["PROCESS"]["startStates"].split(",")
-goodEnd = config["PROCESS"]["goodEnd"].split(",")
-badEnd = config["PROCESS"]["badEnd"].split(",")
+timesUp = arrayToString(config["PROCESS"]["timesUp"])
+timesDown = arrayToString(config["PROCESS"]["timesDown"])
 
+endsGood = arrayToString(config["PROCESS"]["endsGood"])
+endsBad = arrayToString(config["PROCESS"]["endsBad"])
 
-statesTs = [[[upTimeStates[i]],[0],[0],[timedelta(0)]] for i in range(len(upTimeStates))]
-statesTs = statesTs + [[[downTimeStates[i]],[0],[0],[timedelta(0)]] for i in range(len(downTimeStates))]
+startDateTime = config["START_DATE_TIME"]["date"] + "T" + config["START_DATE_TIME"]["time"] + "Z"
 
+idealTime = str(convert_to_seconds(config["OEE"]["idealTime"]))
+timestep = str(config["OEE"]["timestep"])
 
+print(f"[INFO] Timestep is {timestep}.")
 
-# OEE
-idealTime = float(config["OEE"]["idealTime_ppm"]) / 60
-timestep = int(config["OEE"]["timestep"])
+# Configuration -->
+# <-- Script
 
-totalGood = 0
-totalBad = 0
+sqlFilePath = script_dir + "//" + "Query" + ".sql"
 
-# ####################################################
-# #
-# # TIME STEP OVERRIDE
-# #
-# timestep = 10
+try:
+	print("[INFO]" + "[Query file]" + "Opening...")
+	sqlFile = open(sqlFilePath, 'r')
+	print("[INFO]" + "[Query file]" + "Successful opened.")
+except Exception as e:
+	print("[ERROR]" + "[Query file]" + "Opening failed:\n" + str(e) + "\n")
 
-print("Timestep is {} seconds".format(timestep))
+sqlFileContent = sqlFile.read()
+sqlFile.close()
+sqlFile_rows = sqlFileContent.split("\n")
 
-print("Connection to CrateDB in progress.")
+sqlCommands = str()
 
-# ####################################################
-# #
-# # HOST OVERRIDE
-# #
-crateDBhost = "localhost"
-# crateDBhost = "crate-db"
+for row in sqlFile_rows:
+	if row.find('-- ') == -1:
+	# if not row.startswith('-- '):
+	# if not row.startswith('-- ') or not row.find('-- '):
 
-connection_device = client.connect(crateDBhost + ":" + "4200", error_trace=True)
-cursor = connection_device.cursor()
-print("Connection to CrateDB succesful.")
-cursor.execute(
-    "create table if not exists mtopcua_car.oee (start_date timestamp primary key, end_date timestamp, num_prod int, num_good int, num_bad int, up_time float, down_time float, availability float, performance float, quality float, oee float);"
-)
+		row = row.replace("\t", "").replace("\n", "")
 
-start_time = datetime.now()
-dt_obj = datetime.now()
-end_block_time = datetime.now()
-end_time = datetime.now() # Aggiunto perchè viene dichiarato nel ciclo IF, e se non entra da errore.
-begin_block_time = datetime.now() # Aggiunto perchè viene dichiarato nel ciclo IF, e se non entra da errore.
-oldStatus = ""
+		if row.find("20 * 1000") != -1 : row = f"{idealTime} * 1000"
+		elif row.find("5 minute") != -1 : row = f"'{timestep}'"
+		elif row.find("2023-01-01T08:00:00Z") != -1 : row = f"'{startDateTime}'"
+		elif row.find("'In Picking','In Welding','In QC','In Placing'") != -1 : row = timesUp
+		elif row.find("'Idle','In Reworking','In QC from rework','In Trashing'") != -1 : row = timesDown
+		elif row.find("In Placing") != -1 : row = endsGood
+		elif row.find("In Trashing") != -1 : row = endsBad
 
+		elif row.find("mtopcua_car") != -1 : row = row.replace("ocua_car", FIWARE_SERVICE.lower())
+		elif row.find("etplc") != -1 : row = row.replace("plc", CONTEXTS_TYPE.lower())
 
-nowT = time.time()
-timerA = time.time()
+		# FIWARE_SERVICE=opcua_car
+		# FIWARE_SERVICEPATH=/demo
+		# CONTEXTS_ID=age01_Car
+		# CONTEXTS_TYPE=PLC
+  
+		sqlCommands += str(row) + " "
 
-#for i in range (len(statesTs)):
+# print(sqlCommands)
 
+sqlCommands = sqlCommands.split(';')
+try:
+	sqlCommands.remove(' ')
+except Exception as e:
+	print("[WARNING]" + "[SQL Commands]" + ": " + str(e) + "\n")
 
+# Set CrateDB View
+query_CrateDB(sqlCommands)
 
-
-
-
-while True:
-    #print("Loop")
-    nowT = time.time()
-    if ((nowT - timerA)  > 0.500):
-        
-
-        query = "SELECT time_index, processstatus FROM mtopcua_car.etplc ORDER BY time_index DESC LIMIT 1;"
-
-
-        cursor.execute(query)
-        records = cursor.fetchall()
-        tS = records[0][0]
-        actStatus = records[0][1]
-        tS = datetime.fromtimestamp(tS/1e3)
-
-        
-
-
-        if actStatus!=oldStatus:  
-
-            print(nowT - timerA, records, tS)    
-            print("cambio")
-
-            for i in range(len(statesTs)):
-             
-                if statesTs[i][0][0] == actStatus:
-                    index = i
-                    statesTs[index][1][0] = tS
-
-            for i in range(len(statesTs)):
-           
-                if statesTs[i][0][0] == oldStatus:
-                    index = i
-                    statesTs[index][2][0] = tS
-                    statesTs[index][3][0] = statesTs[index][2][0]-statesTs[index][1][0]
-                    print(statesTs[index][3][0])
-
-                 
-            if actStatus in goodEnd:
-                totalGood = totalGood + 1
-
-            if actStatus in badEnd:
-                totalBad = totalBad + 1
-
-            if actStatus in startStates :
-                print("inizio ciclo")
-      
-
-            if oldStatus in endStates:
-                upTime=0.0
-                downTime = 0.0
-                totalTime = 0.0
-                for i in range(len(statesTs)):
-                    
-                    if statesTs[i][0][0] in upTimeStates:
-                        upTime = upTime + statesTs[i][3][0].total_seconds() 
-                    if statesTs[i][0][0] in downTimeStates:
-                        downTime = downTime + statesTs[i][3][0].total_seconds() 
-
-                    totalTime = totalTime + statesTs[i][3][0].total_seconds() 
-                
-                print("fine ciclo")
-                print("DT",downTime,"UT", upTime,"TT",totalTime, "TG",totalGood,"TB",totalBad)
-
-                  
-
-
-
-
-        
-
-        oldStatus  = actStatus
-        oldTs = tS
-        timerA = time.time()
-    
-
-
-
-
-while True:
-    print("Loop")
-    now_time = datetime.now()
-    if (now_time - end_block_time).seconds > timestep:
-
-        query_wakeup = "SELECT time_index, processstatus FROM mtopcua_car.etplc"
-        cursor.execute(query_wakeup)
-        
-        query = "SELECT time_index, processstatus FROM mtopcua_car.etplc WHERE time_index BETWEEN {} and {} ORDER BY time_index ASC LIMIT 100;".format(
-            end_block_time.timestamp(),
-            datetime.now().timestamp()
-        )
-        cursor.execute(query)
-        
-
-        records = []
-        records = cursor.fetchall()
-
-        process_list = []
-        total_upTime, total_downTime, total_produce, total_good, total_bad = (
-            0,
-            0,
-            0,
-            0,
-            0,
-        )
-        for i, row in enumerate(records):
-            dt_obj = datetime.fromtimestamp(row[0] / 1000)
-            processStatus = row[-1]
-            if i > 0:
-                start_time = old_dt_obj
-                end_time = dt_obj
-                process_length = (end_time - start_time).total_seconds()
-                down_up_time = "downTime" if old_status in downTimeStates else "upTime"
-                up_time = process_length if down_up_time == "upTime" else 0
-                down_time = process_length if down_up_time == "downTime" else 0
-
-                total_upTime += up_time
-                total_downTime += down_time
-
-                total_produce += 1 if old_status in endStates else 0
-                total_good += 1 if old_status in goodEnd else 0
-                total_bad += 1 if old_status in badEnd else 0
-
-            else:
-                begin_block_time = dt_obj
-            old_dt_obj = dt_obj
-            old_status = processStatus
-
-        start_time = datetime.now()
-        end_block_time = end_time
-
-        try:
-            availability = total_upTime / (total_upTime + total_downTime)
-        except:
-            print("No time not yet detected.")
-            availability = 0
-
-        try:
-            performance = total_produce / (total_upTime * idealTime)
-        except:
-            print("No time not yet detected.")
-            performance = 0
-        
-        try:
-            quality = total_good / total_produce
-        except:
-            print("No products in this period")
-            quality = 0
-
-        oee = availability * performance * quality
-
-        save_data = (
-            begin_block_time.timestamp(),
-            end_block_time.timestamp(),
-            total_produce,
-            total_good,
-            total_bad,
-            total_upTime,
-            total_downTime,
-            availability,
-            performance,
-            quality,
-            oee,
-        )
-
-        cursor.execute("""INSERT INTO mtopcua_car.oee (start_date, end_date, num_prod,num_good,num_bad, up_time, down_time, availability, performance, quality, oee) VALUES (?, ?, ?, ?,?,?,?,?,?,?,?)""", save_data)
-
-        # print("start block: {}, end block: {}, total upTime: {}, total downTime: {}, total produce: {}".format(begin_block_time,end_block_time,total_upTime,total_downTime,total_produce))
-
-        print("5-min Availability is {:.2f}%".format(availability * 100))
-        print("5-min Performance is {:.2f}%".format(performance * 100))
-        print("5-min Quality is {:.2f}%".format(quality * 100))
-        print("5-min OEE is {:.2f}%".format(oee * 100))
-        
-        jsonData = '{"actionType": "append","entities": [{"id": "urn:ngsiv2:I40Asset:PLC:001","type": "PLC","Availability": {"type": "Float","value":' + str(availability) + '},"Performance": {"type": "Float","value":' + str(performance) + '},"Quality": {"type": "Float","value":' + str(quality) + '},"OEE": {"type": "Float","value":' + str(oee) + '}}]}'
-
-        # print(jsonData)
-
-        crl = pycurl.Curl()
-        # ####################################################
-		# #
-		# # LOCALHOST OVERRIDE
-		# #
-        crl.setopt(crl.URL,"http://localhost:1026/v2/op/update")
-        # crl.setopt(crl.URL,"http://orion:1026/v2/op/update")
-        crl.setopt(crl.CUSTOMREQUEST, "POST")
-        crl.setopt(crl.HTTPHEADER, ['Content-Type: application/json'])
-        crl.setopt(crl.POSTFIELDS, jsonData)
-        crl.perform()
-        crl.close()
-
-    # time.sleep(timestep / 100)  # TO BE REMOVED
-    time.sleep(1) # TO BE REMOVED
+# Star webserver listening for notification
+httpWebServer(BIND_HOST, PORT)

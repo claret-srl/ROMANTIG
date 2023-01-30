@@ -196,10 +196,24 @@ services:
         condition: service_healthy
     volumes:
       - ./oee-service/oee_conf.config:/oee-service/oee_conf.config
+      - ./.env:/oee-service/.env
+    ports:
+      - "${ROSEAP_OEE_PORT}:8008"
     networks:
       - default
     # restart: 'always'
-    
+
+  # webserver:
+  #   labels:
+  #     org.fiware: 'claret-romantig'
+  #   image: webserver
+  #   stdin_open: true # docker run -i
+  #   tty: true        # docker run -t
+  #   container_name: 'webserver'
+  #   ports:
+  #     - "8008:8008"
+  #   networks:
+  #     - default
 
 networks:
   default:
