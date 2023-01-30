@@ -1,6 +1,12 @@
 
 # CRUD Action
 
+## CrateDB
+curl -iX POST \
+	'http://localhost:4200/_sql' \
+	-H 'Content-Type: application/json' \
+	-d '{"stmt":"SELECT oee, availability, performance, quality FROM mtopcua_car.process_status_oee LIMIT 1;"}'
+
 ## IoT-Agent
 
 ### Service Group
@@ -193,14 +199,14 @@ curl -X GET \
 
 ### Delete a Subscription (endpoint: /v2/subscriptions/<subscription-id>)
 curl -X DELETE \
-	--url 'http://localhost:1026/v2/subscriptions/63d6a32d468f3161a87b55cc' \
+	--url 'http://localhost:1026/v2/subscriptions/63d7e1a200a2a07abd0a799b' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
 
 ### Read the detail of a Subscription (endpoint: /v2/subscriptions/<subscription-id>)
 curl -X GET \
-	--url 'http://localhost:1026/v2/subscriptions/63d69ac91d4f7669b83640ee' \
+	--url 'http://localhost:1026/v2/subscriptions/63d7e1a200a2a07abd0a799b' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
