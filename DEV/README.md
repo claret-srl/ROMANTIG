@@ -30,6 +30,7 @@
 - [ ] Division by 0
 - [ ] Non gestite le eccezzioni di connessione
 - [ ] Non gestite le eccezzioni di inserimento con key duplicata
+- [ ] Unificare nomenclatua rose-ap-OEE
 
 ## Phase 3
 - [x] Github repository

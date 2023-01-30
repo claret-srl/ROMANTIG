@@ -80,7 +80,6 @@ curl -X GET \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-
 #### Delete a Provisioned Device
 curl -iX DELETE \
 	'http://localhost:4041/iot/devices/urn:ngsiv2:I40Asset:PLC:001' \
@@ -104,6 +103,22 @@ curl -X GET \
 	--url 'http://localhost:1026/v2/entities' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
+
+### Get details of specific entity
+curl -X GET \
+	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' \
+	| jq
+
+
+### Get details of specific entity atribute
+curl -X GET \
+	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/Availability' | jq
+
+### Get details of specific entity atribute value
+curl -X GET \
+	'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/Availability/value' | jq
 
 ### Get types
 curl -X GET \
@@ -170,21 +185,28 @@ curl -G -X GET \
 	-H 'fiware-servicepath: /demo' \
 	-d 'options=keyValues' | jq
 
-### Get all subscriptions (endpoint: /v2/subscriptions/)
+### Get all Subscription (endpoint: /v2/subscriptions/)
 curl -X GET \
 	--url 'http://localhost:1026/v2/subscriptions' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-### Read the detail of a Subscription (endpoint: /v2/subscriptions/<subscription-id>)
-curl -X GET \
-	--url 'http://localhost:1026/v2/subscriptions/63d62efe603056276828003b' \
+### Delete a Subscription (endpoint: /v2/subscriptions/<subscription-id>)
+curl -X DELETE \
+	--url 'http://localhost:1026/v2/subscriptions/63d6a32d468f3161a87b55cc' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' | jq
 
-### Edit am Orion Subscription to Quantumleap
+
+### Read the detail of a Subscription (endpoint: /v2/subscriptions/<subscription-id>)
+curl -X GET \
+	--url 'http://localhost:1026/v2/subscriptions/63d69ac91d4f7669b83640ee' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' | jq
+
+### Edit an Orion Subscription to Quantumleap
 curl -iX PATCH \
-	--url 'http://localhost:1026/v2/subscriptions/63d62efe603056276828003b' \
+	--url 'http://localhost:1026/v2/subscriptions/63d639084ca03a4d993b833b' \
 	-H 'fiware-service: opcua_car' \
 	-H 'fiware-servicepath: /demo' \
 	-H 'content-type: application/json' \
@@ -239,27 +261,11 @@ curl -iX POST \
 		}
 	}
 }'
-
-
-### Provision a subscription notification to python
-curl -iX POST \
-	--url 'http://localhost:1026/v2/subscriptions' \
-	--data '{
-	"description": "Notify me of all OEE changes",
-	-H 'content-type: application/json' \
-	"subject": {
-		"entities": [{"idPattern": ".*", "type": "Product"}],
-		"condition": {
-			"attrs": [ "Availability", "Performance", "Quality", "OEE" ]
-			]
-		}
-	},
-	"notification": {
-		"http": {
-			"url": "http://localhost:3000/python_websocket_test/"
-		}
-	}
-}'
+## CrateDB
+curl -X POST \
+	'http://localhost:4200/_sql' \
+	-H 'Content-Type: application/json' \
+	-d '{"stmt": "SELECT time_frame, performance, quality, availability, oee FROM mtopcua_car.process_status_oee LIMIT 1;"}' | jq
 
 
 
