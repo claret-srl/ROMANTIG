@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 script_dir = os.path.dirname(__file__)
 load_dotenv(script_dir + "//" + ".env")
 
+" + PLACE_HOLDER + "
+PLACE_HOLDER = os.getenv('PLACE_HOLDER')
+
 COMPOSE_PROJECT_NAME = os.getenv('COMPOSE_PROJECT_NAME')
 CONTEXTS_ID = os.getenv('CONTEXTS_ID')
 CONTEXTS_TYPE = os.getenv('CONTEXTS_TYPE')
