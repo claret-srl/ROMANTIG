@@ -22,177 +22,167 @@ services:
   # Orion is the context broker
   orion:
     labels:
-      org.fiware: 'claret-romantig'
+      org.fiware: ${ORG_FIWARE}
     image: fiware/orion:${ORION_VERSION}
-    hostname: orion
-    container_name: fiware-orion
+    container_name: ${ORION}
     depends_on:
-      mongo-db:
+      db-mongo:
         condition: service_healthy
     networks:
       - default
     expose:
       - "${ORION_PORT}"
     ports:
-      - "${ORION_PORT}:${ORION_PORT}" # localhost:1026
-    command: -dbhost mongo-db -logLevel DEBUG
+      - "${ORION_PORT}:1026"
+    command: -dbhost ${MONGO} -logLevel ${LOG_LEVEL}
     healthcheck:
-      test: curl --fail -s http://orion:${ORION_PORT}/version || exit 1
+      test: curl --fail -s http://${ORION}:${ORION_PORT}/version || exit 1
       interval: 5s
 
-  # Quantum Leap is persisting Short Term History to Crate-DB
+
+  # Quantum Leap is persisting Short Term History to CrateDB
   quantumleap:
     labels:
-      org.fiware: 'claret-romantig'
+      org.fiware: ${ORG_FIWARE}
     image: orchestracities/quantumleap:${QUANTUMLEAP_VERSION}
-    hostname: quantumleap
-    container_name: fiware-quantumleap
+    container_name: ${QUANTUMLEAP}
     ports:
       - "${QUANTUMLEAP_PORT}:8668"
     depends_on:
-      crate-db:
+      db-crate:
         condition: service_healthy
-      redis-db:
+      db-redis:
         condition: service_started
     environment:
-      - CRATE_HOST=crate-db
-      - REDIS_HOST=redis-db
+      - CRATE_HOST=${CRATE}
+      - REDIS_HOST=${REDIS}
       - REDIS_PORT=${REDIS_PORT}
-      - LOGLEVEL=DEBUG
+      - LOGLEVEL=${LOG_LEVEL}
     healthcheck:
-      test: curl --fail -s http://quantumleap:${QUANTUMLEAP_PORT}/version || exit 1
+      test: curl --fail -s http://${QUANTUMLEAP}:${QUANTUMLEAP_PORT}/version || exit 1
       interval: 5s
+
 
   # IoT-Agent
   iot-agent:
     labels:
-      org.fiware: 'claret-romantig'
+      org.fiware: ${ORG_FIWARE}
     image: iotagent4fiware/iotagent-opcua:${OPC_UA_VERSION}
-    hostname: iot-agent
-    container_name: fiware-iot-agent
+    container_name: ${IOTA}
     depends_on:
-      - mongo-db
+      - ${MONGO}
     networks:
       - default
     ports:
-      - "${IOTA_NORTH_PORT}:4041" # localhost:4041
-      - "${IOTA_SOUTH_PORT}:9229" # localhost:4081
-    # extra_hosts:
-    #   - opcuaServerHostname:10.0.7.236
+      - "${IOTA_NORTH_PORT}:4041"
+      - "${IOTA_SOUTH_PORT}:9229"
     volumes:
       - ./conf/config.js:/opt/iotagent-opcua/conf/config.js # OPC_UA_VERSION=2.0.5
     environment:
-      - "IOTA_CB_HOST=orion"								# Hostname of the context broker to update context
-      - "IOTA_CB_PORT=1026"									# Port that context broker listens on to update context
-      - "IOTA_NORTH_PORT=4041"								# Port used for configuring the IoT Agent and receiving context updates from the context broker
+      - "IOTA_CB_HOST=${ORION}"								# Hostname of the context broker to update context
+      - "IOTA_CB_PORT=${ORION_PORT}"									# Port that context broker listens on to update context
+      - "IOTA_NORTH_PORT=${IOTA_NORTH_PORT}"								# Port used for configuring the IoT Agent and receiving context updates from the context broker
       - "IOTA_REGISTRY_TYPE=mongodb"						# Whether to hold IoT device info in memory or in a database
-      - "IOTA_MONGO_HOST=mongo-db"							# The hostname of MongoDB - used for holding device and service information
-      - "IOTA_MONGO_PORT=27017"								# The port that MongoDB is listening on
-      - "IOTA_MONGO_DB=iotagent_opcua"						# The name of the database used in MongoDB
-      - "IOTA_PROVIDER_URL=http://iot-agent:4041"		# URL passed to the Context Broker when commands are registered, used as a forwarding URL location when the Context Broker issues a command to a device
+      - "IOTA_MONGO_HOST=${MONGO}"							# The hostname of MongoDB - used for holding device and service information
+      - "IOTA_MONGO_PORT=${MONGO_PORT}"								# The port that MongoDB is listening on
+      - "IOTA_MONGO=iotagent_opcua"						# The name of the database used in MongoDB
+      - "IOTA_PROVIDER_URL=http://${IOTA}:${IOTA_NORTH_PORT}"		# URL passed to the Context Broker when commands are registered, used as a forwarding URL location when the Context Broker issues a command to a device
       - "IOTA_OPCUA_ENDPOINT=opc.tcp://10.0.7.236:4840/"	# Endpoint of OPC UA Server
       - "IOTA_OPCUA_SECURITY_MODE=None"						# Security mode for OPC UA connection
       - "IOTA_OPCUA_SECURITY_POLICY=None"					# Security policy for OPC UA connection, username, password
       - "IOTA_OPCUA_SECURITY_USERNAME=null"
       - "IOTA_OPCUA_SECURITY_PASSWORD=null"
       - "IOTA_OPCUA_UNIQUE_SUBSCRIPTION=false"				# Boolean property to assess whether subscribe once for multiple OPC UA nodes or not
-      - "IOTA_OPCUA_MT_POLLING=true"						# Boolean property to assess whether enable polling in MappingTool or not
-      - "IOTA_OPCUA_MT_AGENT_ID=age01_"						# agentId prefix to be assigned to the newly generated entity from MappingTool execution
-      - "IOTA_OPCUA_MT_ENTITY_ID=age01_Car"					# entityId to be assigned to the newly generated entity from MappingTool execution
-      - "IOTA_OPCUA_MT_ENTITY_TYPE=Device"					# entityType to be assigned to the newly generated entity from MappingTool execution
-      - "IOTA_OPCUA_MT_NAMESPACE_IGNORE=null"			# Namespaces to ignore when crawling nodes from OPC UA Server
-    # curl: not found in the image
-    # healthcheck:
-    #   test: curl --fail -s http://iot-agent:${IOTA_NORTH_PORT}/version || exit 1
-    #   interval: 5s
+
 
   # Databases
-  mongo-db:
+  db-mongo:
     labels:
-      org.fiware: 'claret-romantig'
-    image: mongo:${MONGO_DB_VERSION}
-    hostname: mongo-db
-    container_name: db-mongo
+      org.fiware: ${ORG_FIWARE}
+    image: mongo:${MONGO_VERSION}
+    container_name: ${MONGO}
     expose:
-      - "${MONGO_DB_PORT}"
+      - "${MONGO_PORT}"
     ports:
-      - "${MONGO_DB_PORT}:${MONGO_DB_PORT}" # localhost:27017
+      - "${MONGO_PORT}:${MONGO_PORT}" # localhost:27017
     networks:
       - default
     volumes:
-      - mongo-db:/data
+      - ${MONGO}:/data
     healthcheck:
       test: |
         host=`hostname --ip-address || echo '127.0.0.1'`; 
         mongo --quiet $host/test --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)' && echo 0 || echo 1
       interval: 5s
   
-  crate-db:
+
+  db-crate:
     labels:
-      org.fiware: 'claret-romantig'
+      org.fiware: ${ORG_FIWARE}
     image: crate:${CRATE_VERSION}
-    hostname: crate-db
-    container_name: db-crate
+    container_name: ${CRATE}
     ports:
-      # Admin UI
       - "${CRATE_PORT_ADMIN}:4200"
-      # Transport protocol
       - "${CRATE_PORT_TRANSPORT_PROTOCOL}:4300"
-      - 5432:5432
+      - ${CRATE_PORT_POSTGRES}:5432
     command: crate -Cauth.host_based.enabled=false  -Ccluster.name=rampcluster -Chttp.cors.enabled=false -Chttp.cors.allow-origin="*"
     environment:
       - CRATE_HEAP_SIZE=2g # see https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
     volumes:
-      - crate-db:/data
+      - ${CRATE}:/data
     healthcheck:
-      test: curl --fail -s http://crate-db:4200/ || exit 1
+      test: curl --fail -s http://${CRATE}:${CRATE_PORT_ADMIN}/ || exit 1
       interval: 5s
 
-  redis-db:
+
+  db-redis:
     labels:
-      org.fiware: 'claret-romantig'
+      org.fiware: ${ORG_FIWARE}
     image: redis:${REDIS_VERSION}
-    hostname: redis-db
-    container_name: db-redis
+    container_name: ${REDIS}
     networks:
       - default
     ports:
-      - "${REDIS_PORT}:6379" # localhost:6379
+      - "${REDIS_PORT}:6379"
     volumes:
-      - redis-db:/data
+      - ${REDIS}:/data
 
-  # Other services
+
+  # Dashboard
   grafana:
     labels:
-      org.fiware: 'claret-romantig'
+      org.fiware: ${ORG_FIWARE}
     image: grafana/grafana:${GRAFANA_VERSION}
-    container_name: grafana
+    container_name: ${GRAFANA}
     depends_on:
-      crate-db:
+      db-crate:
         condition: service_healthy
     ports:
       - "${GRAFANA_PORT}:3000"
     # environment:
+      # - "CRATE_SCHEMA=${CRATE_SCHEMA}"
+      # - "CRATE_TABLE=${CRATE_TABLE}"
+      # - "CRATE_TABLE_DURATION=${CRATE_TABLE_DURATION}"
+      # - "CRATE_TABLE_OEE=${CRATE_TABLE_OEE}"
       # - GF_INSTALL_PLUGINS=https://github.com/orchestracities/grafana-map-plugin/archive/master.zip;grafana-map-plugin,grafana-clock-panel,grafana-worldmap-panel
     volumes:
-      - grafana:/var/lib/grafana
+      - ${GRAFANA}:/var/lib/grafana
       - ./grafana/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/configuration/custom.ini:/etc/grafana/grafana.ini
 
-      # /usr/share/grafana/conf
-      # /usr/local/etc/grafana
-      
+
+  # ROSE-AP
   oee-service:
     labels:
-      org.fiware: 'claret-romantig'
+      org.fiware: ${ORG_FIWARE}
     # profiles: ['oee_service']
     image: roseap_oee
     stdin_open: true # docker run -i
     tty: true        # docker run -t
-    container_name: 'oee-service'
+    container_name: ${ROSEAP_OEE}
     depends_on:
-      crate-db:
+      db-crate:
         condition: service_healthy
     volumes:
       - ./oee-service/oee_conf.config:/oee-service/oee_conf.config
@@ -203,28 +193,15 @@ services:
       - default
     # restart: 'always'
 
-  # webserver:
-  #   labels:
-  #     org.fiware: 'claret-romantig'
-  #   image: webserver
-  #   stdin_open: true # docker run -i
-  #   tty: true        # docker run -t
-  #   container_name: 'webserver'
-  #   ports:
-  #     - "8008:8008"
-  #   networks:
-  #     - default
-
 networks:
   default:
     labels:
-      org.fiware: 'claret-romantig'
+      org.fiware: ${ORG_FIWARE}
+
 
 volumes:
-  mongo-db: ~
-  crate-db: ~
-  redis-db: ~
+  db-mongo: ~
+  db-crate: ~
+  db-redis: ~
   grafana: ~
   # oee-service: ~
-  mysql-db: ~
-  # superset: ~

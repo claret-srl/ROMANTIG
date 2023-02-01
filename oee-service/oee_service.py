@@ -14,10 +14,54 @@ script_dir = os.path.dirname(__file__)
 
 load_dotenv(script_dir + "//" + ".env")
 
-FIWARE_SERVICE = os.getenv('FIWARE_SERVICE')
-FIWARE_SERVICEPATH = os.getenv('FIWARE_SERVICEPATH')
-CONTEXTS_ID = os.getenv('CONTEXTS_ID')
-CONTEXTS_TYPE = os.getenv('CONTEXTS_TYPE')
+LOG_LEVEL = os.getenv('LOG_LEVEL') # debug
+
+COMPOSE_PROJECT_NAME = os.getenv('COMPOSE_PROJECT_NAME') # fiware
+ORG_FIWARE = os.getenv('ORG_FIWARE') # claret-romantig
+
+CONTEXTS_ID = os.getenv('CONTEXTS_ID') # age01_Car
+CONTEXTS_TYPE = os.getenv('CONTEXTS_TYPE') # PLC
+
+DEVICE_ID = os.getenv('DEVICE_ID') # urn:ngsiv2:I40Asset:PLC:001
+OCB_ID = os.getenv('OCB_ID') # processStatus
+
+FIWARE_SERVICE = os.getenv('FIWARE_SERVICE') # opcua_car
+FIWARE_SERVICEPATH = os.getenv('FIWARE_SERVICEPATH') # /demo
+
+IOTA = os.getenv('IOTA') # iot-agent
+IOTA_NORTH_PORT = os.getenv('IOTA_NORTH_PORT') # 4041
+IOTA_SOUTH_PORT = os.getenv('IOTA_SOUTH_PORT') # 9229
+OPCUA_ID = os.getenv('OPCUA_ID') # "ns=4;i=198"
+
+ORION = os.getenv('ORION') # orion
+ORION_PORT = os.getenv('ORION_PORT') # 1026
+
+QUANTUMLEAP = os.getenv('QUANTUMLEAP') # quantumleap
+QUANTUMLEAP_PORT = os.getenv('QUANTUMLEAP_PORT') # 8668
+
+ROSEAP_OEE = os.getenv('ROSEAP_OEE') # oee-service
+ROSEAP_OEE_PORT = os.getenv('ROSEAP_OEE_PORT') # 8008
+
+CRATE = os.getenv('CRATE') # db-crate
+CRATE_PORT_ADMIN = os.getenv('CRATE_PORT_ADMIN') # 4200
+CRATE_PORT_POSTGRES = os.getenv('CRATE_PORT_POSTGRES') # 5432
+CRATE_PORT_TRANSPORT_PROTOCOL = os.getenv('CRATE_PORT_TRANSPORT_PROTOCOL') # 4300
+
+CRATE_SCHEMA = os.getenv('CRATE_SCHEMA') # mtopcua_car # I don't think they are used
+CRATE_TABLE = os.getenv('CRATE_TABLE') # etdevice # I don't think they are used
+CRATE_TABLE_DURATION = os.getenv('CRATE_TABLE') # etprocessduration		# I don't think they are used --> Used in pyhon and Query.sql
+CRATE_TABLE_OEE = os.getenv('CRATE_TABLE') # etoee	
+
+MONGO = os.getenv('MONGO') # db-mongo
+MONGO_PORT = os.getenv('MONGO_PORT') # 27017
+
+REDIS = os.getenv('REDIS') # db-redis
+REDIS_PORT = os.getenv('REDIS_PORT') # 6379
+
+GRAFANA = os.getenv('GRAFANA') # grafana
+GRAFANA_PORT = os.getenv('GRAFANA_PORT') # 3000
+
+
 # ROSEAP_OEE_CONTAINER = os.getenv('ROSEAP_OEE_CONTAINER')
 # .env -->
 # <-- Docker
@@ -27,14 +71,11 @@ Docker = True
 if Docker == False:
 	orionHost = crateHost = BIND_HOST = 'localhost'
 else:
-	orionHost = "orion"
-	crateHost = "crate-db"
+	orionHost = ORION
+	crateHost = CRATE
 	BIND_HOST = '0.0.0.0'
 
 PORT = 8008
-
-orionPort = str(1026)
-cratePort = str(4200)
 
 # Docker -->
 # <-- Main Variables
@@ -44,13 +85,19 @@ if len(argv) > 1:
 	BIND_HOST = arg[0]
 	PORT = int(arg[1])
 
-sql = ['''SELECT
+# ##############################################
+# 
+# Devo capire come settare il nome della tabella
+# 
+# ##############################################
+
+sql = [f'''SELECT
 		oee,
 		availability,
 		performance,
 		quality
 	FROM
-	"mtopcua_car"."process_status_oee"
+	"{CRATE_SCHEMA}"."{CRATE_TABLE_OEE}"
 	LIMIT 1;''']
  
 jsonDataTemplate = '''{
@@ -80,8 +127,6 @@ jsonDataTemplate = '''{
 }'''
 
 # Main Variables -->
-# print("[INFO]" + "[WebServer]" + self.headers)
-# TypeError: can only concatenate str (not "HTTPMessage") to str
 # <-- nickjj Web server https://github.com/nickjj/webserver
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -93,10 +138,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 		print("[INFO]" + "[WebServer]" + "Headers:" + "\n")
 		print(self.headers)
 		print("[INFO]" + "[WebServer]" + "Content:" + "\n")
-		# print(json.dumps(content.decode('utf-8'), indent=1))
 		print(content.decode('utf-8'))
-  
-  
+
 	def do_GET(self):
 		self.write_response(b'')
 
@@ -120,7 +163,7 @@ def httpWebServer (_BIND_HOST = '0.0.0.0', _PORT = 8008):
 def query_CrateDB(_sqlCommands):
 	try:
 		print("[INFO]" + "[CrateDB]" + "Connecting...")
-		connection = client.connect(crateHost + ":" + cratePort, error_trace=True)
+		connection = client.connect(crateHost + ":" + CRATE_PORT_ADMIN, error_trace=True)
 		print("[INFO]" + "[CrateDB]" + "Connection Successful.")
 		try:
 			cursor = connection.cursor()
@@ -167,7 +210,7 @@ def updateContexBroker(_sql, _jsonObject):
 	c = pycurl.Curl()
 
 	method = "POST"
-	url = f"http://{orionHost}:{orionPort}/v2/op/update"
+	url = f"http://{orionHost}:{ORION_PORT}/v2/op/update"
 	header = ["Content-Type: application/json", f"fiware-service: {FIWARE_SERVICE}", f"fiware-servicepath: {FIWARE_SERVICEPATH}"]
 
 	print(url)
@@ -182,7 +225,7 @@ def updateContexBroker(_sql, _jsonObject):
 
 
 	method = "GET"
-	url = f"http://{orionHost}:{orionPort}/v2/entities/urn:ngsiv2:I40Asset:PLC:001"
+	url = f"http://{orionHost}:{ORION_PORT}/v2/entities/{DEVICE_ID}"
 	header = [f"fiware-service: {FIWARE_SERVICE}", f"fiware-servicepath: {FIWARE_SERVICEPATH}"]
 
 	print(url)
@@ -194,9 +237,8 @@ def updateContexBroker(_sql, _jsonObject):
 	# c.setopt(c.POSTFIELDS, None)
 	# c.unsetopt(c.POSTFIELDS)
 	c.perform()
-	c.reset()
- 	
-
+	c.reset()	
+ 
 	c.close()
 
 
