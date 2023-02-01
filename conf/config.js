@@ -154,7 +154,7 @@ config.iota = {
         port: '27017',
         /**
          * Name of the Mongo database that will be created to store IoT Agent data.
-		 * ******************** Overriden in the docker file by IOTA_MONGO_DB
+		 * ******************** Overriden in the docker file by IOTA_MONGO
          */
         db: 'iotagent_opcua'
     },
@@ -190,20 +190,7 @@ config.iota = {
 			]
 		}
 	],
-	contextSubscriptions: [
-		{
-			id: 'urn:ngsiv2:I40Asset:PLC:001',
-			type: 'PLC',
-			mappings: [
-				{
-					ocb_id: 'processStatus',
-					opcua_id: 'ns=4;i=198',
-					object_id: 'ns=4;i=198',
-					inputArguments: []
-				}
-			]
-		}
-	],
+	contextSubscriptions: [],
     /**
      * Default service, for IoT Agent installations that won't require preregistration.
      */
@@ -225,7 +212,7 @@ config.iota = {
     /**
      * Default type, for IoT Agent installations that won't require preregistration.
      */
-    defaultType: 'Device',
+    defaultType: 'PLC',
     /**
      * Default resource of the IoT Agent. This value must be different for every IoT Agent connecting to the IoT
      * Manager.
