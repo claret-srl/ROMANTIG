@@ -5,20 +5,159 @@
 
 set -e
 
-buildRoseAp () {
-	cd oee-service
-	docker build -t roseap_oee .
-	cd ..
+setRedisCrate () {
+    sudo sysctl -w vm.max_map_count=262144 # CrateDB
+    sudo sysctl vm.overcommit_memory=1 # Redis
 }
 
-# Set enviroment from .env file
+buildRoseAp () {
+    cd oee-service
+    docker build -t roseap_oee .
+    cd ..
+}
+
 setEnviroment () {
-	export $(cat .env | grep "#" -v)
+    export $(cat .env | grep "#" -v)
+}
+
+loadData () {
+    waitForMongo
+    addDatabaseIndex
+    waitForOrion
+    
+    docker run --rm -v $(pwd)/import-data:/import-data \
+    --network fiware_default \
+    -e ORION="${ORION}" \
+    -e ORION_PORT="${ORION_PORT}" \
+    --entrypoint /bin/ash curlimages/curl import-data
+    waitForIoTAgent
+    
+    docker run --rm -v $(pwd)/provision-devices:/provision-devices \
+    --network fiware_default \
+    -e ORION="${ORION}" \
+    -e ORION_PORT="${ORION_PORT}" \
+    -e IOTA_NORTH_PORT="${IOTA_NORTH_PORT}" \
+    -e FIWARE_SERVICE="${FIWARE_SERVICE}" \
+    -e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
+    -e DEVICE_ID="${DEVICE_ID}" \
+    -e FIWARE_SERVICE="${FIWARE_SERVICE}" \
+    -e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
+    -e OCB_ID="${OCB_ID}" \
+    -e OPCUA_ID="${OPCUA_ID}" \
+    --entrypoint /bin/ash curlimages/curl provision-devices
+    
+    waitForCrateDB
+    waitForQuantumleap
+}
+
+stoppingContainers () {
+    CONTAINERS=$(docker ps --filter "label=org.fiware=${ORG_FIWARE}" -aq)
+    if [[ -n $CONTAINERS ]]; then
+        echo "Stopping containers"
+        docker rm -f $CONTAINERS || true
+    fi
+}
+
+deletingContainers () {
+    stoppingContainers
+    VOLUMES=$(docker volume ls -qf dangling=true)
+    if [[ -n $VOLUMES ]]; then
+        echo "Removing old volumes"
+        docker volume rm $VOLUMES || true
+    fi
+    NETWORKS=$(docker network ls  --filter "label=org.fiware=${ORG_FIWARE}" -q)
+    if [[ -n $NETWORKS ]]; then
+        echo "Removing networks"
+        docker network rm $NETWORKS || true
+    fi
+}
+
+displayServices () {
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter "label=org.fiware=${ORG_FIWARE}"
+    (gp ports list 2> /dev/null) || true
+    echo ""
+}
+
+addDatabaseIndex () {
+    printf "Adding appropriate \033[1mMongo-DB\033[0m indexes for \033[1;34mOrion\033[0m  ..."
+    
+    docker exec ${MONGO} mongo --eval '
+	conn = new Mongo();db.createCollection("orion");
+	db = conn.getDB("orion");
+	db.createCollection("entities");
+	db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
+	db.entities.createIndex({"_id.type": 1});
+    db.entities.createIndex({"_id.id": 1});' > /dev/null
+    
+    docker exec ${MONGO} mongo --eval '
+	conn = new Mongo();db.createCollection("orion-openiot");
+	db = conn.getDB("orion-openiot");
+	db.createCollection("entities");
+	db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
+	db.entities.createIndex({"_id.type": 1});
+    db.entities.createIndex({"_id.id": 1});' > /dev/null
+    
+    echo -e " \033[1;32mdone\033[0m"
+    
+    printf "Adding appropriate \033[1mMongo-DB\033[0m indexes for \033[1;36mIoT-Agent\033[0m  ..."
+    
+    docker exec ${MONGO} mongo --eval '
+	conn = new Mongo();
+	db = conn.getDB("iotagentul");
+	db.createCollection("devices");
+	db.devices.createIndex({"_id.service": 1, "_id.id": 1, "_id.type": 1});
+	db.devices.createIndex({"_id.type": 1});
+	db.devices.createIndex({"_id.id": 1});
+	db.createCollection("groups");
+	db.groups.createIndex({"_id.resource": 1, "_id.apikey": 1, "_id.service": 1});
+    db.groups.createIndex({"_id.type": 1});' > /dev/null
+    
+    echo -e " \033[1;32mdone\033[0m"
+}
+
+waitForMongo () {
+    echo -e "\n⏳ Waiting for \033[1mMongo-DB\033[0m to be available\n"
+    while ! [ `docker inspect --format='{{.State.Health.Status}}' ${MONGO}` == "healthy" ]
+    do
+        sleep 1
+    done
+}
+
+waitForOrion () {
+    echo -e "\n⏳ Waiting for \033[1;34mOrion\033[0m to be available\n"
+    while ! [ `docker inspect --format='{{.State.Health.Status}}' ${ORION}` == "healthy" ]
+    do
+        sleep 1
+    done
+}
+
+waitForQuantumleap () {
+    echo -e "\n⏳ Waiting for \033[1;34mQuantumleap\033[0m to be available\n"
+    while ! [ `docker inspect --format='{{.State.Health.Status}}' ${QUANTUMLEAP}` == "healthy" ]
+    do
+        sleep 1
+    done
+}
+
+waitForIoTAgent () {
+    echo -e "\n⏳ Waiting for \033[1;36mIoT-Agent\033[0m to be available\n"
+    while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:${IOTA_NORTH_PORT}/version"` == 200 ]
+    do
+        sleep 1
+    done
+}
+
+waitForCrateDB () {
+    echo -e "\n⏳ Waiting for \033[1;36mCrateDB\033[0m to be available\n"
+    while ! [ `docker inspect --format='{{.State.Health.Status}}' ${CRATE}` == "healthy" ]
+    do
+        sleep 1
+    done
 }
 
 setEnviroment
 
-usage="usage: services [create|start|stop|remove|debug]"
+usage="usage: services [pull|start|stop|remove|debug]"
 
 dockerCmd="docker compose"
 if (( $# == 2 )); then
@@ -31,207 +170,68 @@ if (( $# < 1 )); then
     exit 1
 fi
 
-loadData () {
-	waitForMongo
-	addDatabaseIndex
-	waitForOrion
-
-	docker run --rm -v $(pwd)/import-data:/import-data \
-		--network fiware_default \
-		-e ORION_PORT="${ORION_PORT}" \
-		--entrypoint /bin/ash curlimages/curl import-data
-	waitForIoTAgent
-
-	docker run --rm -v $(pwd)/provision-devices:/provision-devices \
-		--network fiware_default \
-		-e ORION_PORT="${ORION_PORT}" \
-		-e IOTA_NORTH_PORT="${IOTA_NORTH_PORT}" \
-		-e FIWARE_SERVICE="${FIWARE_SERVICE}" \
-		-e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
-		--entrypoint /bin/ash curlimages/curl provision-devices
-	
-	waitForCrateDB
-	waitForQuantumleap
-
-	# docker run --rm -v $(pwd)/start-oee:/oee-service/start-oee
-	# docker exec -it oee-service python3 oee_service.py
-		#  --entrypoint /bin/sh rose-ap-oee start-oee
-	# sleep 5
-	# echo -e  "\n⏳ Starting \033[1mOEE-Service\033[0m.\n"
-	# docker exec -it -d oee-service python3 oee_service.py
-	# echo ""
-}
-
-stoppingContainers () {
-	CONTAINERS=$(docker ps --filter "label=org.fiware=claret-romantig" -aq)
-	if [[ -n $CONTAINERS ]]; then 
-		echo "Stopping containers"
-		docker rm -f $CONTAINERS || true
-	fi
-}
-
-deletingContainers () {
-	stoppingContainers
-	VOLUMES=$(docker volume ls -qf dangling=true) 
-	if [[ -n $VOLUMES ]]; then 
-		echo "Removing old volumes"
-		docker volume rm $VOLUMES || true
-	fi
-	NETWORKS=$(docker network ls  --filter "label=org.fiware=claret-romantig" -q) 
-	if [[ -n $NETWORKS ]]; then 
-		echo "Removing networks"
-		docker network rm $NETWORKS || true
-	fi
-}
-
-displayServices () {
-	# docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter name=fiware-*
-	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter "label=org.fiware=claret-romantig"
-	(gp ports list 2> /dev/null) || true 
-	echo ""
-}
-
-addDatabaseIndex () {
-	printf "Adding appropriate \033[1mMongo-DB\033[0m indexes for \033[1;34mOrion\033[0m  ..."
-
-	docker exec  db-mongo mongo --eval '
-	conn = new Mongo();db.createCollection("orion");
-	db = conn.getDB("orion");
-	db.createCollection("entities");
-	db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
-	db.entities.createIndex({"_id.type": 1}); 
-	db.entities.createIndex({"_id.id": 1});' > /dev/null
-
-	docker exec  db-mongo mongo --eval '
-	conn = new Mongo();db.createCollection("orion-openiot");
-	db = conn.getDB("orion-openiot");
-	db.createCollection("entities");
-	db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
-	db.entities.createIndex({"_id.type": 1}); 
-	db.entities.createIndex({"_id.id": 1});' > /dev/null
-
-	echo -e " \033[1;32mdone\033[0m"
-
-	printf "Adding appropriate \033[1mMongo-DB\033[0m indexes for \033[1;36mIoT-Agent\033[0m  ..."
-
-	docker exec  db-mongo mongo --eval '
-	conn = new Mongo();
-	db = conn.getDB("iotagentul");
-	db.createCollection("devices");
-	db.devices.createIndex({"_id.service": 1, "_id.id": 1, "_id.type": 1});
-	db.devices.createIndex({"_id.type": 1}); 
-	db.devices.createIndex({"_id.id": 1});
-	db.createCollection("groups");
-	db.groups.createIndex({"_id.resource": 1, "_id.apikey": 1, "_id.service": 1});
-	db.groups.createIndex({"_id.type": 1});' > /dev/null
-
-	echo -e " \033[1;32mdone\033[0m"
-}
-
-waitForMongo () {
-	echo -e "\n⏳ Waiting for \033[1mMongo-DB\033[0m to be available\n"
-	while ! [ `docker inspect --format='{{.State.Health.Status}}' db-mongo` == "healthy" ]
-	do 
-		sleep 1
-	done
-}
-
-waitForOrion () {
-	echo -e "\n⏳ Waiting for \033[1;34mOrion\033[0m to be available\n"
-	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-orion` == "healthy" ]
-	do
-	  sleep 1
-	done
-}
-
-waitForQuantumleap () {
-	echo -e "\n⏳ Waiting for \033[1;34mQuantumleap\033[0m to be available\n"
-	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-quantumleap` == "healthy" ]
-	do
-	  sleep 1
-	done
-}
-
-waitForIoTAgent () {
-	echo -e "\n⏳ Waiting for \033[1;36mIoT-Agent\033[0m to be available\n"
-	while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:${IOTA_NORTH_PORT}/version"` == 200 ]
-	do 
-	  sleep 1
-	done
-}
-
-waitForCrateDB () {
-	echo -e "\n⏳ Waiting for \033[1;36mCrateDB\033[0m to be available\n"
-	while ! [ `docker inspect --format='{{.State.Health.Status}}' db-crate` == "healthy" ]
-	do 
-	  sleep 1
-	done
-}
-
 command="$1"
 case "${command}" in
-	"help")
+    "help")
         echo "$usage"
-        ;;
-	"build")
-		echo "Building Rose-AP Docker images"
-		buildRoseAp
-		echo -e " \033[1;32mdone\033[0m"
-	;;
-	"debug")
-	sudo ./services stop
-	sudo ./services build
-	sudo ./services start
-	;;
-	"create")
-		setEnviroment
-	 	sudo sysctl -w vm.max_map_count=262144 # CrateDB
-		sudo sysctl vm.overcommit_memory=1 # Redis
-		echo "Pulling Docker images"
-		docker pull curlimages/curl
-		${dockerCmd} pull	
-		;;
-	 "start")		
-		setEnviroment
-		stoppingContainers
-		echo -e "Starting containers: \033[1;34mOrion\033[0m, \033[1;34mQuantumLeap\033[0m, \033[1;36mIoT-Agent\033[0m, \033[1mGrafana\033[0m, \033[1mCrate-DB\033[0m and \033[1mMongo-DB\033[0m."
-		echo -e "- FIWARE \033[1;34mOrion Context Broker\033[0m, configured for NGSI-v2."
-		echo -e "- Engineering \033[1;36mIoT-Agent for OPC-UA\033[0m will receive northbound measurements from PLC in OPC-UA format and convert them to NGSI-v2 requests for the context broker to alter the state of the context entities."
-		echo -e "- FIWARE \033[1;34mQuantumLeap\033[0m subscribed to context changes and persisting them into a \033[1mCrate-DB\033[0m database."
-		echo -e "- \033[1mMongo-DB\033[0m is the \033[1;34mOrion Context Broker\033[0m and \033[1;36mIoT-Agent\033[0m database to hold context data information such as data entities, subscriptions and registrations."
-		echo -e "- \033[1mCrate-DB\033[0m as a data sink to hold time-based historical context data and HTTP endpoint to interpret time-based data queries."
-		echo -e "- \033[1mGrafana\033[0m is a time series analytics tool will visualise data from CrateDB."
-		echo -e "- \033[1mOEE-calculator\033[0m is a tool to calculate OEE data from CrateDB."
-		echo ""
-		${dockerCmd} up -d --remove-orphans
-		# ${dockerCmd} --profile oee_service up -d --remove-orphans
-		loadData
-		displayServices
-		;;
-	"stop")
-		setEnviroment
-		stoppingContainers
-		;;
-	"remove")
-		setEnviroment
-		read -p "This operation will erase also the data stored in the database, continue (y/n)?" choice
-		case "$choice" in 
-			y|Y|[yY][eE][sS] )
-				echo "Deleting..."
-				deletingContainers
-			;;
-			n|N|[nN][oO] )
-				echo "Continer removal skipped."
-			;;
-			* )
-				echo "Invalid"
-			;;
-		esac
-		
-		;;
-	*)
-		echo "Command not Found."
-		echo "$usage"
-		exit 127;
-		;;
+    ;;
+    "build")
+        echo "Building Rose-AP Docker images"
+        buildRoseAp
+        echo -e " \033[1;32mdone\033[0m"
+    ;;
+    "debug")
+        sudo ./services stop
+        sudo ./services build
+        sudo ./services start
+    ;;
+    "pull")
+        echo "Pulling Docker images"
+        docker pull curlimages/curl
+        ${dockerCmd} pull
+    ;;
+    "start")
+        setEnviroment
+        setRedisCrate
+        stoppingContainers
+        echo -e "Starting containers: \033[1;34mOrion\033[0m, \033[1;34mQuantumLeap\033[0m, \033[1;36mIoT-Agent\033[0m, \033[1mGrafana\033[0m, \033[1mCrate-DB\033[0m and \033[1mMongo-DB\033[0m."
+        echo -e "- FIWARE \033[1;34mOrion Context Broker\033[0m, configured for NGSI-v2."
+        echo -e "- Engineering \033[1;36mIoT-Agent for OPC-UA\033[0m will receive northbound measurements from PLC in OPC-UA format and convert them to NGSI-v2 requests for the context broker to alter the state of the context entities."
+        echo -e "- FIWARE \033[1;34mQuantumLeap\033[0m subscribed to context changes and persisting them into a \033[1mCrate-DB\033[0m database."
+        echo -e "- \033[1mMongo-DB\033[0m is the \033[1;34mOrion Context Broker\033[0m and \033[1;36mIoT-Agent\033[0m database to hold context data information such as data entities, subscriptions and registrations."
+        echo -e "- \033[1mCrate-DB\033[0m as a data sink to hold time-based historical context data and HTTP endpoint to interpret time-based data queries."
+        echo -e "- \033[1mGrafana\033[0m is a time series analytics tool will visualise data from CrateDB."
+        echo -e "- \033[1mOEE-calculator\033[0m is a tool to calculate OEE data from CrateDB."
+        echo ""
+        ${dockerCmd} up -d --remove-orphans
+        # ${dockerCmd} --profile oee_service up -d --remove-orphans
+        loadData
+        displayServices
+    ;;
+    "stop")
+        setEnviroment
+        stoppingContainers
+    ;;
+    "remove")
+        setEnviroment
+        read -p "This operation will erase also the data stored in the database, continue (y/n)?" choice
+        case "$choice" in
+            y|Y|[yY][eE][sS] )
+                echo "Deleting..."
+                deletingContainers
+            ;;
+            n|N|[nN][oO] )
+                echo "Continer removal skipped."
+            ;;
+            * )
+                echo "Invalid"
+            ;;
+        esac
+        
+    ;;
+    *)
+        echo "Command not Found."
+        echo "$usage"
+        exit 127;
+    ;;
 esac
