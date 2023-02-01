@@ -14,13 +14,22 @@
 - [ ] set .env in provision-device import-data
 - [ ] set .env clenaup in services
 - [ ] riscrivere lo script python
-- [ ] mettere tutte le variabili dell .env nel docker-compsoe
 - [ ] si possono rimuovere i WaitForCotiners visto che adesso startano in ordine?
 - [ ] Rimuovere pull remoto docker img rose ap, e ripristinarlo in produzione
 - [ ] WARN[0000] The "host" variable is not set. Defaulting to a blank string.
 - [ ] job-working-directory: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
+- [x] Rename cmd create to pull
+## docker-compose
+- [x] mettere tutte le variabili dell .env
+- [x] Check if is possible to assign .env variable to service_id and volume_id
+- [ ] oee-service folder name
+- [ ] debug level for all services
+- [x] org.fiware
+## services
+- [x] mettere tutte le variabili dell .env
 ## ROSE-AP
-- [x] Removed the absurd necessity to re-build in case of .config update, (update .config > restart the container)
+- [ ] Add Where NAME = ngsi:v2:...:I40Asset:PLC
+- [x] Removed the absurd necessity to re-build in case of .config update, (update .config > restart the service)
 - [ ] Pushing the img to docker hub
 - [ ] L'oee va calcolato on deamand ad ogni prodotto completato, per poi visualizzare a piacimento i dati potendo filtrare per prodotto, lotto, ora/giorno/mese/anno (websocket?)
 - [ ] Bisogna scambiare i dati di prodotto, lotto e turno di produzione
@@ -32,6 +41,10 @@
 - [ ] Non gestite le eccezzioni di inserimento con key duplicata
 - [ ] Unificare nomenclatua rose-ap-OEE
 
+## Grafana
+- [ ] grafana\datasources\datasource.yaml db-crate host, ports, mtopcua_car
+- [ ] Shared Data between dashboard
+- [ ] .env table name
 ## Phase 3
 - [x] Github repository
 - [ ] Step by Step Tutorial (nuova build, specificare l'origine dei dati, procesStatus, e lo switch di eventual icomponenti spedcificando l'architettura)
