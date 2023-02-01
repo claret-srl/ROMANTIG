@@ -87,7 +87,6 @@ curl -iX POST \
       "entity_type": "PLC",
       "device_id": "urn:ngsiv2:I40Asset:PLC:111",
       "apikey": "urn:ngsiv2:I40Asset:PLC:111",
-      "endpoint": "opc.tcp://1.1.1.1:1111/",
       "attributes": [
         {
           "object_id": "processStatus",
@@ -113,6 +112,11 @@ curl -X GET \
 #### Read Device Details
 curl -X GET \
   'http://localhost:4041/iot/devices/urn:ngsiv2:I40Asset:PLC:001' \
+  -H 'fiware-service: opcua_car' \
+  -H 'fiware-servicepath: /demo' | jq
+
+curl -X GET \
+  'http://localhost:4041/iot/devices/urn:ngsiv2:I40Asset:PLC:111' \
   -H 'fiware-service: opcua_car' \
   -H 'fiware-servicepath: /demo' | jq
 
