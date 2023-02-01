@@ -46,10 +46,13 @@ Build the Docker image for the OEE microservice:
 ```
 sudo ./services build
 ```
-To pull all images, apply settings and then start the containers run:
+To pull all images:
 ```
-sudo ./services create
-./services start
+./services pull
+```
+To apply settings and start all the services in the containers run:
+```
+sudo ./services start
 ```
 Now you can open Grafana on [localhost:3000](localhost:3000) (`user:admin` `password:admin`) and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana. Below an example:
 
