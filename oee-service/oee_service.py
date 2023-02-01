@@ -23,6 +23,7 @@ CONTEXTS_ID = os.getenv('CONTEXTS_ID') # age01_Car
 CONTEXTS_TYPE = os.getenv('CONTEXTS_TYPE') # PLC
 
 DEVICE_ID = os.getenv('DEVICE_ID') # urn:ngsiv2:I40Asset:PLC:001
+DEVICE_TYPE = os.getenv('DEVICE_TYPE') # PLC
 OCB_ID = os.getenv('OCB_ID') # processStatus
 
 FIWARE_SERVICE = os.getenv('FIWARE_SERVICE') # opcua_car
@@ -279,6 +280,7 @@ print(f"[INFO] Timestep is {timestep}.")
 # Configuration -->
 # <-- Script
 
+# SQL setup
 sqlFilePath = script_dir + "//" + "Query" + ".sql"
 
 try:
@@ -311,15 +313,9 @@ for row in sqlFile_rows:
 
 		elif row.find("mtopcua_car") != -1 : row = row.replace("ocua_car", FIWARE_SERVICE.lower())
 		elif row.find("etplc") != -1 : row = row.replace("plc", CONTEXTS_TYPE.lower())
-
-		# FIWARE_SERVICE=opcua_car
-		# FIWARE_SERVICEPATH=/demo
-		# CONTEXTS_ID=age01_Car
-		# CONTEXTS_TYPE=PLC
-  
+ 
 		sqlCommands += str(row) + " "
 
-# print(sqlCommands)
 
 sqlCommands = sqlCommands.split(';')
 try:
@@ -327,7 +323,7 @@ try:
 except Exception as e:
 	print("[WARNING]" + "[SQL Commands]" + ": " + str(e) + "\n")
 
-# Set CrateDB View
+## Set CrateDB View
 query_CrateDB(sqlCommands)
 
 # Star webserver listening for notification
