@@ -1,18 +1,20 @@
 ## Misc
 - [x] CrateDB persistent (Splitted stop and delete case for services script)
-- [x] Improve Grafana dashboard (https://github.blog/2022-05-19-math-support-in-markdown/)
+- [x] Improve Grafana dashboard 
+- [ ] improve doc both github and grafana (https://github.blog/2022-05-19-math-support-in-markdown/)
 - [x] Update Grafana to 9.3.6 (latest)
 - [x] Update Grafana to 9.1.3 (latest)
 - [x] Update IoT-Agent to 2.0.5 (latest working)
 - [x] Update to Orion 3.8.0 (latest)
 - [x] Update to Orion 3.7.0000 (latest stable)
-- [x] Update to Mongo 4.4.18 (latest 4)
+- [x] Update to Mongo 6.0.4 (latest)
+- [x] Update to Mongo 4.4.18 (latest 4.xx.xx)
 - [x] Update to Crate 5.1.3 (latest)
 - [x] Update to Redis 7.0.8 (latest)
 - [x] Services port inherit from .env file
 - [x] Add waitForQuantumleap
 - [x] Switch Base image of the OEE-Service to python:3.9.16-alpine3.17 (from 892.95MB to 59.35MB)
-- [ ] Make the PLC IP configurable in the same file as the .config of the ROSE-AP
+- [x] Make the PLC IP configurable in the same file as the .config of the ROSE-AP
 - [ ] set .env in provision-device import-data
 - [ ] set .env clenaup in services
 - [x] riscrivere lo script python
@@ -29,10 +31,11 @@
 - [ ] oee-service folder name
 - [ ] debug level for all services
 - [x] org.fiware
+- [x] Fix unused and Mongo anonymus volumes
 ## services
 - [x] mettere tutte le variabili dell .env
 ## ROSE-AP
-- [ ] Add Where NAME = ngsi:v2:...:I40Asset:PLC
+- [x] Add Where NAME = ngsi:v2:...:I40Asset:PLC
 - [x] Removed the absurd necessity to re-build in case of .config update, (update .config > restart the service)
 - [ ] Pushing the img to docker hub
 - [x] L'oee va calcolato on deamand ad ogni prodotto completato, per poi visualizzare a piacimento i dati potendo filtrare per prodotto, lotto, ora/giorno/mese/anno (websocket?)
@@ -53,9 +56,9 @@
 ## Phase 3
 - [x] Github repository
 - [ ] Step by Step Tutorial (nuova build, specificare l'origine dei dati, procesStatus, e lo switch di eventual icomponenti spedcificando l'architettura)
-- [ ] NGSI-V2 Naming standard for procesStatus
-- [ ] ID and atribute following Smart Factory Demo (https://github.com/FcoMelendez/smart_factory_demo)
-- [ ] Modificare il provisioning dei device e relashhionship con gli header corretti di service e servicepath
+- [x] NGSI-V2 Naming standard for procesStatus
+- [x] ID and atribute following Smart Factory Demo (https://github.com/FcoMelendez/smart_factory_demo)
+- [x] Modificare il provisioning dei device e relashhionship con gli header corretti di service e servicepath
 
 ### ROSE-AP
 - [ ] Add information on machine activation status (e.g. records and calculate OEE only when it's active).

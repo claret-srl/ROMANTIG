@@ -45,24 +45,22 @@ printf "⏳ Provisioning IoT devices "
 
 ## Area
 curl -iX POST \
-  'http://orion:1026/v2/entities' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: opcua_car' \
-  -H 'fiware-servicepath: /demo' \
-  -d '
-{
+'http://orion:1026/v2/entities' \
+-H 'Content-Type: application/json' \
+-H 'fiware-service: opcua_car' \
+-H 'fiware-servicepath: /demo' \
+-d '{
 	"type": "Area",
 	"id": "urn:ngsiv2:I40Asset:Area:001"
 }'
 
 ## Workstation
 curl -iX POST \
-  'http://orion:1026/v2/entities' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: opcua_car' \
-  -H 'fiware-servicepath: /demo' \
-  -d '
-{
+'http://orion:1026/v2/entities' \
+-H 'Content-Type: application/json' \
+-H 'fiware-service: opcua_car' \
+-H 'fiware-servicepath: /demo' \
+-d '{
 	"type": "Workstation",
 	"id": "urn:ngsiv2:I40Asset:Workstation:001"
 }'
@@ -81,29 +79,29 @@ curl -iX POST \
 # }'
 
 ## PLC - Add OEE attributes
-curl -iX POST \
-  'http://orion:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: opcua_car' \
-  -H 'fiware-servicepath: /demo' \
-  -d '{
-	"Availability": {
-		"type": "Float",
-		"value": null
-	},
-	"Performance": {
-		"type": "Float",
-		"value": null
-	},
-	"Quality": {
-		"type": "Float",
-		"value": null
-	},
-	"OEE": {
-		"type": "Float",
-		"value": null
-	}
-}'
+# curl -iX POST \
+#   'http://orion:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs' \
+#   -H 'Content-Type: application/json' \
+#   -H 'fiware-service: opcua_car' \
+#   -H 'fiware-servicepath: /demo' \
+#   -d '{
+# 	"Availability": {
+# 		"type": "Float",
+# 		"value": null
+# 	},
+# 	"Performance": {
+# 		"type": "Float",
+# 		"value": null
+# 	},
+# 	"Quality": {
+# 		"type": "Float",
+# 		"value": null
+# 	},
+# 	"OEE": {
+# 		"type": "Float",
+# 		"value": null
+# 	}
+# }'
 
 
 # ####################################################

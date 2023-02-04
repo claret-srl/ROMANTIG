@@ -45,4 +45,8 @@ CRATE = os.getenv('CRATE')
 REDIS = os.getenv('REDIS')
 GRAFANA = os.getenv('GRAFANA')
 
-print(DEVICE_ID)
+CUSTOM_01 = os.getenv('CUSTOM_01')
+CUSTOM_02 = os.getenv('CUSTOM_02')
+CUSTOM_03 = os.getenv('CUSTOM_03')
+
+print(CUSTOM_01, "\n", CUSTOM_02, "\n", CUSTOM_03)

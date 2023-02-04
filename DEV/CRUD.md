@@ -225,10 +225,10 @@ curl -G -X GET \
   -d 'options=keyValues' | jq
 
 ### Get all Subscription (endpoint: /v2/subscriptions/)
-Curl -X Get \
-  --Url 'Http://Localhost:1026/V2/Subscriptions' \
-  -H 'Fiware-Service: Opcua_Car' \
-  -H 'Fiware-Servicepath: /Demo' | Jq
+curl -X GET \
+  --url 'http://localhost:1026/v2/subscriptions' \
+  -H 'fiware-service: opcua_Car' \
+  -H 'fiware-servicepath: /demo' | jq
 
 ### Delete a Subscription (endpoint: /v2/subscriptions/<subscription-id>)
 curl -X DELETE \
