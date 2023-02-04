@@ -38,11 +38,25 @@
 Data%20Access%20View\DocumentType=Data Access View
 Data%20Access%20View\DocumentSettings\headerState=@ByteArray(\0\0\0\xff\0\0\0\0\0\0\0\x1\0\0\0\x1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x3\x43\0\0\0\t\x1\0\x1\0\0\0\0\0\0\0\0\0\0\0\0\0\x64\xff\xff\xff\xff\0\0\0\x84\0\0\0\0\0\0\0\x2\0\0\0#\0\0\0\x1\0\0\0\0\0\0\x3 \0\0\0\b\0\0\0\0)
 Data%20Access%20View\DocumentSettings\SubscriptionSettings\publishingInterval=500
-Data%20Access%20View\DocumentSettings\SubscriptionSettings\lifetimeCount=2400
+Data%20Access%20View\DocumentSettings\SubscriptionSettings\lifetimeCount=600
 Data%20Access%20View\DocumentSettings\SubscriptionSettings\maxKeepAliveCount=10
 Data%20Access%20View\DocumentSettings\SubscriptionSettings\maxNotificationsPerPublish=0
 Data%20Access%20View\DocumentSettings\SubscriptionSettings\priority=0
 Data%20Access%20View\DocumentSettings\SubscriptionSettings\publishingEnabled=true
+Data%20Access%20View\DocumentSettings\Items\000\001\DisplayName=processStatus
+Data%20Access%20View\DocumentSettings\Items\000\001\NodeId="ns=4;i=198"
+Data%20Access%20View\DocumentSettings\Items\000\001\Status=2
+Data%20Access%20View\DocumentSettings\Items\000\001\MonitoringMode=2
+Data%20Access%20View\DocumentSettings\Items\000\001\MonitoringParameters\DiscardOldest=1
+Data%20Access%20View\DocumentSettings\Items\000\001\MonitoringParameters\QueueSize=1
+Data%20Access%20View\DocumentSettings\Items\000\001\MonitoringParameters\SamplingInterval=250
+Data%20Access%20View\DocumentSettings\Items\000\005\DisplayName=SECOND
+Data%20Access%20View\DocumentSettings\Items\000\005\NodeId="ns=4;i=34"
+Data%20Access%20View\DocumentSettings\Items\000\005\Status=2
+Data%20Access%20View\DocumentSettings\Items\000\005\MonitoringMode=2
+Data%20Access%20View\DocumentSettings\Items\000\005\MonitoringParameters\DiscardOldest=1
+Data%20Access%20View\DocumentSettings\Items\000\005\MonitoringParameters\QueueSize=1
+Data%20Access%20View\DocumentSettings\Items\000\005\MonitoringParameters\SamplingInterval=250
 
 [Attribute%20Plugin]
 Act_OnOff_Checked=true

@@ -6,7 +6,14 @@ script_dir = os.path.dirname(__file__)
 load_dotenv(script_dir + "//" + ".env")
 
 " + PLACE_HOLDER + "
-PLACE_HOLDER = os.getenv('PLACE_HOLDER')
+ENDSGOOD = os.getenv('ENDSGOOD')
+ENDSBAD = os.getenv('ENDSBAD')
+TIMESUP = os.getenv('TIMESUP')
+TIMESDOWN = os.getenv('TIMESDOWN')
+TIMESTEP = os.getenv('TIMESTEP')
+IDEALTIME = os.getenv('IDEALTIME')
+OEE_START_DATE = os.getenv('OEE_START_DATE')
+OEE_START_TIME = os.getenv('OEE_START_TIME')
 
 COMPOSE_PROJECT_NAME = os.getenv('COMPOSE_PROJECT_NAME')
 CONTEXTS_ID = os.getenv('CONTEXTS_ID')

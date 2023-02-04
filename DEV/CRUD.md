@@ -35,7 +35,7 @@ curl -X GET \
 
 #### Delete service group
 curl -iX DELETE \
-  'http://localhost:4041/iot/services/?resource=/iot/opcua&apikey=iot' \
+  'http://localhost:4041/iot/services/?resource=/iot/d&apikey=localhost-1026-PLC-/iot/d' \
   -H 'fiware-service: opcua_car' \
   -H 'fiware-servicepath: /demo'
 
