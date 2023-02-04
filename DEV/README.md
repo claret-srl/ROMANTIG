@@ -1,7 +1,9 @@
 ## Misc
 - [x] CrateDB persistent (Splitted stop and delete case for services script)
 - [x] Improve Grafana dashboard 
-- [ ] improve doc both github and grafana (https://github.blog/2022-05-19-math-support-in-markdown/)
+- [ ] improve doc both github and grafana
+	- [ ] Mermaid
+	- [ ] https://github.blog/2022-05-19-math-support-in-markdown/
 - [x] Update Grafana to 9.3.6 (latest)
 - [x] Update Grafana to 9.1.3 (latest)
 - [x] Update IoT-Agent to 2.0.5 (latest working)
@@ -25,6 +27,7 @@
 - [x] job-working-directory: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
 	- error related to the remote pull of a local docker service
 - [x] Rename cmd create to pull
+
 ## docker-compose
 - [x] mettere tutte le variabili dell .env
 - [x] Check if is possible to assign .env variable to service_id and volume_id
@@ -34,6 +37,7 @@
 - [x] Fix unused and Mongo anonymus volumes
 ## services
 - [x] mettere tutte le variabili dell .env
+
 ## ROSE-AP
 - [x] Add Where NAME = ngsi:v2:...:I40Asset:PLC
 - [x] Removed the absurd necessity to re-build in case of .config update, (update .config > restart the service)
@@ -62,7 +66,7 @@
 
 ### ROSE-AP
 - [ ] Add information on machine activation status (e.g. records and calculate OEE only when it's active).
-	- Provision the information about hte schedule production to know when in planned production on the microservice. (https://www.machinemetrics.com/blog/oee-ooe-teep)
+	- Provision the information about the schedule production to know when in planned production on the microservice. (https://www.machinemetrics.com/blog/oee-ooe-teep)
 - [ ] Add information about reworks (parts and time).
 - [ ] Add information about total OEE stats for all the production.
 - [ ] Extend to Factory level (e.g. un elemento nel contex broker che comunica lo scheduling dei turni di lavoro)
@@ -72,8 +76,11 @@
 - Connessione remota RAMP
 
 ## Business
-- Intregrare presso 2 clienti o lettera di intenti.
-- Fee annuale per integrazione sulle macchine.
+- [ ] Intregrare presso 3 clienti o lettera di intenti.
+	- [ ] Zenti
+	- [ ] G.Engineering
+	- [ ] Laserlam
+- [ ] Fee annuale per integrazione sulle macchine.
 
 ## Architettura
 ![Architettura](img/architettura.png)
