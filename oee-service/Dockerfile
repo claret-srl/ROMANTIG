@@ -2,7 +2,7 @@
 FROM python:3.9.16-alpine3.17
 
 # During building, run the following commands to install dependecies
-RUN apk add --no-cache openssl-dev curl-dev gcc g++ libgcc jq
+RUN apk --no-cache add openssl-dev curl curl-dev gcc g++ libgcc jq
 RUN pip install --upgrade pip
 RUN pip install pycurl crate requests python-dotenv
 
@@ -10,7 +10,8 @@ RUN pip install pycurl crate requests python-dotenv
 WORKDIR /oee-service
 
 # Copy in the continer the following files
-COPY oee_service.py Query.sql ./
+COPY ./ ./
+# COPY oee_service.py Query.sql ./
 # COPY ["oee_service.py", "Query.sql", "./"]
 
 # Run this command at startup

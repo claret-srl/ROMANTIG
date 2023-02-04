@@ -5,60 +5,77 @@
 
 set -e
 
-setRedisCrate () {
+setRedisCrateHostMemory () {
+    echo ""
     sudo sysctl -w vm.max_map_count=262144 # CrateDB
     sudo sysctl vm.overcommit_memory=1 # Redis
 }
 
-buildRoseAp () {
-    cd oee-service
-    docker build -t roseap_oee .
-    cd ..
-}
-
 setEnviroment () {
+	# echo $(cat .env | grep "#" -v)
     export $(cat .env | grep "#" -v)
 }
 
 loadData () {
+    echo ""
     waitForMongo
     addDatabaseIndex
     waitForOrion
     
-    docker run --rm -v $(pwd)/import-data:/import-data \
-    --network fiware_default \
-    -e ORION="${ORION}" \
-    -e ORION_PORT="${ORION_PORT}" \
-    --entrypoint /bin/ash curlimages/curl import-data
+    # docker run --rm -v $(pwd)/import-data:/import-data \
+    # --network fiware_default \
+    # -e ORION="${ORION}" \
+    # -e ORION_PORT="${ORION_PORT}" \
+    # --entrypoint /bin/ash curlimages/curl import-data
+
     waitForIoTAgent
     
-    docker run --rm -v $(pwd)/provision-devices:/provision-devices \
-    --network fiware_default \
-    -e ORION="${ORION}" \
-    -e ORION_PORT="${ORION_PORT}" \
-    -e IOTA_NORTH_PORT="${IOTA_NORTH_PORT}" \
-    -e FIWARE_SERVICE="${FIWARE_SERVICE}" \
-    -e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
-    -e DEVICE_ID="${DEVICE_ID}" \
-    -e FIWARE_SERVICE="${FIWARE_SERVICE}" \
-    -e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
-    -e OCB_ID="${OCB_ID}" \
-    -e OPCUA_ID="${OPCUA_ID}" \
-    --entrypoint /bin/ash curlimages/curl provision-devices
+    # docker run --rm -v $(pwd)/provision-devices:/provision-devices \
+    # --network fiware_default \
+    # -e ORION="${ORION}" \
+    # -e ORION_PORT="${ORION_PORT}" \
+    # -e IOTA_NORTH_PORT="${IOTA_NORTH_PORT}" \
+    # -e FIWARE_SERVICE="${FIWARE_SERVICE}" \
+    # -e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
+    # -e DEVICE_ID="${DEVICE_ID}" \
+    # -e FIWARE_SERVICE="${FIWARE_SERVICE}" \
+    # -e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
+    # -e OCB_ID="${OCB_ID}" \
+    # -e OPCUA_ID="${OPCUA_ID}" \
+    # --entrypoint /bin/ash curlimages/curl provision-devices
     
     waitForCrateDB
     waitForQuantumleap
 }
 
+startingContainers () {
+	    echo ""
+        echo -e "Starting containers:"
+        echo -e "\033[1;34mOrion\033[0m, \033[1;34mQuantumLeap\033[0m, \033[1;36mIoT-Agent\033[0m, \033[1mGrafana\033[0m, \033[1mCrate-DB\033[0m and \033[1mMongo-DB\033[0m."
+        echo ""
+		echo -e "- FIWARE \033[1;34mOrion Context Broker\033[0m, configured for NGSI-v2."
+        echo -e "- Engineering \033[1;36mIoT-Agent for OPC-UA\033[0m will receive northbound measurements from PLC in OPC-UA format and convert them to NGSI-v2 requests for the context broker to alter the state of the context entities."
+        echo -e "- FIWARE \033[1;34mQuantumLeap\033[0m subscribed to context changes and persisting them into a \033[1mCrate-DB\033[0m database."
+        echo -e "- \033[1mMongo-DB\033[0m is the \033[1;34mOrion Context Broker\033[0m and \033[1;36mIoT-Agent\033[0m database to hold context data information such as data entities, subscriptions and registrations."
+        echo -e "- \033[1mCrate-DB\033[0m as a data sink to hold time-based historical context data and HTTP endpoint to interpret time-based data queries."
+        echo -e "- \033[1mGrafana\033[0m is a time series analytics tool will visualise data from CrateDB."
+        echo -e "- \033[1mOEE-calculator\033[0m is a tool to calculate OEE data from CrateDB."
+        echo ""
+        ${dockerCmd} up -d --remove-orphans
+}
+
 stoppingContainers () {
+    echo ""
     CONTAINERS=$(docker ps --filter "label=org.fiware=${ORG_FIWARE}" -aq)
     if [[ -n $CONTAINERS ]]; then
-        echo "Stopping containers"
+        echo "Stopping containers:"
+   		echo ""
         docker rm -f $CONTAINERS || true
     fi
 }
 
 deletingContainers () {
+    echo ""
     stoppingContainers
     VOLUMES=$(docker volume ls -qf dangling=true)
     if [[ -n $VOLUMES ]]; then
@@ -73,9 +90,9 @@ deletingContainers () {
 }
 
 displayServices () {
+    echo ""
     docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter "label=org.fiware=${ORG_FIWARE}"
     (gp ports list 2> /dev/null) || true
-    echo ""
 }
 
 addDatabaseIndex () {
@@ -157,7 +174,15 @@ waitForCrateDB () {
 
 setEnviroment
 
-usage="usage: services [pull|start|stop|remove|debug]"
+usage="usage: ./services <flag>
+-h	| --help	Show this usage message.
+-b	| --build	Builds the Docker Images for the OEE-Service.
+-p	| --pull	Pulls images from Docker Hub.
+-u	| --up		Startup the services in a Docker Container.
+-d	| --down	Shoutdown the running services of the Docker Container.
+-rm	| --remove	Remove the Docker Volumes and the Docker Networks. This will cause the loss of data stored in the databases.
+-d	| --debug	Convenient script to Shoutdown, Builds and Startup the services.
+"
 
 dockerCmd="docker compose"
 if (( $# == 2 )); then
@@ -172,47 +197,54 @@ fi
 
 command="$1"
 case "${command}" in
-    "help")
+    "-h"|"--help")
         echo "$usage"
+    	echo ""
     ;;
-    "build")
+    "-b"|"--build")
         echo "Building Rose-AP Docker images"
-        buildRoseAp
+        echo ""
+    	cd oee-service
+		# rm -r __pycache__
+		docker image rm -f roseap_oee
+    	docker build -t roseap_oee .
+		# docker scan
+    	cd ..
         echo -e " \033[1;32mdone\033[0m"
+    	echo ""
     ;;
-    "debug")
-        sudo ./services stop
-        sudo ./services build
-        sudo ./services start
+    "-d"|"--debug")
+        sudo ./services --down
+        sudo ./services --build
+        sudo ./services --up
+    	echo ""
     ;;
-    "pull")
+    "-p"|"--pull")
         echo "Pulling Docker images"
         docker pull curlimages/curl
         ${dockerCmd} pull
+    	echo ""
     ;;
-    "start")
+    "up"|"--up")
+		if ((docker volume ls | grep "mongo")); then
+			docker volume rm $(docker volume ls | grep "mongo")
+		fi
         setEnviroment
-        setRedisCrate
+        setRedisCrateHostMemory
         stoppingContainers
-        echo -e "Starting containers: \033[1;34mOrion\033[0m, \033[1;34mQuantumLeap\033[0m, \033[1;36mIoT-Agent\033[0m, \033[1mGrafana\033[0m, \033[1mCrate-DB\033[0m and \033[1mMongo-DB\033[0m."
-        echo -e "- FIWARE \033[1;34mOrion Context Broker\033[0m, configured for NGSI-v2."
-        echo -e "- Engineering \033[1;36mIoT-Agent for OPC-UA\033[0m will receive northbound measurements from PLC in OPC-UA format and convert them to NGSI-v2 requests for the context broker to alter the state of the context entities."
-        echo -e "- FIWARE \033[1;34mQuantumLeap\033[0m subscribed to context changes and persisting them into a \033[1mCrate-DB\033[0m database."
-        echo -e "- \033[1mMongo-DB\033[0m is the \033[1;34mOrion Context Broker\033[0m and \033[1;36mIoT-Agent\033[0m database to hold context data information such as data entities, subscriptions and registrations."
-        echo -e "- \033[1mCrate-DB\033[0m as a data sink to hold time-based historical context data and HTTP endpoint to interpret time-based data queries."
-        echo -e "- \033[1mGrafana\033[0m is a time series analytics tool will visualise data from CrateDB."
-        echo -e "- \033[1mOEE-calculator\033[0m is a tool to calculate OEE data from CrateDB."
-        echo ""
-        ${dockerCmd} up -d --remove-orphans
+		startingContainers
+		# docker volume prune --filter "label=org.fiware=${ORG_FIWARE}"
         # ${dockerCmd} --profile oee_service up -d --remove-orphans
-        loadData
+        # loadData
         displayServices
+    	echo ""
     ;;
-    "stop")
+    "down"|"--down")
         setEnviroment
         stoppingContainers
+    	echo ""
     ;;
-    "remove")
+    "-rm"|"--remove")
         setEnviroment
         read -p "This operation will erase also the data stored in the database, continue (y/n)?" choice
         case "$choice" in
@@ -227,11 +259,12 @@ case "${command}" in
                 echo "Invalid"
             ;;
         esac
-        
+    	echo ""
     ;;
     *)
         echo "Command not Found."
         echo "$usage"
         exit 127;
+    	echo ""
     ;;
 esac

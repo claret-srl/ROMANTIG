@@ -120,7 +120,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\noee AS \"OEE\",\navailability AS \"Availability\",\nperformance AS \"Performance\",\nquality AS \"Quality\"\nFROM \"etoee\"\nORDER BY 1 DESC;",
+          "rawSql": "SELECT\ntime_frame AS \"time\",\noee AS \"OEE\",\navailability AS \"Availability\",\nperformance AS \"Performance\",\nquality AS \"Quality\"\nFROM \"process_status_oee\"\nORDER BY 1 DESC;",
           "refId": "A",
           "select": [
             [
@@ -384,7 +384,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\noee AS \"OEE\",\navailability AS \"Availability\",\nperformance AS \"Performance\",\nquality AS \"Quality\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 1;",
+          "rawSql": "SELECT\ntime_frame AS \"time\",\noee AS \"OEE\",\navailability AS \"Availability\",\nperformance AS \"Performance\",\nquality AS \"Quality\"\nFROM \"process_status_oee\"\nORDER BY 1 DESC\nLIMIT 1;",
           "refId": "A",
           "select": [
             [
@@ -571,7 +571,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\nparts_good AS \"Parts Good\",\nparts_bad AS \"Parts Bad\",\nparts_total AS \"Parts Total\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 100;",
+          "rawSql": "SELECT\ntime_frame AS \"time\",\nparts_good AS \"Parts Good\",\nparts_bad AS \"Parts Bad\",\nparts_total AS \"Parts Total\"\nFROM \"process_status_oee\"\nORDER BY 1 DESC\nLIMIT 100;",
           "refId": "A",
           "select": [
             [
@@ -717,7 +717,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\"\r\nFROM \"etoee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
+          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\"\r\nFROM \"process_status_oee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -844,7 +844,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\ntime_up AS \"Time Up\",\ntime_down AS \"Time Down\",\ntime_total AS \"Time Total\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 60;",
+          "rawSql": "SELECT\ntime_frame AS \"time\",\ntime_up AS \"Time Up\",\ntime_down AS \"Time Down\",\ntime_total AS \"Time Total\"\nFROM \"process_status_oee\"\nORDER BY 1 DESC\nLIMIT 60;",
           "refId": "A",
           "select": [
             [
@@ -991,7 +991,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\"\r\nFROM \"etoee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
+          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\"\r\nFROM \"process_status_oee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1132,7 +1132,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\nparts_good AS \"Parts Good\",\nparts_bad AS \"Parts Bad\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 100;",
+          "rawSql": "SELECT\ntime_frame AS \"time\",\nparts_good AS \"Parts Good\",\nparts_bad AS \"Parts Bad\"\nFROM \"process_status_oee\"\nORDER BY 1 DESC\nLIMIT 100;",
           "refId": "A",
           "select": [
             [
@@ -1319,7 +1319,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\ntime_up AS \"Time Up\",\ntime_down AS \"Time Down\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 100;",
+          "rawSql": "SELECT\ntime_frame AS \"time\",\ntime_up AS \"Time Up\",\ntime_down AS \"Time Down\"\nFROM \"process_status_oee\"\nORDER BY 1 DESC\nLIMIT 100;",
           "refId": "A",
           "select": [
             [
@@ -1496,7 +1496,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\noee AS \"OEE\",\r\navailability AS \"Availability\",\r\nperformance AS \"Performance\",\r\nquality AS \"Quality\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\",\r\nparts_total AS \"Parts Total\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\",\r\ntime_total AS \"Time Total\"\r\nFROM \"etoee\"\r\nORDER BY 1 DESC\r\nLIMIT 100;",
+          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\noee AS \"OEE\",\r\navailability AS \"Availability\",\r\nperformance AS \"Performance\",\r\nquality AS \"Quality\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\",\r\nparts_total AS \"Parts Total\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\",\r\ntime_total AS \"Time Total\"\r\nFROM \"process_status_oee\"\r\nORDER BY 1 DESC\r\nLIMIT 100;",
           "refId": "A",
           "select": [
             [

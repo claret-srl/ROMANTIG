@@ -52,7 +52,7 @@ services:
       db-crate:
         condition: service_healthy
       db-redis:
-        condition: service_started
+        condition: service_healthy
     environment:
       - CRATE_HOST=${CRATE}
       - REDIS_HOST=${REDIS}
@@ -70,29 +70,39 @@ services:
     image: iotagent4fiware/iotagent-opcua:${OPC_UA_VERSION}
     container_name: ${IOTA}
     depends_on:
-      - ${MONGO}
+      orion:
+        condition: service_healthy
     networks:
       - default
     ports:
       - "${IOTA_NORTH_PORT}:4041"
       - "${IOTA_SOUTH_PORT}:9229"
     volumes:
-      - ./conf/config.js:/opt/iotagent-opcua/conf/config.js # OPC_UA_VERSION=2.0.5
+      - ./iot-agent/config.js:/opt/iotagent-opcua/conf/config.js
     environment:
-      - "IOTA_CB_HOST=${ORION}"								# Hostname of the context broker to update context
-      - "IOTA_CB_PORT=${ORION_PORT}"									# Port that context broker listens on to update context
-      - "IOTA_NORTH_PORT=${IOTA_NORTH_PORT}"								# Port used for configuring the IoT Agent and receiving context updates from the context broker
-      - "IOTA_REGISTRY_TYPE=mongodb"						# Whether to hold IoT device info in memory or in a database
-      - "IOTA_MONGO_HOST=${MONGO}"							# The hostname of MongoDB - used for holding device and service information
-      - "IOTA_MONGO_PORT=${MONGO_PORT}"								# The port that MongoDB is listening on
-      - "IOTA_MONGO=iotagent_opcua"						# The name of the database used in MongoDB
+      - "FIWARE_SERVICE=${FIWARE_SERVICE}"
+      - "FIWARE_SERVICEPATH=${FIWARE_SERVICEPATH}"
+      - "CONTEXTS_ID=${CONTEXTS_ID}"
+      - "CONTEXTS_TYPE=${CONTEXTS_TYPE}"
+      - "DEVICE_ID=${DEVICE_ID}"
+      - "OCB_ID=${OCB_ID}"
+      - "OPCUA_ID=${OPCUA_ID}"
+      - "IOTA_OPCUA_ENDPOINT=${IOTA_OPCUA_ENDPOINT}"	          # Endpoint of OPC UA Server
+      - "IOTA_FALLBACK_TENANT=${FIWARE_SERVICE}"
+      - "IOTA_FALLBACK_PATH=${FIWARE_SERVICEPATH}"
+      - "IOTA_OPCUA_SECURITY_MODE=None"						              # Security mode for OPC UA connection
+      - "IOTA_OPCUA_SECURITY_POLICY=None"					              # Security policy for OPC UA connection
+      - "IOTA_OPCUA_SECURITY_USERNAME=null"                     # Security username for OPC UA connection
+      - "IOTA_OPCUA_SECURITY_PASSWORD=null"                     # Security password for OPC UA connection
+      - "IOTA_CB_HOST=${ORION}"								                  # Hostname of the context broker to update context
+      - "IOTA_CB_PORT=${ORION_PORT}"									          # Port that context broker listens on to update context
+      - "IOTA_NORTH_PORT=${IOTA_NORTH_PORT}"							      # Port used for configuring the IoT Agent and receiving context updates from the context broker
+      - "IOTA_REGISTRY_TYPE=mongodb"						                # Whether to hold IoT device info in memory or in a database
+      - "IOTA_MONGO_HOST=${MONGO}"							                # The hostname of MongoDB - used for holding device and service information
+      - "IOTA_MONGO_PORT=${MONGO_PORT}"								          # The port that MongoDB is listening on
+      - "IOTA_MONGO=${IOTA}"						                        # The name of the database used in MongoDB
       - "IOTA_PROVIDER_URL=http://${IOTA}:${IOTA_NORTH_PORT}"		# URL passed to the Context Broker when commands are registered, used as a forwarding URL location when the Context Broker issues a command to a device
-      - "IOTA_OPCUA_ENDPOINT=opc.tcp://10.0.7.236:4840/"	# Endpoint of OPC UA Server
-      - "IOTA_OPCUA_SECURITY_MODE=None"						# Security mode for OPC UA connection
-      - "IOTA_OPCUA_SECURITY_POLICY=None"					# Security policy for OPC UA connection, username, password
-      - "IOTA_OPCUA_SECURITY_USERNAME=null"
-      - "IOTA_OPCUA_SECURITY_PASSWORD=null"
-      - "IOTA_OPCUA_UNIQUE_SUBSCRIPTION=false"				# Boolean property to assess whether subscribe once for multiple OPC UA nodes or not
+      - "IOTA_OPCUA_UNIQUE_SUBSCRIPTION=false"				          # Boolean property to assess whether subscribe once for multiple OPC UA nodes or not
 
 
   # Databases
@@ -104,11 +114,12 @@ services:
     expose:
       - "${MONGO_PORT}"
     ports:
-      - "${MONGO_PORT}:${MONGO_PORT}" # localhost:27017
+      - "${MONGO_PORT}:${MONGO_PORT}"
     networks:
       - default
     volumes:
-      - ${MONGO}:/data
+      - ${MONGO}_data:/data/db
+      - ${MONGO}_config:/data/configdb
     healthcheck:
       test: |
         host=`hostname --ip-address || echo '127.0.0.1'`; 
@@ -146,7 +157,24 @@ services:
       - "${REDIS_PORT}:6379"
     volumes:
       - ${REDIS}:/data
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 5s
 
+  redisinsight:
+    labels:
+      org.fiware: ${ORG_FIWARE}
+    image: redislabs/redisinsight:1.13.1
+    container_name: "redisinsight"
+    networks:
+      - default
+    ports:
+      - '8001:8001'
+    volumes:
+      - redisinsight:/db
+    depends_on:
+      db-redis:
+        condition: service_healthy
 
   # Dashboard
   grafana:
@@ -154,16 +182,22 @@ services:
       org.fiware: ${ORG_FIWARE}
     image: grafana/grafana:${GRAFANA_VERSION}
     container_name: ${GRAFANA}
-    depends_on:
-      db-crate:
-        condition: service_healthy
+    # depends_on:
+    #   db-crate:
+    #     condition: service_healthy
+    #   oee-service: 
+    #     condition: service_healthy
     ports:
       - "${GRAFANA_PORT}:3000"
-    # environment:
-      # - "CRATE_SCHEMA=${CRATE_SCHEMA}"
-      # - "CRATE_TABLE=${CRATE_TABLE}"
-      # - "CRATE_TABLE_DURATION=${CRATE_TABLE_DURATION}"
-      # - "CRATE_TABLE_OEE=${CRATE_TABLE_OEE}"
+    environment:
+      - "CRATE=${CRATE}"
+      - "CRATE_PORT_POSTGRES=${CRATE_PORT_POSTGRES}"
+      # - "=${}"
+      - "FIWARE_SERVICE=$FIWARE_SERVICE"
+      - "CRATE_SCHEMA=$CRATE_SCHEMA"
+      - "CRATE_TABLE=$CRATE_TABLE"
+      - "CRATE_TABLE_DURATION=$CRATE_TABLE_DURATION"
+      - "CRATE_TABLE_OEE=$CRATE_TABLE_OEE"
       # - GF_INSTALL_PLUGINS=https://github.com/orchestracities/grafana-map-plugin/archive/master.zip;grafana-map-plugin,grafana-clock-panel,grafana-worldmap-panel
     volumes:
       - ${GRAFANA}:/var/lib/grafana
@@ -184,14 +218,23 @@ services:
     depends_on:
       db-crate:
         condition: service_healthy
+      # redis:
+      #   condition: service_started
+      orion:
+        condition: service_healthy
+      # quantumleap:
+      #   condition: service_healthy
     volumes:
-      - ./oee-service/oee_conf.config:/oee-service/oee_conf.config
+      - ./oee-service/.config:/oee-service/.config
       - ./.env:/oee-service/.env
     ports:
       - "${ROSEAP_OEE_PORT}:8008"
     networks:
       - default
     # restart: 'always'
+    healthcheck:
+      test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/" == 200 || exit 1
+      interval: 5s
 
 networks:
   default:
@@ -200,8 +243,9 @@ networks:
 
 
 volumes:
-  db-mongo: ~
+  db-mongo_data: ~
+  db-mongo_config: ~
   db-crate: ~
   db-redis: ~
+  redisinsight: ~
   grafana: ~
-  # oee-service: ~
