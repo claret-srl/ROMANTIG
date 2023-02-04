@@ -1,1 +1,3 @@
 *.dccache
+oee-service\__pycache__
+*.pyc
