@@ -1,6 +1,5 @@
 # ROMANTIG ROSE-AP OEE Calculator
 
-
 This ROSE-AP is intended as a microservice for automatic OEE, and related metrics, calculation. The service works by connecting to a [Crate database](https://crate.io/) on port 4200, where information about the status of your target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) and [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) services.
 
 ## Table of Contents
