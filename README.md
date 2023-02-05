@@ -65,19 +65,17 @@ The process cycle and the respective up and down time states are shown below:
 
 ```mermaid
 flowchart LR
-    Idle --> Picking --> Welding --> QC
+    Picking --> Welding --> QC
+    QC -- Good Part --> Placing
     QC --> Rework --> QC
-    QC -- Bad Part --> Trashing --> Idle
-    QC -- Good Part --> Placing --> Idle
+    QC -- Bad Part --> Trashing
+    Placing & Trashing --> Idle --> Picking
 
-classDef upTime fill:lightgreen,stroke:#333,color:#333
-classDef downTime fill:LightCoral,stroke:#333,color:#333
-classDef upDownTime fill:#f7dc6f,stroke:#333,color:#333
+class Picking,Placing,QC,Welding,upTime,Idle,Trashing,Rework,QC_Rework Gainsboro
 
-class Picking,Placing,QC,Welding,upTime upTime
-class Idle,Trashing,Rework,QC_Rework,downTime downTime
+linkStyle 0,1,2 stroke:lightgreen;
+linkStyle 3,4,5,6,7,8 stroke:LightCoral;
 ```
-
 
 In general, we suggest you to adopt a state space representation similar to the one above for your target process, in order to clearly highlight every step in the cycle and attribute it the correct value for up or down time. The state representation (the onthology of the system) should not be too detailed (i.e. too many states) or too general (i.e. one or two states) because of unnecessary additional workload or possible loss of information.
 
@@ -129,19 +127,19 @@ The overall architecture can be seen below:
 
 ```mermaid
   flowchart TD
-    Welder[fa:fa-broom Welder]:::Cyan
-    Robot[fa:fa-robot Robot]:::Cyan
-    QC[fa:fa-video QC]:::Cyan
-    Device[fa:fa-ethernet Device]:::Cyan
-    PLC[fa:fa-microchip PLC]:::Cyan
-    IoT-Agent[fa:fa-network-wired IoT-Agent]:::Cyan
+    Welder[Welder]
+    Robot[Robot]
+    QC[Quality Control]
+    Device[Device]
+    PLC[PLC]
+    IoT-Agent[IoT-Agent]:::Cyan
     Orion[Orion \n Context Broker]:::DarkBlue
     Quantumleap[Quantum \n Leap]:::DarkBlue
-    ROSE-AP(fa:fa-wand-magic-sparkles \n ROSE-AP \n RomanTIG):::ROSE-AP
-    Redis[(fa:fa-server \n RedisDB)]
-    Mongo[(fa:fa-server \n MongoDB)]
-    Crate[(fa:fa-server \n CrateDB)]
-    Grafana[fa:fa-chart-line \n Grafana]:::Grafana
+    ROSE-AP(ROSE-AP \n RomanTIG):::Claret
+    Redis[(RedisDB)]
+    Mongo[(MongoDB)]
+    Crate[(CrateDB)]
+    Grafana[Grafana]:::Grafana
 
     Orion & IoT-Agent <--27017:27017---> Mongo
     ROSE-AP <--1026:1026--> Orion
@@ -154,7 +152,7 @@ classDef DarkBlue fill:#233C68,stroke:#333,color:#FFF
 classDef Cyan fill:#45D3DD,stroke:#333,color:#333
 classDef Gainsboro fill:Gainsboro,stroke:#333,color:#333
 classDef Grafana fill:#333,Stroke:#282828,color:#FCB35F
-classDef ROSE-AP fill:#F8F8F8,Stroke:#0999D0,color:#0999D0
+classDef Claret fill:#0999D0,Stroke:#F8F8F8,color:#F8F8F8
 
 class Crate,Mongo,Redis Gainsboro
 ```
@@ -186,18 +184,18 @@ docker version
 Please ensure that you are using Docker version 20.10 or higher and Docker Compose 1.29 or higher and upgrade if
 necessary.
 
-## Troubleshooting
+# Troubleshooting
+
 If the following error will appear creating or starting the container
 ```
 /bin/bash^M: bad interpreter: No such file or directory
 ```
-Please use the utility `dos2unix` to convert the text files from DOS/Mac to Unix enviroment
-Install dos2unix on CentOS/Fedora/RHEL
+Please use the utility `dos2unix` to convert the text files from DOS/Mac to Unix enviroment, install dos2unix on CentOS/Fedora/RHEL
 ```
 sudo yum update
 sudo yum install dos2unix
 ```
-Install dos2unix on Ubuntu/Debian
+or in Ubuntu/Debian:
 ```
 sudo apt update
 sudo apt install dos2unix
@@ -207,16 +205,18 @@ Then run the following command, in the root directory, to convert all the text f
 dos2unix ./.env ./docker-compose.yml ./import-data ./provision-devices ./services
 ```
 
-### CrateDB
+## CrateDB
+
 If the CrateDB container crashes after startup, run the following command:
 ```
 sudo sysctl vm.max_map_count=262144
 ```
-This setting in included in the script case `sudo ./services create`. 
+This setting in included in the script case `sudo ./services up`.
 
-### Redis
+## Redis
+
 If the Redis container crashes after startup, run the following command:
 ```
 sudo sysctl vm.overcommit_memory=1
 ```
-This setting in included in the script case `sudo ./services create`. 
+This setting in included in the script case `sudo ./services up`.
