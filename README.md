@@ -141,7 +141,7 @@ The overall architecture can be seen below:
     Redis[(fa:fa-server \n RedisDB)]
     Mongo[(fa:fa-server \n MongoDB)]
     Crate[(fa:fa-server \n CrateDB)]
-    Grafana[fa:fa-chart-line \n Grafana]::Grafana
+    Grafana[fa:fa-chart-line \n Grafana]:::Grafana
 
     Orion & IoT-Agent <--27017:27017---> Mongo
     ROSE-AP <--1026:1026--> Orion
