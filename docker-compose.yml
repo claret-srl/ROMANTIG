@@ -114,7 +114,7 @@ services:
     expose:
       - "${MONGO_PORT}"
     ports:
-      - "${MONGO_PORT}:${MONGO_PORT}"
+      - "${MONGO_PORT}:27017"
     networks:
       - default
     # volumes:
@@ -126,6 +126,25 @@ services:
         mongo --quiet $host/test --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)' && echo 0 || echo 1
       interval: 5s
   
+  # Mongo GUI, to chek if Mongo it's working just for dev purpose
+  # mongo-express:
+  #   image: mongo-express:latest
+  #   labels:
+  #     org.fiware: ${ORG_FIWARE}
+  #   container_name: mongo-express
+  #   environment:
+  #     # ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+  #     # ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+  #     ME_CONFIG_MONGODB_SERVER: "${MONGO}"
+  #     ME_CONFIG_MONGODB_PORT: "${MONGO_PORT}"
+  #   ports:
+  #     - "8081:8081"
+  #   networks:
+  #     - default
+  #   depends_on:
+  #     db-mongo:
+  #       condition: service_healthy
+
 
   db-crate:
     labels:
@@ -161,7 +180,7 @@ services:
       test: ["CMD", "redis-cli","ping"]
       interval: 5s
 
-  # Redis GUI, to chek if Redis is it working just for dev purpose
+  # Redis GUI, to chek if Redis it's working just for dev purpose
   # redisinsight:
   #   labels:
   #     org.fiware: ${ORG_FIWARE}
