@@ -58,14 +58,27 @@ Now you can open Grafana on [localhost:3000](localhost:3000) (`user:admin` `pass
 
 ![grafana_oee](img/dashboard.png)
 
-
 ## Example
-
 Our example use-case scenario is based on an automated welding robotic system which performs several tasks. At first, a stereometric scanner individuates the 3D pose estimate of target pipes, then the robot arm proceeds to pick those and place them in front of a torch, where they will be welded. Once welded, the system proceeds to perform a quality control check to validate the welding: if the check succeeds, the pipe is placed in the final bin; if the check fail, welding is performed again and the QC control the pipe a second time. If the check fails twice in a row, the pipe is discarded. 
 
 The process cycle and the respective up and down time states are shown below:
 
-![mockup_cycle](img/mockup_cycle.png)
+```mermaid
+flowchart LR
+    Idle --> Picking --> Welding --> QC
+    QC -- Rework --> Welding
+    QC -- Bad Part --> Trashing --> Idle
+    QC -- Good Part --> Placing --> Idle
+
+classDef upTime fill:lightgreen,stroke:#333,color:#333
+classDef downTime fill:LightCoral,stroke:#333,color:#333
+classDef upDownTime fill:#f7dc6f,stroke:#333,color:#333
+
+class Picking,Welding,Placing upTime
+class Idle,Trashing,Rework downTime
+class QC upDownTime
+```
+
 
 In general, we suggest you to adopt a state space representation similar to the one above for your target process, in order to clearly highlight every step in the cycle and attribute it the correct value for up or down time. The state representation (the onthology of the system) should not be too detailed (i.e. too many states) or too general (i.e. one or two states) because of unnecessary additional workload or possible loss of information.
 
