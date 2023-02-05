@@ -2,7 +2,7 @@
 FROM python:3.9.16-alpine3.17
 
 # During building, run the following commands to install dependecies
-RUN apk --no-cache add openssl-dev curl curl-dev gcc g++ libgcc jq
+RUN apk --no-cache add openssl-dev curl curl-dev gcc g++ libgcc
 RUN pip install --upgrade pip
 RUN pip install pycurl crate requests python-dotenv
 
