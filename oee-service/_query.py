@@ -65,4 +65,4 @@ def oee(
 		subquery_03;"""
 
 def oeeCallBack(CRATE_SCHEMA, CRATE_TABLE_OEE):
-    return f'''SELECT oee, availability, performance, quality FROM "{CRATE_SCHEMA.lower()}"."{CRATE_TABLE_OEE.lower()}" LIMIT 1;'''
+    return f'''SELECT oee, availability, performance, quality FROM "{CRATE_SCHEMA.lower()}"."{CRATE_TABLE_OEE.lower()}" ORDER BY time_frame DESC LIMIT 1;'''
