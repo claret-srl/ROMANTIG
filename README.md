@@ -81,7 +81,110 @@ class Idle,Trashing,Rework,QC_Rework,downTime downTime
 
 In general, we suggest you to adopt a state space representation similar to the one above for your target process, in order to clearly highlight every step in the cycle and attribute it the correct value for up or down time. The state representation (the onthology of the system) should not be too detailed (i.e. too many states) or too general (i.e. one or two states) because of unnecessary additional workload or possible loss of information.
 
-As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to Orion Context Broker through the [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our OEE calculator.  
+As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to Orion Context Broker through the [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our OEE calculator.
+
+# Architecture
+
+This application builds on the components and dummy IoT devices created in
+[previous tutorials](https://github.com/FIWARE/tutorials.IoT-Agent/). It will use three FIWARE components: the
+[Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), the
+[IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/), and
+[QuantumLeap](https://smartsdk.github.io/ngsi-timeseries-api/) .
+
+Therefore the overall architecture will consist of the following elements:
+
+-   The **FIWARE Generic Enablers**:
+
+    -   The FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests
+        using [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
+    -   The FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) which will
+        receive northbound measurements from the dummy IoT devices in
+        [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
+        format and convert them to [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the
+        context broker to alter the state of the context entities
+    -   FIWARE [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) subscribed to context changes and persisting
+        them into a **CrateDB** database
+
+-   A [MongoDB](https://www.mongodb.com/) database:
+
+    -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions and
+        registrations
+    -   Used by the **IoT Agent** to hold device information such as device URLs and Keys
+
+-   A [CrateDB](https://crate.io/) database:
+
+    -   Used as a data sink to hold time-based historical context data
+    -   offers an HTTP endpoint to interpret time-based data queries
+
+-   A **Context Provider**: - A webserver acting as set of
+    [dummy IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-v2) using the
+    [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
+    protocol running over HTTP. - Note the **Stock Management Frontend** and **Context Provider NGSI** proxy are not
+    used in this tutorial.
+
+Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run
+from exposed ports.
+
+The overall architecture can be seen below:
+
+```mermaid
+  flowchart TD
+    Welder[fa:fa-broom Welder]:::Cyan
+    Robot[fa:fa-robot Robot]:::Cyan
+    QC[fa:fa-video QC]:::Cyan
+    Device[fa:fa-ethernet Device]:::Cyan
+    PLC[fa:fa-microchip PLC]:::Cyan
+    IoT-Agent[fa:fa-network-wired IoT-Agent]:::Cyan
+    Orion[Orion \n Context Broker]:::DarkBlue
+    Quantumleap[Quantum \n Leap]:::DarkBlue
+    ROSE-AP(fa:fa-wand-magic-sparkles \n ROSE-AP \n RomanTIG):::ROSE-AP
+    Redis[(fa:fa-server \n RedisDB)]
+    Mongo[(fa:fa-server \n MongoDB)]
+    Crate[(fa:fa-server \n CrateDB)]
+    Grafana[fa:fa-chart-line \n Grafana]::Grafana
+
+    Orion & IoT-Agent <--27017:27017---> Mongo
+    ROSE-AP <--1026:1026--> Orion
+    Quantumleap <--6379:6379--> Redis
+    Welder & Robot & QC & Device <--PROFINET--> PLC <--OPC-UA--> IoT-Agent <--4041:4041--> Orion <--8668:8668--> Quantumleap
+    Grafana <--4200:4200--> Crate
+    ROSE-AP  & Quantumleap <--4200:4200--> Crate
+
+classDef DarkBlue fill:#233C68,stroke:#333,color:#FFF
+classDef Cyan fill:#45D3DD,stroke:#333,color:#333
+classDef Gainsboro fill:Gainsboro,stroke:#333,color:#333
+classDef Grafana fill:#333,Stroke:#282828,color:#FCB35F
+classDef ROSE-AP fill:#F8F8F8,Stroke:#0999D0,color:#0999D0
+
+class Crate,Mongo,Redis Gainsboro
+```
+
+# Prerequisites
+
+## Docker and Docker Compose
+
+To keep things simple all components will be run using [Docker](https://www.docker.com). **Docker** is a container
+technology which allows to different components isolated into their respective environments.
+
+-   To install Docker on Windows follow the instructions [here](https://docs.docker.com/docker-for-windows/)
+-   To install Docker on Mac follow the instructions [here](https://docs.docker.com/docker-for-mac/)
+-   To install Docker on Linux follow the instructions [here](https://docs.docker.com/install/)
+
+**Docker Compose** is a tool for defining and running multi-container Docker applications. A series of
+[YAML files](https://raw.githubusercontent.com/Fiware/tutorials.Time-Series-Data/master/docker-compose.yml) are used to
+configure the required services for the application. This means all container services can be brought up in a single
+command. Docker Compose is installed by default as part of Docker for Windows and Docker for Mac, however Linux users
+will need to follow the instructions found [here](https://docs.docker.com/compose/install/)
+
+You can check your current **Docker** and **Docker Compose** versions using the following commands:
+
+```console
+docker-compose -v
+docker version
+```
+
+Please ensure that you are using Docker version 20.10 or higher and Docker Compose 1.29 or higher and upgrade if
+necessary.
 
 ## Troubleshooting
 If the following error will appear creating or starting the container
