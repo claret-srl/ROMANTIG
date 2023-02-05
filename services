@@ -59,9 +59,15 @@ startingContainers () {
         echo -e "- \033[1mMongo-DB\033[0m is the \033[1;34mOrion Context Broker\033[0m and \033[1;36mIoT-Agent\033[0m database to hold context data information such as data entities, subscriptions and registrations."
         echo -e "- \033[1mCrate-DB\033[0m as a data sink to hold time-based historical context data and HTTP endpoint to interpret time-based data queries."
         echo -e "- \033[1mGrafana\033[0m is a time series analytics tool will visualise data from CrateDB."
-        echo -e "- \033[1mOEE-calculator\033[0m is a tool to calculate OEE data from CrateDB."
+        echo -e "- \033[1mOEE-calculator\033[0m is a ROSE-AP module to calculate OEE data from CrateDB."
         echo ""
         ${dockerCmd} up -d --remove-orphans
+        echo ""
+		echo "Removing orphans volumes"
+		docker volume rm $(docker volume ls -qf dangling=true)
+        # ${dockerCmd} --profile oee_service up -d --remove-orphans
+		# docker volume prune --filter "label=org.fiware=${ORG_FIWARE}"
+        echo ""
 }
 
 stoppingContainers () {
@@ -79,12 +85,12 @@ deletingContainers () {
     stoppingContainers
     VOLUMES=$(docker volume ls -qf dangling=true)
     if [[ -n $VOLUMES ]]; then
-        echo "Removing old volumes"
+        echo "Removing all Volumes"
         docker volume rm $VOLUMES || true
     fi
     NETWORKS=$(docker network ls  --filter "label=org.fiware=${ORG_FIWARE}" -q)
     if [[ -n $NETWORKS ]]; then
-        echo "Removing networks"
+        echo "Removing all Networks"
         docker network rm $NETWORKS || true
     fi
 }
@@ -205,7 +211,6 @@ case "${command}" in
         echo "Building Rose-AP Docker images"
         echo ""
     	cd oee-service
-		# rm -r __pycache__
 		docker image rm -f roseap_oee
     	docker build -t roseap_oee .
 		# docker scan
@@ -225,16 +230,11 @@ case "${command}" in
         ${dockerCmd} pull
     	echo ""
     ;;
-    "up"|"--up")
-		if ((docker volume ls | grep "mongo")); then
-			docker volume rm $(docker volume ls | grep "mongo")
-		fi
+    "up"|"--up")	
         setEnviroment
         setRedisCrateHostMemory
         stoppingContainers
 		startingContainers
-		# docker volume prune --filter "label=org.fiware=${ORG_FIWARE}"
-        # ${dockerCmd} --profile oee_service up -d --remove-orphans
         # loadData
         displayServices
     	echo ""
