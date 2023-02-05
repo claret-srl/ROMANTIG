@@ -5,7 +5,91 @@
 curl -iX POST \
   'http://localhost:4200/_sql' \
   -H 'Content-Type: application/json' \
-  -d '{"stmt":"SELECT oee, availability, performance, quality FROM mtopcua_car.process_status_oee LIMIT 1;"}'
+  -d '{"stmt":"SELECT oee, availability, performance, quality FROM mtopcua_car.etoee ORDER BY time_frame DESC LIMIT 1;"}'
+
+  <!-- {
+  "cols": [
+    "oee",
+    "availability",
+    "performance",
+    "quality"
+  ],
+  "rows": [
+    [
+      0.26060768544741464,
+      0.5837221242493917,
+      0.6696877023014934,
+      0.6666666666666667
+    ]
+  ],
+  "rowcount": 1,
+  "duration": 5.3954
+} -->
+
+## Registration
+
+curl -iX POST \
+  'http://localhost:1026/v2/registrations' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "description": "Random Weather Conditions",
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "urn:ngsiv2:I40Asset:PLC:001",
+        "type": "PLC"
+      }
+    ],
+    "attrs": [
+       "oee",
+       "availability",
+       "performance",
+       "quality"
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://context-provider:3000/random/weatherConditions"
+    }
+  }
+}'
+
+### Provision a subscription notification to Quantumleap
+curl -s -o /dev/null -X POST \
+  'http://orion:1026/v2/subscriptions/' \
+  -H 'fiware-service: opcua_car' \
+  -H 'fiware-servicepath: /demo' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "description": "Provision subscriptions for QuantumLeap",
+  "subject": {
+    "entities": [
+      {
+        "id": "urn:ngsiv2:I40Asset:PLC:001",
+        "type": "PLC"
+      }
+    ],
+    "condition": {
+      "attrs": ["processStatus"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://quantumleap:8668/v2/notify"
+    },
+    "attrs": ["processStatus"]
+  },
+  "throttling": 1
+}'
+
+
+
+
+
+
+
+
+
 
 ## IoT-Agent
 

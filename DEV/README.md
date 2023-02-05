@@ -1,9 +1,17 @@
+## Business
+- [ ] Intregrare presso 3 clienti o lettera di intenti.
+	- [ ] Zenti
+	- [ ] G.Engineering
+	- [ ] Laserlam
+- [ ] Fee annuale per integrazione sulle macchine.
+- [ ] Business Plan.
+
 ## Misc
 - [x] CrateDB persistent (Splitted stop and delete case for services script)
 - [x] Improve Grafana dashboard 
 - [ ] improve doc both github and grafana
-	- [ ] Mermaid
-	- [ ] https://github.blog/2022-05-19-math-support-in-markdown/
+	- [x] Mermaid
+	- [x] https://github.blog/2022-05-19-math-support-in-markdown/
 - [x] Update Grafana to 9.3.6 (latest)
 - [x] Update Grafana to 9.1.3 (latest)
 - [x] Update IoT-Agent to 2.0.5 (latest working)
@@ -18,9 +26,9 @@
 - [x] Switch Base image of the OEE-Service to python:3.9.16-alpine3.17 (from 892.95MB to 59.35MB)
 - [x] Make the PLC IP configurable in the same file as the .config of the ROSE-AP
 - [ ] set .env in provision-device import-data
-- [ ] set .env clenaup in services
+- [x] remove duplicated setEnviroment() in services, env var are passed trough commands -e "${ENV}=ENV"
 - [x] riscrivere lo script python
-- [ ] si possono rimuovere i WaitForCotiners visto che adesso startano in ordine?
+- [x] si possono rimuovere i WaitForCotiners visto che adesso startano in ordine?
 - [x] WARN[0000] The "host" variable is not set. Defaulting to a blank string.
 	- host=0.0.0.0 in .env, default host for docker services
 - [ ] Rimuovere pull remoto docker img rose ap, e ripristinarlo in produzione
@@ -71,18 +79,13 @@
 	- the oee is computed on demand so it's only computed if production is present
 - [ ] Add information about reworks (parts and time).
 - [ ] Add information about total OEE stats for all the production.
-- [x] Extend to Factory level (e.g. un elemento nel contex broker che comunica lo scheduling dei turni di lavoro)
-	- Non necessario
+- [] Extend to Factory level (e.g. un elemento nel contex broker che comunica lo scheduling dei turni di lavoro)
+	- Si potrebbe fare per calcolare l'oee dei turni
 
 
 ## RAMP in remoto
 - Connessione remota RAMP
 
-## Business
-- [ ] Intregrare presso 3 clienti o lettera di intenti.
-	- [ ] Zenti
-	- [ ] G.Engineering
-	- [ ] Laserlam
-- [ ] Fee annuale per integrazione sulle macchine.
+
 
 
