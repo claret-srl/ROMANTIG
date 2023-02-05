@@ -56,8 +56,10 @@ sudo ./services start
 ```
 Now you can open Grafana on [localhost:3000](localhost:3000) (`user:admin` `password:admin`) and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana. Below an example:
 
-![grafana](img/dashboard_dark.png#gh-dark-mode-only)
-![grafana](img/dashboard_light.png#gh-light-mode-only)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./img/dashboard_dark.png">
+  <img alt="Light: 'So light!' Dark: 'So dark!'" src="./img/dashboard_light.png">
+</picture>
 
 ## Example
 Our example use-case scenario is based on an automated welding robotic system which performs several tasks. At first, a stereometric scanner individuates the 3D pose estimate of target pipes, then the robot arm proceeds to pick those and place them in front of a torch, where they will be welded. Once welded, the system proceeds to perform a quality control check to validate the welding: if the check succeeds, the pipe is placed in the final bin; if the check fail, welding is performed again and the QC control the pipe a second time. If the check fails twice in a row, the pipe is discarded. 
