@@ -66,17 +66,16 @@ The process cycle and the respective up and down time states are shown below:
 ```mermaid
 flowchart LR
     Idle --> Picking --> Welding --> QC
-    QC -- Rework --> Welding
-    QC -- Bad Part --> Trashing
-    QC -- Good Part --> Placing
+    QC --> Rework --> QC
+    QC -- Bad Part --> Trashing --> Idle
+    QC -- Good Part --> Placing --> Idle
 
 classDef upTime fill:lightgreen,stroke:#333,color:#333
 classDef downTime fill:LightCoral,stroke:#333,color:#333
 classDef upDownTime fill:#f7dc6f,stroke:#333,color:#333
 
-class Picking,Welding,Placing upTime
-class Idle,Trashing,Rework downTime
-class QC upDownTime
+class Picking,Placing,QC,Welding,upTime upTime
+class Idle,Trashing,Rework,QC_Rework,downTime downTime
 ```
 
 
