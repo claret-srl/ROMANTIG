@@ -71,9 +71,11 @@ flowchart LR
     QC -- Bad Part --> Trashing
     Placing & Trashing --> Idle --> Picking
 
+classDef Gainsboro fill:Gainsboro,stroke:#333,color:#333
+
 class Picking,Placing,QC,Welding,upTime,Idle,Trashing,Rework,QC_Rework Gainsboro
 
-linkStyle 0,1,2 stroke:lightgreen;
+linkStyle 0,1,2 stroke:lightgreen,border-color:lightgreen;
 linkStyle 3,4,5,6,7,8 stroke:LightCoral;
 ```
 
@@ -147,14 +149,14 @@ The overall architecture can be seen below:
     Welder & Robot & QC & Device <--PROFINET--> PLC <--OPC-UA--> IoT-Agent <--4041:4041--> Orion <--8668:8668--> Quantumleap
     Grafana <--4200:4200--> Crate
     ROSE-AP  & Quantumleap <--4200:4200--> Crate
-
+    
 classDef DarkBlue fill:#233C68,stroke:#333,color:#FFF
 classDef Cyan fill:#45D3DD,stroke:#333,color:#333
 classDef Gainsboro fill:Gainsboro,stroke:#333,color:#333
 classDef Grafana fill:#333,Stroke:#282828,color:#FCB35F
 classDef Claret fill:#0999D0,Stroke:#F8F8F8,color:#F8F8F8
 
-class Crate,Mongo,Redis Gainsboro,Welder,Robot,QC,Device,PLC
+class Crate,Mongo,Redis,Welder,Robot,QC,Device,PLC Gainsboro
 ```
 
 # Prerequisites
