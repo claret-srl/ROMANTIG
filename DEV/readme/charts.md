@@ -22,8 +22,7 @@ graph TD
     Redis[(fa:fa-server \n RedisDB)]
     Mongo[(fa:fa-server \n MongoDB)]
     Crate[(fa:fa-server \n CrateDB)]
-    Grafana[fa:fa-chart-line \n Grafana]
-
+    Grafana[fa:fa-chart-line \n Grafana]::Grafana
 
     Orion & IoT-Agent <--27017:27017---> Mongo
     ROSE-AP <--1026:1026--> Orion
@@ -39,7 +38,6 @@ classDef Grafana fill:#333,Stroke:#282828,color:#FCB35F
 classDef ROSE-AP fill:#F8F8F8,Stroke:#0999D0,color:#0999D0
 
 class Crate,Mongo,Redis Gainsboro
-class Grafana Grafana
 ```
 
 classDef upTime fill:lightgreen,stroke:#333,color:#333

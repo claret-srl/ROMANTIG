@@ -43,7 +43,6 @@
 - [x] Removed the absurd necessity to re-build in case of .config update, (update .config > restart the service)
 - [ ] Pushing the img to docker hub
 - [x] L'oee va calcolato on deamand ad ogni prodotto completato, per poi visualizzare a piacimento i dati potendo filtrare per prodotto, lotto, ora/giorno/mese/anno (websocket?)
-- [ ] Bisogna scambiare i dati di prodotto, lotto e turno di produzione
 - [x] Ciclo tempo non prevede l'evenienza che non entri nel ciclo la prima volta
 - [x] Division by 0
 - [x] Ciclo tempo assurdo
@@ -55,6 +54,7 @@
 ## Grafana
 - [x] grafana\datasources\datasource.yaml db-crate host, ports, mtopcua_car
 - [ ] Shared Data between dashboard
+- [x] Provisioning datasurce from .env
 - [x] .env table name
 	- Non è possibile senza plugin di terze parti
 ## Phase 3
@@ -63,13 +63,16 @@
 - [x] NGSI-V2 Naming standard for procesStatus
 - [x] ID and atribute following Smart Factory Demo (https://github.com/FcoMelendez/smart_factory_demo)
 - [x] Modificare il provisioning dei device e relashhionship con gli header corretti di service e servicepath
+- [x] Process Mermaid Chart
+- [x] Architecture Mermaid Chart
 
 ### ROSE-AP
-- [ ] Add information on machine activation status (e.g. records and calculate OEE only when it's active).
-	- Provision the information about the schedule production to know when in planned production on the microservice. (https://www.machinemetrics.com/blog/oee-ooe-teep)
+- [x] Add information on machine activation status (e.g. records and calculate OEE only when it's active).
+	- the oee is computed on demand so it's only computed if production is present
 - [ ] Add information about reworks (parts and time).
 - [ ] Add information about total OEE stats for all the production.
-- [ ] Extend to Factory level (e.g. un elemento nel contex broker che comunica lo scheduling dei turni di lavoro)
+- [x] Extend to Factory level (e.g. un elemento nel contex broker che comunica lo scheduling dei turni di lavoro)
+	- Non necessario
 
 
 ## RAMP in remoto
@@ -82,15 +85,4 @@
 	- [ ] Laserlam
 - [ ] Fee annuale per integrazione sulle macchine.
 
-## Architettura
-![Architettura](img/architettura.png)
 
-## Mermaid
-```mermaid
-flowchart TD
-    A[Start] --> B{Is it?}
-    B -- Yes --> C[OK]
-    C --> D[Rethink]
-    D --> B
-    B -- No ----> E[End]
-```
