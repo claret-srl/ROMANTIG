@@ -117,9 +117,9 @@ services:
       - "${MONGO_PORT}:${MONGO_PORT}"
     networks:
       - default
-    volumes:
-      - ${MONGO}_data:/data/db
-      - ${MONGO}_config:/data/configdb
+    # volumes:
+    #   - ${MONGO}_data:/data/db
+    #   - ${MONGO}_config:/data/configdb
     healthcheck:
       test: |
         host=`hostname --ip-address || echo '127.0.0.1'`; 
@@ -161,20 +161,21 @@ services:
       test: ["CMD", "redis-cli","ping"]
       interval: 5s
 
-  redisinsight:
-    labels:
-      org.fiware: ${ORG_FIWARE}
-    image: redislabs/redisinsight:1.13.1
-    container_name: "redisinsight"
-    networks:
-      - default
-    ports:
-      - '8001:8001'
-    volumes:
-      - redisinsight:/db
-    depends_on:
-      db-redis:
-        condition: service_healthy
+  # Redis GUI, to chek if Redis is it working just for dev purpose
+  # redisinsight:
+  #   labels:
+  #     org.fiware: ${ORG_FIWARE}
+  #   image: redislabs/redisinsight:1.13.1
+  #   container_name: "redisinsight"
+  #   networks:
+  #     - default
+  #   ports:
+  #     - '8001:8001'
+  #   volumes:
+  #     - redisinsight:/db
+  #   depends_on:
+  #     db-redis:
+  #       condition: service_healthy
 
   # Dashboard
   grafana:
@@ -192,7 +193,6 @@ services:
     environment:
       - "CRATE=${CRATE}"
       - "CRATE_PORT_POSTGRES=${CRATE_PORT_POSTGRES}"
-      # - "=${}"
       - "FIWARE_SERVICE=$FIWARE_SERVICE"
       - "CRATE_SCHEMA=$CRATE_SCHEMA"
       - "CRATE_TABLE=$CRATE_TABLE"
@@ -243,8 +243,8 @@ networks:
 
 
 volumes:
-  db-mongo_data: ~
-  db-mongo_config: ~
+  # db-mongo_data: ~
+  # db-mongo_config: ~
   db-crate: ~
   db-redis: ~
   redisinsight: ~
