@@ -1,5 +1,5 @@
 ```mermaid
-flowchart
+flowchart LR
     Idle --> Picking --> Welding --> QC
     QC -- Rework --> Welding
     QC -- Bad Part --> Trashing --> Idle
