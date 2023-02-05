@@ -67,8 +67,8 @@ The process cycle and the respective up and down time states are shown below:
 flowchart LR
     Idle --> Picking --> Welding --> QC
     QC -- Rework --> Welding
-    QC -- Bad Part --> Trashing --> Idle
-    QC -- Good Part --> Placing --> Idle
+    QC -- Bad Part --> Trashing
+    QC -- Good Part --> Placing
 
 classDef upTime fill:lightgreen,stroke:#333,color:#333
 classDef downTime fill:LightCoral,stroke:#333,color:#333
