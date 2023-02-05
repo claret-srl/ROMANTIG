@@ -1,5 +1,4 @@
 ```mermaid
-flowchart TD
 flowchart
     Idle --> Picking --> Welding --> QC
     QC -- Rework --> Welding
