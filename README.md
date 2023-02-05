@@ -154,7 +154,7 @@ classDef Gainsboro fill:Gainsboro,stroke:#333,color:#333
 classDef Grafana fill:#333,Stroke:#282828,color:#FCB35F
 classDef Claret fill:#0999D0,Stroke:#F8F8F8,color:#F8F8F8
 
-class Crate,Mongo,Redis Gainsboro
+class Crate,Mongo,Redis Gainsboro,Welder,Robot,QC,Device,PLC
 ```
 
 # Prerequisites
