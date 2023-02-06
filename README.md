@@ -128,19 +128,19 @@ The overall architecture can be seen below:
 
 ```mermaid
   flowchart TD
-    Welder[Welder]
-    Robot[Robot]
-    QC[Quality Control]
-    Device[Device]
-    PLC[PLC]
-    IoT-Agent[IoT-Agent]:::Cyan
-    Orion[Orion \n Context Broker]:::DarkBlue
-    Quantumleap[Quantum \n Leap]:::DarkBlue
+    Welder(Welder)
+    Robot(Robot)
+    QC(Quality Control)
+    Device(Device)
+    PLC(PLC)
+    IoT-Agent(IoT-Agent):::Cyan
+    Orion(Orion \n Context Broker):::DarkBlue
+    Quantumleap(Quantum \n Leap):::DarkBlue
     ROSE-AP(ROSE-AP \n RomanTIG):::Claret
     Redis[(RedisDB)]
     Mongo[(MongoDB)]
     Crate[(CrateDB)]
-    Grafana[Grafana]:::Grafana
+    Grafana(Grafana):::Grafana
 
     Orion & IoT-Agent <--27017:27017---> Mongo
     ROSE-AP <--1026:1026--> Orion
