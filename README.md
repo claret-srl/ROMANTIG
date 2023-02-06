@@ -80,26 +80,35 @@ The date and time to be consider as starting point of the stats collected:
 	START_TIME=08:00:00	# syntax: <hh-mm-ss>
 
 ## Usage
+Star the Docker deamon.
 
 Make the `./services` script executable
 ```
 sudo chmod +x ./services
 ```
-Build the Docker image for the OEE microservice:
+Build the Docker image for the OEE microservice (Remove the old image if any, build the new image and performa a vulnerability scan):
 ```
-sudo ./services build
+sudo ./services --build
 ```
-To pull all images:
-```
-./services pull
-```
-To apply settings and start up all the services in the containers run:
+To apply required settings to the host, and start up all the services in the containers run:
 ```
 sudo ./services up
 ```
+To stop all the services in the containers execute:
+```
+sudo ./services down
+```
 To see the help function of the service script
 ```
-./services -h
+./services --help
+```
+To only pull all images from Docker Hub without start the services in the Docker Container:
+```
+./services --pull
+```
+To stop, build and start the services in the Docker Container:
+```
+./services --debug
 ```
 Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`dashboard.json`](.\grafana\dashboards\dashboard.json) file in `.\grafana\dashboards\` directory to persist the changes after rebooting the container or the Grafana service. Below an example:
 
