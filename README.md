@@ -41,19 +41,19 @@ You have to set the following variables:
 
 The machine states to be considered as a successful conclusion of the production cycle (i.e. an item is successfully created):
 
-	ENDSGOOD = In Placing	[syntax: State 01,State 02, ... ,State nn]
+	ENDSGOOD=In Placing	[syntax: State 01,State 02, ... ,State nn]
 
 The machine states to be considered as a bad conclusion of the production cycle (i.e. an item is defective or faulty and has to be discarded):
 
-	ENDSBAD = In Trashing	[syntax: State 01,State 02, ... ,State nn]
+	ENDSBAD=In Trashing	[syntax: State 01,State 02, ... ,State nn]
 
 The machine states to be considered as productive times:
 
-	TIMESUP = In Picking,In Welding,In QC,In Placing	[syntax: State 01,State 02,...,State nn]
+	TIMESUP=In Picking,In Welding,In QC,In Placing	[syntax: State 01,State 02,...,State nn]
 
 The machine states to be considered as downtime:
 
-	TIMESDOWN = Idle,In Reworking,In QC from rework,In Trashing,Timeout	[syntax: State 01,State 02,...,State nn]
+	TIMESDOWN=Idle,In Reworking,In QC from rework,In Trashing,Timeout	[syntax: State 01,State 02,...,State nn]
 
 The timestep to group [OEE](https://www.oee.com/) stats:
 
