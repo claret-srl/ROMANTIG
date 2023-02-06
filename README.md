@@ -34,13 +34,12 @@ In order to compute the [OEE](https://www.oee.com/), the service must know if ea
  - The ideal duration of a production cycle.
  - A time step and a starting date and time to group the data.
 
-To do so, please change the `.config` file found in the `oee_service` folder, prior to run the service.
-You have to set the following variables:
-
-### Machine States
+To do so, please change the `.config` file found in the `oee_service` folder, prior to run the service, setting the following variables:
 
 > **Warning**
 > Be sure that the name of the states written in the config file perfectly match those that are written by your process, so that the microservice can correctly identify them
+
+### Machine States
 
 The machine states to be considered as a successful conclusion of the production cycle (i.e. an item is successfully created):
 
