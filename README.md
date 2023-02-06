@@ -1,9 +1,10 @@
 # ROMANTIG ROSE-AP [OEE](https://www.oee.com/) Calculator
-[![FIWARE Banner](https://fiware.github.io/tutorials.Time-Series-Data/img/fiware.png)](https://www.fiware.org/developers)
+![logo](./img/logo.png)
+
 
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
-[![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Time-Series-Data.svg)](https://opensource.org/licenses/MIT)
+<!-- [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Time-Series-Data.svg)](https://opensource.org/licenses/MIT) -->
 [![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
 
 
@@ -116,7 +117,8 @@ To delete the Volumes and the Networks
 `./services --remove`
 
 ## Example
-![Dashboard](./img/dashboard_light.png)
+![Dashboard](./img/dashboard.png)
+
 Our example use-case scenario is based on an automated welding robotic system which performs several tasks. At first, a stereometrics scanner individuates the 3D pose estimate of target pipes, then the robot arm proceeds to pick those and place them in front of a torch, where they will be welded. Once welded, the system proceeds to perform a quality control check to validate the welding: if the check succeeds, the pipe is placed in the final bin; if the check fail, welding is performed again and the QC control the pipe a second time. If the check fails twice in a row, the pipe is discarded. 
 
 The process cycle and the respective up and down time states are shown below:
