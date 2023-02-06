@@ -1,0 +1,48 @@
+#!/bin/bash
+set -e
+
+# Set enviroment from .env file
+setEnviroment () {
+	export $(cat ./../../.env | grep "#" -v)
+}
+
+setEnviroment
+
+# echo $(pwd)
+# echo ${FIWARE_SERVICEPATH}
+
+# ./$(pwd)/provision-devices
+# 	-e ORION="${ORION}" \
+# 	-e ORION_PORT="${ORION_PORT}" \
+# 	-e IOTA_NORTH_PORT="${IOTA_NORTH_PORT}" \
+# 	-e FIWARE_SERVICE="${FIWARE_SERVICE}" \
+# 	-e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
+# 	-e DEVICE_ID="${DEVICE_ID}" \
+# 	-e FIWARE_SERVICE="${FIWARE_SERVICE}" \
+# 	-e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
+# 	-e OCB_ID="${OCB_ID}" \
+# 	-e OPCUA_ID="${OPCUA_ID}" \
+# 	--entrypoint /bin/ash curlimages/curl provision-devices
+
+docker run --rm \
+	-v $(pwd)/provision-devices:/provision-devices \
+	--network fiware_default \
+	-e ORION="${ORION}" \
+	-e ORION_PORT="${ORION_PORT}" \
+	-e QUANTUMLEAP="${QUANTUMLEAP}" \
+	-e QUANTUMLEAP_PORT="${QUANTUMLEAP_PORT}" \
+	-e ROSEAP_OEE="${ROSEAP_OEE}" \
+	-e ROSEAP_OEE_PORT="${ROSEAP_OEE_PORT}" \
+	-e FIWARE_SERVICE="${FIWARE_SERVICE}" \
+	-e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
+	-e DEVICE_ID="${DEVICE_ID}" \
+	-e DEVICE_TYPE="${DEVICE_TYPE}" \
+	-e DEVICE_BASE_ID="${DEVICE_BASE_ID}" \
+	-e OCB_ID="${OCB_ID}" \
+	--entrypoint /bin/ash curlimages/curl provision-devices
+
+	# -e IOTA="${IOTA}" \
+	# -e IOTA_NORTH_PORT="${IOTA_NORTH_PORT}" \
+	# -e OPCUA_ID="${OPCUA_ID}" \
+
+	
