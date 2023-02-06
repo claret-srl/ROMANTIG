@@ -19,22 +19,48 @@ Measuring OEE is important in industrial applications as it provides a comprehen
 
 ## Install
 
-In order to compute the OEE, the service must know if each possible process state that is found on CrateDB has to be considered an up-time or a down-time state. To do so, please change the `oee_conf.config` file found in the `oee_service` folder, prior to building the image of the service. You have to set the following variables:
+In order to compute the OEE, the service must know if each possible process state that is found on the context has to be considered:
+ - An up-time or a down-time state.
+ - A good or a bad end of the production cycle.
+ - The ideal duration of a production cycle.
+ - A time step and a starting date and time to group the data.
 
-```
-[PROCESS]
-upTimeStates = ["upTimeStateName1","upTimeStateName2",...,"upTimeStateNameN"] #These represents the states to be considered as up-time
-downTimeStates = ["downTimeStateName1","downTimeStateName2",...,"downTimeStateNameN"]#These represents the states to be considered as down-time
-endStates =["upTimeStateNameN","downTimeStateNameN",...] #Subset of either upTimeStates, downTimeStates or both. These represents the possibly multiple final states of the process
-goodEnd =["endStatesName1",...] #Subset of endStates, these represents the final states in which an item is successfully created
-badEnd =["endStatesName2",...] #Subset of endStates, these represents the final states in which an item is defective or faulty and has to be discarded
+To do so, please change the `.config` file found in the `oee_service` folder, prior to run the service.
+You have to set the following variables:
 
-[OEE]
-timestep = 300 #The timestep granularity (integer) for the resulting OEE metrics, in seconds
-idealTime_ppm = 5 #The theoretical maximum piece per minute rate (integer) that the process is able to deliver in ideal conditions (note: this ppm value cannot be lower than the actual process output rate as this represents a theoretical upper bound) 
-```
+### `Machine States`
 
-Be sure that the name of the states written in the config file perfectly match those that are written by your process to the CrateDB, so that the microservice can correctly identify them.
+The machine states to be considered as a successful conclusion of the production cycle (i.e. an item is successfully created):
+
+	ENDSGOOD = In Placing	[sintax: State 01,State 02, ... ,State nn]
+
+The machine states to be considered as a bad conclusion of the production cycle (i.e. an item is defective or faulty and has to be discarded):
+
+	ENDSBAD = In Trashing	[sintax: State 01,State 02, ... ,State nn]
+
+The machine states to be considered as productive times:
+
+	TIMESUP = In Picking,In Welding,In QC,In Placing	[sintax: State 01,State 02,...,State nn]
+
+The machine states to be considered as downtime:
+
+	TIMESDOWN = Idle,In Reworking,In QC from rework,In Trashing,Timeout	[sintax: State 01,State 02,...,State nn]
+
+The timestep to gruop OEE stats:
+
+	TIMESTEP=5 minute	[sintax: <quantity> <[second|minute|hour|day|week|month|year]>]
+
+The duration of the process in ideal condition, this represents a theoretical lower bound.
+
+	IDEALTIME=20 second	[sintax: <quantity> <[second|minute|hour|day|week|month|year]>]
+
+The date and time to be consider as starting point of the stats collected:
+
+	START_DATE=2023-01-01	[sintax: <YYYY-MM-DD>]
+	START_TIME=08:00:00	# sintax: <hh-mm-ss>
+
+> **Warning**
+> Be sure that the name of the states written in the config file perfectly match those that are written by your process, so that the microservice can correctly identify them
 
 ## Usage
 Make the `./services` script executable
@@ -49,15 +75,20 @@ To pull all images:
 ```
 ./services pull
 ```
-To apply settings and start all the services in the containers run:
+To apply settings and start up all the services in the containers run:
 ```
-sudo ./services start
+sudo ./services up
+```
+To see the help funtion of the service script
+```
+./services -h
 ```
 Now you can open Grafana on [localhost:3000](localhost:3000) (`user:admin` `password:admin`) and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana. Below an example:
-![GitHub-Mark-Light](./img/dashboard_dark.png#gh-dark-mode-only)
-![GitHub-Mark-Dark](./img/dashboard_light.png#gh-light-mode-only)
+
+![Light](./img/dashboard_light.png)
 
 ## Example
+
 Our example use-case scenario is based on an automated welding robotic system which performs several tasks. At first, a stereometric scanner individuates the 3D pose estimate of target pipes, then the robot arm proceeds to pick those and place them in front of a torch, where they will be welded. Once welded, the system proceeds to perform a quality control check to validate the welding: if the check succeeds, the pipe is placed in the final bin; if the check fail, welding is performed again and the QC control the pipe a second time. If the check fails twice in a row, the pipe is discarded. 
 
 The process cycle and the respective up and down time states are shown below:
@@ -84,45 +115,23 @@ As it can be seen in the docker-compose file, the PLC responsible for controllin
 
 # Architecture
 
-This application builds on the components and dummy IoT devices created in
-[previous tutorials](https://github.com/FIWARE/tutorials.IoT-Agent/). It will use three FIWARE components: the
-[Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), the
-[IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/), and
-[QuantumLeap](https://smartsdk.github.io/ngsi-timeseries-api/) .
+This application builds on the following components [ROSE-AP RomanTIG](https://github.com/claret-srl/romantig_RAMP_ROSEAP). It will use the following FIWARE components: the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), the [QuantumLeap](https://smartsdk.github.io/ngsi-timeseries-api/) . [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/), and
 
 Therefore the overall architecture will consist of the following elements:
-
 -   The **FIWARE Generic Enablers**:
-
-    -   The FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests
-        using [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
-    -   The FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) which will
-        receive northbound measurements from the dummy IoT devices in
-        [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
-        format and convert them to [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the
-        context broker to alter the state of the context entities
-    -   FIWARE [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) subscribed to context changes and persisting
-        them into a **CrateDB** database
-
+    -   The FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests using [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
+    -   The FIWARE [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) which will receive northbound measurements from the dummy IoT devices in [OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/)
+        format and convert them to [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the context broker to alter the state of the context entities
+    -   FIWARE [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) subscribed to context changes and persisting them into a **CrateDB** database
 -   A [MongoDB](https://www.mongodb.com/) database:
-
-    -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions and
-        registrations
+    -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions and registrations
     -   Used by the **IoT Agent** to hold device information such as device URLs and Keys
-
 -   A [CrateDB](https://crate.io/) database:
-
     -   Used as a data sink to hold time-based historical context data
     -   offers an HTTP endpoint to interpret time-based data queries
+-   A **Context Provider**: - Should be supplied by integrator, as an active OPC-UA device. It could be repaced with any other protocol as far as the relative IoT Agent is used instead of the [OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) one.
 
--   A **Context Provider**: - A webserver acting as set of
-    [dummy IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-v2) using the
-    [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
-    protocol running over HTTP. - Note the **Stock Management Frontend** and **Context Provider NGSI** proxy are not
-    used in this tutorial.
-
-Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run
-from exposed ports.
+Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run from exposed ports.
 
 The overall architecture can be seen below:
 
