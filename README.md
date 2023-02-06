@@ -51,6 +51,9 @@ The machine states to be considered as productive times:
 
 	TIMESUP=In Picking,In Welding,In QC,In Placing	[syntax: State 01,State 02,...,State nn]
 
+> **Note**
+> To avoid unexpected behavior (i.e., not updating statistics if the machine stops for any reason), a `Timeout` variable should be provided that fires cyclically when each new timeout is reached.
+
 The machine states to be considered as downtime:
 
 	TIMESDOWN=Idle,In Reworking,In QC from rework,In Trashing,Timeout	[syntax: State 01,State 02,...,State nn]
