@@ -6,7 +6,7 @@ This ROSE-AP is intended as a microservice for automatic OEE, and related metric
 
 - [Background](#background)
 - [Install](#install)
-	-[Machine States](#Machine States)
+	-[Machine States](#Machine-States)
 - [Usage](#usage)
 - [Example](#example)
 - [Architecture](#Architecture)
