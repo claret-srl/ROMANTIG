@@ -1,4 +1,12 @@
 # ROMANTIG ROSE-AP [OEE](https://www.oee.com/) Calculator
+![logo](./img/logo.png)
+
+
+[![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
+[![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
+<!-- [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Time-Series-Data.svg)](https://opensource.org/licenses/MIT) -->
+[![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
+
 
 This ROSE-AP is intended as a microservice for automatic [OEE](https://www.oee.com/), and related metrics, calculation. The service works by connecting to a [CrateDB](https://crate.io/) database, where information about the context of your target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) through [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) services.
 
@@ -81,31 +89,35 @@ The date and time to be consider as starting point of the stats collected:
 
 ## Usage
 
-Make the `./services` script executable
-```
-sudo chmod +x ./services
-```
-Build the Docker image for the OEE microservice:
-```
-sudo ./services build
-```
-To pull all images:
-```
-./services pull
-```
-To apply settings and start up all the services in the containers run:
-```
-sudo ./services up
-```
-To see the help function of the service script
-```
-./services -h
-```
-Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`dashboard.json`](.\grafana\dashboards\dashboard.json) file in `.\grafana\dashboards\` directory to persist the changes after rebooting the container or the Grafana service. Below an example:
+Star the Docker deamon.
 
-![Dashboard](./img/dashboard_light.png)
+Make the `./services` script executable
+`sudo chmod +x ./services`
+
+Build the Docker image for the OEE microservice (Remove the old image if any, build the new image and performa a vulnerability scan):
+`./services --build`
+
+To apply required settings to the host, and start up all the services in the containers run:
+`sudo ./services up`
+
+Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`dashboard.json`](.\grafana\dashboards\dashboard.json) file in `.\grafana\dashboards\` directory to persist the changes after rebooting the container or the Grafana service.
+
+To stop all the services in the containers execute:
+`./services down`
+To only pull all images from Docker Hub without start the services in the Docker Container:
+`./services --pull`
+To stop, build and start the services in the Docker Container:
+`sudo ./services --debug`
+To see the help function of the service script
+`./services --help`
+
+To delete the Volumes and the Networks
+> **Warning**
+> This operation will ERASE ALL the Docker Volumes and all the data stored in the databases!
+`./services --remove`
 
 ## Example
+![Dashboard](./img/dashboard.png)
 
 Our example use-case scenario is based on an automated welding robotic system which performs several tasks. At first, a stereometrics scanner individuates the 3D pose estimate of target pipes, then the robot arm proceeds to pick those and place them in front of a torch, where they will be welded. Once welded, the system proceeds to perform a quality control check to validate the welding: if the check succeeds, the pipe is placed in the final bin; if the check fail, welding is performed again and the QC control the pipe a second time. If the check fails twice in a row, the pipe is discarded. 
 
