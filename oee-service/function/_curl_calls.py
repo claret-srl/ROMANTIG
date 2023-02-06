@@ -209,7 +209,7 @@ def provisioning_ARGS(
     },
     "notification": {
         "http": {
-            "url": "http://''' + ROSEAP_OEE + ":" + ROSEAP_OEE_PORT + '''/"
+            "url": "http://''' + ROSEAP_OEE + ":" + ROSEAP_OEE_PORT + '''/v2/notify"
         },
         "attrs": ["''' + OCB_ID + '''"]
     }
