@@ -185,7 +185,7 @@ config.iota = {
 	contexts: [
 		{
 			id: process.env.DEVICE_ID,
-			type: process.env.CONTEXTS_TYPE,
+			type: process.env.DEVICE_TYPE,
 			mappings: [
 				{
 					ocb_id: process.env.OCB_ID,

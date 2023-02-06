@@ -11,11 +11,6 @@ WORKDIR /oee-service
 
 # Copy in the continer the following files
 COPY ./ ./
-# COPY oee_service.py Query.sql ./
-# COPY ["oee_service.py", "Query.sql", "./"]
 
 # Run this command at startup
 CMD ["python3","-u","oee_service.py"]
-
-# To build the service as a Docker image:
-# docker build -t roseap_oee .

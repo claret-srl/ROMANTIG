@@ -12,45 +12,68 @@ setRedisCrateHostMemory () {
 }
 
 setEnviroment () {
-	# echo $(cat .env | grep "#" -v)
     export $(cat .env | grep "#" -v)
     echo ""
 }
 
-# loadData () {
-#     echo ""
-#     waitForMongo
-#     addDatabaseIndex
-#     waitForOrion
-    
-#     # docker run --rm -v $(pwd)/import-data:/import-data \
-#     # --network fiware_default \
-#     # -e ORION="${ORION}" \
-#     # -e ORION_PORT="${ORION_PORT}" \
-#     # --entrypoint /bin/ash curlimages/curl import-data
+provisionDevices () {
+	docker run --rm \
+	-v $(pwd)/provision-devices.sh:/provision-devices.sh \
+	--network fiware_default \
+	-e ORION="${ORION}" \
+	-e ORION_PORT="${ORION_PORT}" \
+	-e QUANTUMLEAP="${QUANTUMLEAP}" \
+	-e QUANTUMLEAP_PORT="${QUANTUMLEAP_PORT}" \
+	-e ROSEAP_OEE="${ROSEAP_OEE}" \
+	-e ROSEAP_OEE_PORT="${ROSEAP_OEE_PORT}" \
+	-e FIWARE_SERVICE="${FIWARE_SERVICE}" \
+	-e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
+	-e DEVICE_ID="${DEVICE_ID}" \
+	-e DEVICE_TYPE="${DEVICE_TYPE}" \
+	-e DEVICE_BASE_ID="${DEVICE_BASE_ID}" \
+	-e OCB_ID="${OCB_ID}" \
+	--entrypoint /bin/ash curlimages/curl provision-devices.sh
+}
 
-#     waitForIoTAgent
-    
-#     # docker run --rm -v $(pwd)/provision-devices:/provision-devices \
-#     # --network fiware_default \
-#     # -e ORION="${ORION}" \
-#     # -e ORION_PORT="${ORION_PORT}" \
-#     # -e IOTA_NORTH_PORT="${IOTA_NORTH_PORT}" \
-#     # -e FIWARE_SERVICE="${FIWARE_SERVICE}" \
-#     # -e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
-#     # -e DEVICE_ID="${DEVICE_ID}" \
-#     # -e FIWARE_SERVICE="${FIWARE_SERVICE}" \
-#     # -e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
-#     # -e OCB_ID="${OCB_ID}" \
-#     # -e OPCUA_ID="${OPCUA_ID}" \
-#     # --entrypoint /bin/ash curlimages/curl provision-devices
-    
-#     waitForCrateDB
-#     waitForQuantumleap
+# importData () {
+# 	docker run --rm -v $(pwd)/import-data:/import-data \
+#     --network fiware_default \
+#     -e ORION="${ORION}" \
+#     -e ORION_PORT="${ORION_PORT}" \
+#     --entrypoint /bin/ash curlimages/curl import-data
 # }
 
-startingContainers () {
-        echo -e "Starting containers:"
+waitForDockerService () {
+    echo -e "⏳ Waiting for \033[1;36m$1\033[0m to be available"
+    while ! [ `docker inspect --format='{{.State.Health.Status}}' $1` == "healthy" ]
+    do
+        sleep 1
+    done
+	echo -e "\t$1 \033[1;32mAvailable\033[0m\n"
+}
+
+waitForDockerServiceVersion () {
+    echo -e "⏳ Waiting for \033[1;36m$1\033[0m to be available"
+    while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:$2/version"` == 200 ]
+    do
+        sleep 1
+    done
+	echo -e "\t$1 \033[1;32mAvailable\033[0m\n"
+}
+
+loadData () {
+    echo ""
+	waitForDockerService ${MONGO}
+	waitForDockerService ${ORION}
+	waitForDockerServiceVersion ${IOTA} ${IOTA_NORTH_PORT}
+	waitForDockerService ${CRATE}
+	waitForDockerService ${QUANTUMLEAP}
+	# provisionDevices
+	# importdata
+}
+
+startingServices () {
+        echo -e "Starting Services:"
         echo -e "\033[1;34mOrion\033[0m, \033[1;34mQuantumLeap\033[0m, \033[1;36mIoT-Agent\033[0m, \033[1mGrafana\033[0m, \033[1mCrate-DB\033[0m and \033[1mMongo-DB\033[0m."
         echo ""
 		echo -e "- FIWARE \033[1;34mOrion Context Broker\033[0m, configured for NGSI-v2."
@@ -63,33 +86,31 @@ startingContainers () {
         echo ""
         ${dockerCmd} up -d --remove-orphans
         echo ""
-		echo "Removing orphans volumes"
-		docker volume rm $(docker volume ls -qf dangling=true) || echo "No volumes to remove."
-        # ${dockerCmd} --profile oee_service up -d --remove-orphans
-		# docker volume prune --filter "label=org.fiware=${ORG_FIWARE}"
+		echo "Removing orphans volumes:"
+		docker volume rm $(docker volume ls -q --filter dangling=true) || echo "No volumes to remove."
         echo ""
 }
 
-stoppingContainers () {
-    CONTAINERS=$(docker ps --filter "label=org.fiware=${ORG_FIWARE}" -aq)
-    if [[ -n $CONTAINERS ]]; then
-        echo "Stopping containers:"
+stoppingServices () {
+    SERVICES=$(docker ps --filter "label=org.fiware=${ORG_FIWARE}" -aq)
+    if [[ -n $SERVICES ]]; then
+        echo "Stopping Services:"
    		echo ""
-        docker rm -f $CONTAINERS || true
+        docker rm -f $SERVICES || true
     fi
     echo ""
 }
 
-deletingContainers () {
-    stoppingContainers
+deletingVolumesNetwork () {
+    stoppingServices
     VOLUMES=$(docker volume ls -qf dangling=true)
     if [[ -n $VOLUMES ]]; then
-        echo "Removing all Volumes"
-        docker volume rm $VOLUMES || true
+        echo "Removing all the Volumes of Docker:"
+        sudo docker volume rm $VOLUMES || true
     fi
     NETWORKS=$(docker network ls  --filter "label=org.fiware=${ORG_FIWARE}" -q)
     if [[ -n $NETWORKS ]]; then
-        echo "Removing all Networks"
+        echo "Removing all Networks of Docker:"
         docker network rm $NETWORKS || true
     fi
     echo ""
@@ -100,83 +121,6 @@ displayServices () {
     (gp ports list 2> /dev/null) || true
     echo ""
 }
-
-# addDatabaseIndex () {
-#     printf "Adding appropriate \033[1mMongo-DB\033[0m indexes for \033[1;34mOrion\033[0m  ..."
-    
-#     docker exec ${MONGO} mongo --eval '
-# 	conn = new Mongo();db.createCollection("orion");
-# 	db = conn.getDB("orion");
-# 	db.createCollection("entities");
-# 	db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
-# 	db.entities.createIndex({"_id.type": 1});
-#     db.entities.createIndex({"_id.id": 1});' > /dev/null
-    
-#     docker exec ${MONGO} mongo --eval '
-# 	conn = new Mongo();db.createCollection("orion-openiot");
-# 	db = conn.getDB("orion-openiot");
-# 	db.createCollection("entities");
-# 	db.entities.createIndex({"_id.servicePath": 1, "_id.id": 1, "_id.type": 1}, {unique: true});
-# 	db.entities.createIndex({"_id.type": 1});
-#     db.entities.createIndex({"_id.id": 1});' > /dev/null
-    
-#     echo -e " \033[1;32mdone\033[0m"
-    
-#     printf "Adding appropriate \033[1mMongo-DB\033[0m indexes for \033[1;36mIoT-Agent\033[0m  ..."
-    
-#     docker exec ${MONGO} mongo --eval '
-# 	conn = new Mongo();
-# 	db = conn.getDB("iotagentul");
-# 	db.createCollection("devices");
-# 	db.devices.createIndex({"_id.service": 1, "_id.id": 1, "_id.type": 1});
-# 	db.devices.createIndex({"_id.type": 1});
-# 	db.devices.createIndex({"_id.id": 1});
-# 	db.createCollection("groups");
-# 	db.groups.createIndex({"_id.resource": 1, "_id.apikey": 1, "_id.service": 1});
-#     db.groups.createIndex({"_id.type": 1});' > /dev/null
-    
-#     echo -e " \033[1;32mdone\033[0m"
-# }
-
-# waitForMongo () {
-#     echo -e "\n⏳ Waiting for \033[1mMongo-DB\033[0m to be available\n"
-#     while ! [ `docker inspect --format='{{.State.Health.Status}}' ${MONGO}` == "healthy" ]
-#     do
-#         sleep 1
-#     done
-# }
-
-# waitForOrion () {
-#     echo -e "\n⏳ Waiting for \033[1;34mOrion\033[0m to be available\n"
-#     while ! [ `docker inspect --format='{{.State.Health.Status}}' ${ORION}` == "healthy" ]
-#     do
-#         sleep 1
-#     done
-# }
-
-# waitForQuantumleap () {
-#     echo -e "\n⏳ Waiting for \033[1;34mQuantumleap\033[0m to be available\n"
-#     while ! [ `docker inspect --format='{{.State.Health.Status}}' ${QUANTUMLEAP}` == "healthy" ]
-#     do
-#         sleep 1
-#     done
-# }
-
-# waitForIoTAgent () {
-#     echo -e "\n⏳ Waiting for \033[1;36mIoT-Agent\033[0m to be available\n"
-#     while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:${IOTA_NORTH_PORT}/version"` == 200 ]
-#     do
-#         sleep 1
-#     done
-# }
-
-# waitForCrateDB () {
-#     echo -e "\n⏳ Waiting for \033[1;36mCrateDB\033[0m to be available\n"
-#     while ! [ `docker inspect --format='{{.State.Health.Status}}' ${CRATE}` == "healthy" ]
-#     do
-#         sleep 1
-#     done
-# }
 
 setEnviroment
 
@@ -212,15 +156,15 @@ case "${command}" in
         echo "Building Rose-AP Docker images"
         echo ""
     	cd oee-service
-		docker image rm -f roseap_oee
-    	docker build -t roseap_oee .
-		# docker scan
+		docker image rm -f ${ROSEAP_OEE}
+    	docker build -t ${ROSEAP_OEE} .
+		docker scan ${ROSEAP_OEE}
     	cd ..
-        echo -e " \033[1;32mdone\033[0m"
+        echo -e " \033[1;32mdone\033[0m\n"
     ;;
     "-d"|"--debug")
-        sudo ./services --down
-        sudo ./services --build
+        ./services --down
+        ./services --build
         sudo ./services --up
     ;;
     "-p"|"--pull")
@@ -229,24 +173,21 @@ case "${command}" in
         ${dockerCmd} pull
     ;;
     "up"|"--up")	
-        # setEnviroment
         setRedisCrateHostMemory
-        stoppingContainers
-		startingContainers
-        # loadData
+        stoppingServices
+		startingServices
         displayServices
+        loadData
     ;;
     "down"|"--down")
-        # setEnviroment
-        stoppingContainers
+        stoppingServices
     ;;
     "-rm"|"--remove")
-        # setEnviroment
-        read -p "This operation will erase also the data stored in the database, continue (y/n)?" choice
+        read -p "This operation will ERASE ALL the Docker Volumes and als the data stored in the database, continue (y/n)?" choice
         case "$choice" in
             y|Y|[yY][eE][sS] )
                 echo "Deleting..."
-                deletingContainers
+                deletingVolumesNetwork
             ;;
             n|N|[nN][oO] )
                 echo "Continer removal skipped."

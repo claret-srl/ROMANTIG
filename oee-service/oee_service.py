@@ -3,23 +3,16 @@ from crate import client
 import pycurl
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from sys import argv
-# import json
 import os
-import re
 from dotenv import load_dotenv
 
-import _query
-# import _dataTemplate
-import _curl_calls
-
-
-# counter = 0
+import function._query as _query
+import function._curl_calls as _curl_calls
 
 
 # <-- Docker
 Docker = True
-# Docker = True
-Debug = True
+Debug = False
 # Docker -->
 
 
@@ -28,8 +21,13 @@ script_dir = os.path.dirname(__file__)
 
 # <-- nickjj Web server https://github.com/nickjj/webserver
 
-
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    def do_version(self):
+        self.wfile.write(b'''{"service" : "ROSE-AP OEE-Service", "version" : 0.1}''')
+
+    def do_notify(self):
+        updateContexBroker()
+    
     def write_response(self, content):
         self.send_response(200)
         self.end_headers()
@@ -42,31 +40,21 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             print(content.decode("utf-8"))
 
     def do_GET(self):
-        if self.path.endswith('/plain_text'):
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            self.wfile.write(b'This is text/plain')
-        elif re.search(r'/set_cookie', self.path):
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.send_header('Set-Cookie', 'monster=1')
-            self.end_headers()
-            self.wfile.write(b"<html>C is for cookie, it's good enough for me</html>")
-        elif not re.search(r'.*\.\w+$', self.path):
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-        else:
-            SimpleHTTPRequestHandler.do_GET(self) 
+        self.send_response(200)
+        self.send_header('Content-type','application/json')
+        self.end_headers()
+
+        if self.path == '/version':
+            SimpleHTTPRequestHandler.do_version(self)
+        if self.path == '/v2/notify':
+            SimpleHTTPRequestHandler.do_notify(self)
+
 
     def do_POST(self):
         content_length = int(self.headers.get("content-length", 0))
         body = self.rfile.read(content_length)
         self.write_response(body)
-
         updateContexBroker()
-        
 
 
 def httpWebServer(_BIND_HOST="0.0.0.0", _PORT=8008):
@@ -75,13 +63,7 @@ def httpWebServer(_BIND_HOST="0.0.0.0", _PORT=8008):
         print("[INFO]" + "[WebServer]" + f"Listening on http://{_BIND_HOST}:{_PORT}\n")
         httpd.serve_forever()
     except Exception as e:
-        print(
-            "[ERROR]"
-            + "[WebServer]"
-            + f"Fail on http://{_BIND_HOST}:{_PORT}\n"
-            + str(e)
-            + "\n"
-        )
+        print("[ERROR]" + "[WebServer]" + f"Fail on http://{_BIND_HOST}:{_PORT}\n" + str(e) + "\n")
 
 
 # nickjj Web server > https://github.com/nickjj/webserver -->
@@ -96,7 +78,10 @@ def query_CrateDB(_sqlCommands):
         try:
             cursor = connection.cursor()
             print("[INFO]" + "[CrateDB]" + "Cursor created." + "\n")
-            # print(_sqlCommands)
+
+            if Debug:
+                print(_sqlCommands)
+
             for command in _sqlCommands:
                 print(command)
                 try:
@@ -114,9 +99,7 @@ def query_CrateDB(_sqlCommands):
                         + "\n"
                     )
                 print(command + "\n")
-                print(
-                    "#####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####  ##### \n"
-                )
+                print(" #####   #####   #####   #####   #####   #####   #####   ##### \n")
         except Exception as e:
             print(
                 "[ERROR]" + "[CrateDB]" + "Error in cursor creation:\n" + str(e) + "\n"
@@ -154,12 +137,14 @@ def convert_to_seconds(s):
 
 def updateContexBroker():
     oeeCallBackQuery = _query.oeeCallBack(CRATE_SCHEMA, CRATE_TABLE_OEE)
-    # print("oeeCallBackQuery: ", oeeCallBackQuery)
     oeeCallBackQueryResults = query_CrateDB([oeeCallBackQuery])
-    # print("oeeCallBackQueryResults: ", oeeCallBackQueryResults)
-    # oeeCallBackQueryResultsDataTemplate = _dataTemplate.append_ARGS(oeeCallBackQueryResults)
+    print("oeeCallBackQueryResults: ", oeeCallBackQueryResults)
+    
+    for i in range(len(oeeCallBackQueryResults[0])):
+        if oeeCallBackQueryResults[0][i] == None:
+            oeeCallBackQueryResults[0][i] = 0
+    
     cUrl_call = _curl_calls.update_ARGS(ORION, ORION_PORT, Service, ServicePath, contentType, DEVICE_ID, DEVICE_TYPE, oeeCallBackQueryResults)
-    # print("cUrl_call: ", cUrl_call)
     curl_calls_function(cUrl_call)
 
 # Update Orion Contex Broker -->
@@ -214,12 +199,12 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
 
                 url = f"http://{call['service']}:{call['port']}/{urlPath}"
  
-                print(
-                    "\n #####   #####   #####   #####   #####   #####   #####   #####   ##### \n"
-                )
+                print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
 
-                # print(url, "\n")
-                # print(call, "\n")
+                if Debug:
+                    print(url, "\n")
+                    print(call, "\n")
+                 
                 print(f"curl {call['method']} \\")
                 print(f"{url} \\")
                 for header in call["header"]:
@@ -227,26 +212,19 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
 
                 if _payload_OverRide == False:
                     print(f"-d {call['payload']}", "\n")
-                    # counter = counter + 1
                     curl_call(
                         cursor, call["method"], url, call["header"], call["payload"]
                     )
                 else:
                     print(f"-d {_payload_OverRide}", "\n")
-                    # counter = counter + 1
                     curl_call(
                         cursor, call["method"], url, call["header"], _payload_OverRide
                     )
-                
-                # print(counter)
 
-                print(
-                    "\n #####   #####   #####   #####   #####   #####   #####   #####   ##### \n"
-                )
+                print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
+
             except Exception as e:
-                print(
-                    "[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n"
-                )
+                print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
         cursor.close()
     except Exception as e:
         print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
@@ -272,15 +250,14 @@ LOG_LEVEL = os.getenv("LOG_LEVEL")  # debug
 COMPOSE_PROJECT_NAME = os.getenv("COMPOSE_PROJECT_NAME")  # fiware
 ORG_FIWARE = os.getenv("ORG_FIWARE")  # claret-romantig
 
-CONTEXTS_ID = os.getenv("CONTEXTS_ID")  # age01_Car
-CONTEXTS_TYPE = os.getenv("CONTEXTS_TYPE")  # PLC
+CONTEXTS_ID = os.getenv("CONTEXTS_ID")  # age01_PLC
 
 DEVICE_BASE_ID = os.getenv("DEVICE_BASE_ID")  # urn:ngsiv2:I40Asset
 DEVICE_ID = os.getenv("DEVICE_ID")  # urn:ngsiv2:I40Asset:PLC:001
 DEVICE_TYPE = os.getenv("DEVICE_TYPE")  # PLC
 OCB_ID = os.getenv("OCB_ID")  # processStatus
 
-FIWARE_SERVICE = os.getenv("FIWARE_SERVICE")  # opcua_car
+FIWARE_SERVICE = os.getenv("FIWARE_SERVICE")  # opcua_plc
 FIWARE_SERVICEPATH = os.getenv("FIWARE_SERVICEPATH")  # /demo
 
 IOTA = os.getenv("IOTA")  # iot-agent
@@ -301,7 +278,7 @@ CRATE = os.getenv("CRATE")  # db-crate
 CRATE_PORT_ADMIN = os.getenv("CRATE_PORT_ADMIN")  # 4200
 CRATE_PORT_POSTGRES = os.getenv("CRATE_PORT_POSTGRES")  # 5432
 CRATE_PORT_TRANSPORT_PROTOCOL = os.getenv("CRATE_PORT_TRANSPORT_PROTOCOL")  # 4300
-CRATE_SCHEMA = os.getenv("CRATE_SCHEMA")  # mtopcua_car
+CRATE_SCHEMA = os.getenv("CRATE_SCHEMA")  # mtopcua_plc
 CRATE_TABLE = os.getenv("CRATE_TABLE")  # etdevice
 CRATE_TABLE_DEVICE = os.getenv("CRATE_TABLE_DEVICE")  # etdevice
 CRATE_TABLE_DURATION = os.getenv("CRATE_TABLE_DURATION")  # etprocessduration
@@ -350,11 +327,11 @@ contentType = {"json": "Content-Type: application/json"}
 # <-- External Variables
 
 processDuration = _query.processDuration(
-	CRATE_SCHEMA,
-	CRATE_TABLE_DURATION,
-	OCB_ID,
-	DEVICE_ID,
-	CRATE_TABLE_DEVICE
+    CRATE_SCHEMA,
+    CRATE_TABLE_DURATION,
+    OCB_ID,
+    DEVICE_ID,
+    CRATE_TABLE_DEVICE
 )
 
 oee = _query.oee(

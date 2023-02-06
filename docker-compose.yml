@@ -82,11 +82,11 @@ services:
     environment:
       - "FIWARE_SERVICE=${FIWARE_SERVICE}"
       - "FIWARE_SERVICEPATH=${FIWARE_SERVICEPATH}"
-      - "CONTEXTS_ID=${CONTEXTS_ID}"
-      - "CONTEXTS_TYPE=${CONTEXTS_TYPE}"
       - "DEVICE_ID=${DEVICE_ID}"
+      - "DEVICE_TYPE=${DEVICE_TYPE}"
       - "OCB_ID=${OCB_ID}"
       - "OPCUA_ID=${OPCUA_ID}"
+      - "IOTA_OPCUA_MT_ENTITY_ID=${CONTEXTS_ID}"
       - "IOTA_OPCUA_ENDPOINT=${IOTA_OPCUA_ENDPOINT}"	          # Endpoint of OPC UA Server
       - "IOTA_FALLBACK_TENANT=${FIWARE_SERVICE}"
       - "IOTA_FALLBACK_PATH=${FIWARE_SERVICEPATH}"
@@ -117,7 +117,6 @@ services:
       - "${MONGO_PORT}:27017"
     networks:
       - default
-    # volumes:
     #   - ${MONGO}_data:/data/db
     #   - ${MONGO}_config:/data/configdb
     healthcheck:
@@ -128,7 +127,7 @@ services:
   
   # Mongo GUI, to chek if Mongo it's working just for dev purpose
   # mongo-express:
-  #   image: mongo-express:latest
+  #   image: mongo-express:1.0.0-alpha
   #   labels:
   #     org.fiware: ${ORG_FIWARE}
   #   container_name: mongo-express
@@ -180,7 +179,7 @@ services:
       test: ["CMD", "redis-cli","ping"]
       interval: 5s
 
-  # Redis GUI, to chek if Redis it's working just for dev purpose
+  # # Redis GUI, to chek if Redis it's working just for dev purpose
   # redisinsight:
   #   labels:
   #     org.fiware: ${ORG_FIWARE}
@@ -195,6 +194,7 @@ services:
   #   depends_on:
   #     db-redis:
   #       condition: service_healthy
+
 
   # Dashboard
   grafana:
@@ -229,20 +229,15 @@ services:
   oee-service:
     labels:
       org.fiware: ${ORG_FIWARE}
-    # profiles: ['oee_service']
-    image: roseap_oee
+    image: ${ROSEAP_OEE}
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     container_name: ${ROSEAP_OEE}
     depends_on:
       db-crate:
         condition: service_healthy
-      # redis:
-      #   condition: service_started
       orion:
         condition: service_healthy
-      # quantumleap:
-      #   condition: service_healthy
     volumes:
       - ./oee-service/.config:/oee-service/.config
       - ./.env:/oee-service/.env
@@ -251,9 +246,8 @@ services:
     networks:
       - default
     # restart: 'always'
-    # healthcheck cause GEt request to the same endpoint tath triggers updatecontexBroker()
     # healthcheck:
-    #   test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/" == 200 || exit 1
+    #   test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/version" == 200 || exit 1
     #   interval: 5s
 
 networks:
@@ -267,5 +261,5 @@ volumes:
   # db-mongo_config: ~
   db-crate: ~
   db-redis: ~
-  redisinsight: ~
+  # redisinsight: ~
   grafana: ~
