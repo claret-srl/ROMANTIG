@@ -1,6 +1,6 @@
 # ROMANTIG ROSE-AP OEE Calculator
 
-This ROSE-AP is intended as a microservice for automatic OEE, and related metrics, calculation. The service works by connecting to a [Crate database](https://crate.io/) on port 4200, where information about the status of your target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) and [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) services.
+This ROSE-AP is intended as a microservice for automatic OEE, and related metrics, calculation. The service works by connecting to a [CrateDB](https://crate.io/) database, where information about the context of your target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) through [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) services.
 
 ## Table of Contents
 
@@ -14,6 +14,7 @@ This ROSE-AP is intended as a microservice for automatic OEE, and related metric
 - [Troubleshooting](#troubleshooting)
 
 ## Background
+
 OEE (Overall Equipment Effectiveness) is a metric used in industrial applications to measure the effectiveness and efficiency of a manufacturing process. It is calculated by multiplying the three factors of Availability, Performance, and Quality.
 
 Availability refers to the percentage of time a machine is available to run, taking into account scheduled and unscheduled downtime. Performance measures the actual output of the machine versus its maximum potential output. Quality assesses the percentage of good product produced versus the total number of products produced.
@@ -66,6 +67,7 @@ The date and time to be consider as starting point of the stats collected:
 > Be sure that the name of the states written in the config file perfectly match those that are written by your process, so that the microservice can correctly identify them
 
 ## Usage
+
 Make the `./services` script executable
 ```
 sudo chmod +x ./services
@@ -86,9 +88,9 @@ To see the help funtion of the service script
 ```
 ./services -h
 ```
-Now you can open Grafana on [localhost:3000](localhost:3000) (`user:admin` `password:admin`) and select predefined "Process Status" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana. Below an example:
+Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualiza OEE live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, thna save as a `dashboard.json` file in `.\grafana\dashboards\` directory to persist the changhes after rebooting the container or the Grafana service. Below an example:
 
-![Light](./img/dashboard_light.png)
+![Dashboard](./img/dashboard_light.png)
 
 ## Example
 
