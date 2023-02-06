@@ -45,14 +45,14 @@ The machine states to be considered as a successful conclusion of the production
 
 The machine states to be considered as a bad conclusion of the production cycle (i.e. an item is defective or faulty and has to be discarded):
 
+> **Note**
+> To avoid unexpected behavior (i.e., not updating statistics if the machine stops for any reason), a `Timeout` variable should be provided that fires cyclically when each new timeout is reached.
+
 	ENDSBAD=In Trashing	[syntax: State 01,State 02, ... ,State nn]
 
 The machine states to be considered as productive times:
 
 	TIMESUP=In Picking,In Welding,In QC,In Placing	[syntax: State 01,State 02,...,State nn]
-
-> **Note**
-> To avoid unexpected behavior (i.e., not updating statistics if the machine stops for any reason), a `Timeout` variable should be provided that fires cyclically when each new timeout is reached.
 
 The machine states to be considered as downtime:
 
