@@ -174,11 +174,11 @@ def provisioning_ARGS(
     },
     "notification": {
         "http": {
-            "url": "http://''' + QUANTUMLEAP + ''':'''+ QUANTUMLEAP_PORT+ '''/v2/notify"
+            "url": "http://''' + QUANTUMLEAP + ''':'''+ QUANTUMLEAP_PORT + '''/v2/notify"
         },
         "attrs": ["''' + OCB_ID + '''"]
     }
-}''',
+}'''
         },
         # ##### Contex Broker
         # ##### Subscriptions
@@ -213,7 +213,7 @@ def provisioning_ARGS(
         },
         "attrs": ["''' + OCB_ID + '''"]
     }
-}''',
+}'''
         }
     ]
     
@@ -264,7 +264,7 @@ def update_ARGS(ORION, ORION_PORT, Service, ServicePath, contentType, DEVICE_ID,
         #                 }
         #             ]
         #         }
-        #     ''',
+        #     '''
         # }
         # ,
         # {

@@ -6,15 +6,14 @@
 set -e
 
 setRedisCrateHostMemory () {
+    echo ""
     sudo sysctl -w vm.max_map_count=262144 # CrateDB
     sudo sysctl vm.overcommit_memory=1 # Redis
-    echo ""
 }
 
 setEnviroment () {
 	# echo $(cat .env | grep "#" -v)
     export $(cat .env | grep "#" -v)
-    echo ""
 }
 
 # loadData () {
@@ -50,6 +49,7 @@ setEnviroment () {
 # }
 
 startingContainers () {
+	    echo ""
         echo -e "Starting containers:"
         echo -e "\033[1;34mOrion\033[0m, \033[1;34mQuantumLeap\033[0m, \033[1;36mIoT-Agent\033[0m, \033[1mGrafana\033[0m, \033[1mCrate-DB\033[0m and \033[1mMongo-DB\033[0m."
         echo ""
@@ -71,16 +71,17 @@ startingContainers () {
 }
 
 stoppingContainers () {
+    echo ""
     CONTAINERS=$(docker ps --filter "label=org.fiware=${ORG_FIWARE}" -aq)
     if [[ -n $CONTAINERS ]]; then
         echo "Stopping containers:"
    		echo ""
         docker rm -f $CONTAINERS || true
     fi
-    echo ""
 }
 
 deletingContainers () {
+    echo ""
     stoppingContainers
     VOLUMES=$(docker volume ls -qf dangling=true)
     if [[ -n $VOLUMES ]]; then
@@ -92,13 +93,12 @@ deletingContainers () {
         echo "Removing all Networks"
         docker network rm $NETWORKS || true
     fi
-    echo ""
 }
 
 displayServices () {
+    echo ""
     docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter "label=org.fiware=${ORG_FIWARE}"
     (gp ports list 2> /dev/null) || true
-    echo ""
 }
 
 # addDatabaseIndex () {
@@ -198,7 +198,6 @@ fi
 if (( $# < 1 )); then
     echo "Illegal number of parameters"
     echo "$usage"
-    echo ""
     exit 1
 fi
 
@@ -217,16 +216,19 @@ case "${command}" in
 		# docker scan
     	cd ..
         echo -e " \033[1;32mdone\033[0m"
+    	echo ""
     ;;
     "-d"|"--debug")
         sudo ./services --down
         sudo ./services --build
         sudo ./services --up
+    	echo ""
     ;;
     "-p"|"--pull")
         echo "Pulling Docker images"
         docker pull curlimages/curl
         ${dockerCmd} pull
+    	echo ""
     ;;
     "up"|"--up")	
         # setEnviroment
@@ -235,10 +237,12 @@ case "${command}" in
 		startingContainers
         # loadData
         displayServices
+    	echo ""
     ;;
     "down"|"--down")
         # setEnviroment
         stoppingContainers
+    	echo ""
     ;;
     "-rm"|"--remove")
         # setEnviroment
@@ -255,11 +259,12 @@ case "${command}" in
                 echo "Invalid"
             ;;
         esac
+    	echo ""
     ;;
     *)
         echo "Command not Found."
         echo "$usage"
-    	echo ""
         exit 127;
+    	echo ""
     ;;
 esac

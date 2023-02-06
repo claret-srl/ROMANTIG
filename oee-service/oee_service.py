@@ -5,16 +5,21 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from sys import argv
 # import json
 import os
+import re
 from dotenv import load_dotenv
 
 import _query
 # import _dataTemplate
 import _curl_calls
 
+
+# counter = 0
+
+
 # <-- Docker
 Docker = True
 # Docker = True
-Debug = False
+Debug = True
 # Docker -->
 
 
@@ -30,8 +35,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(content)
 
-        updateContexBroker()
-
         if Debug:
             print("[INFO]" + "[WebServer]" + "Headers:" + "\n")
             print(self.headers)
@@ -39,12 +42,31 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             print(content.decode("utf-8"))
 
     def do_GET(self):
-        self.write_response(b"")
+        if self.path.endswith('/plain_text'):
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b'This is text/plain')
+        elif re.search(r'/set_cookie', self.path):
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.send_header('Set-Cookie', 'monster=1')
+            self.end_headers()
+            self.wfile.write(b"<html>C is for cookie, it's good enough for me</html>")
+        elif not re.search(r'.*\.\w+$', self.path):
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+        else:
+            SimpleHTTPRequestHandler.do_GET(self) 
 
     def do_POST(self):
         content_length = int(self.headers.get("content-length", 0))
         body = self.rfile.read(content_length)
         self.write_response(body)
+
+        updateContexBroker()
+        
 
 
 def httpWebServer(_BIND_HOST="0.0.0.0", _PORT=8008):
@@ -76,7 +98,7 @@ def query_CrateDB(_sqlCommands):
             print("[INFO]" + "[CrateDB]" + "Cursor created." + "\n")
             # print(_sqlCommands)
             for command in _sqlCommands:
-                # print(command)
+                print(command)
                 try:
                     cursor.execute(command)
                     if command.startswith("SELECT"):
@@ -132,9 +154,12 @@ def convert_to_seconds(s):
 
 def updateContexBroker():
     oeeCallBackQuery = _query.oeeCallBack(CRATE_SCHEMA, CRATE_TABLE_OEE)
+    # print("oeeCallBackQuery: ", oeeCallBackQuery)
     oeeCallBackQueryResults = query_CrateDB([oeeCallBackQuery])
+    # print("oeeCallBackQueryResults: ", oeeCallBackQueryResults)
     # oeeCallBackQueryResultsDataTemplate = _dataTemplate.append_ARGS(oeeCallBackQueryResults)
     cUrl_call = _curl_calls.update_ARGS(ORION, ORION_PORT, Service, ServicePath, contentType, DEVICE_ID, DEVICE_TYPE, oeeCallBackQueryResults)
+    # print("cUrl_call: ", cUrl_call)
     curl_calls_function(cUrl_call)
 
 # Update Orion Contex Broker -->
@@ -202,14 +227,18 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
 
                 if _payload_OverRide == False:
                     print(f"-d {call['payload']}", "\n")
+                    # counter = counter + 1
                     curl_call(
                         cursor, call["method"], url, call["header"], call["payload"]
                     )
                 else:
                     print(f"-d {_payload_OverRide}", "\n")
+                    # counter = counter + 1
                     curl_call(
                         cursor, call["method"], url, call["header"], _payload_OverRide
                     )
+                
+                # print(counter)
 
                 print(
                     "\n #####   #####   #####   #####   #####   #####   #####   #####   ##### \n"

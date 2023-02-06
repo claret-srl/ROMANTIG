@@ -251,9 +251,10 @@ services:
     networks:
       - default
     # restart: 'always'
-    healthcheck:
-      test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/" == 200 || exit 1
-      interval: 5s
+    # healthcheck cause GEt request to the same endpoint tath triggers updatecontexBroker()
+    # healthcheck:
+    #   test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/" == 200 || exit 1
+    #   interval: 5s
 
 networks:
   default:
