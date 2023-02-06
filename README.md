@@ -6,8 +6,11 @@ This ROSE-AP is intended as a microservice for automatic OEE, and related metric
 
 - [Background](#background)
 - [Install](#install)
+	-[Machine States](#Machine States)
 - [Usage](#usage)
 - [Example](#example)
+- [Architecture](#Architecture)
+- [Prerequisites](#Prerequisites)
 - [Troubleshooting](#troubleshooting)
 
 ## Background
@@ -28,7 +31,7 @@ In order to compute the OEE, the service must know if each possible process stat
 To do so, please change the `.config` file found in the `oee_service` folder, prior to run the service.
 You have to set the following variables:
 
-### `Machine States`
+### Machine States
 
 The machine states to be considered as a successful conclusion of the production cycle (i.e. an item is successfully created):
 
@@ -113,7 +116,7 @@ In general, we suggest you to adopt a state space representation similar to the 
 
 As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to Orion Context Broker through the [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our OEE calculator.
 
-# Architecture
+## Architecture
 
 This application builds on the following components [ROSE-AP RomanTIG](https://github.com/claret-srl/romantig_RAMP_ROSEAP). It will use the following FIWARE components: the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), the [QuantumLeap](https://smartsdk.github.io/ngsi-timeseries-api/) . [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/), and
 
@@ -167,9 +170,9 @@ classDef Claret fill:#0999D0,Stroke:#F8F8F8,color:#F8F8F8
 class Crate,Mongo,Redis,Welder,Robot,QC,Device,PLC Gainsboro
 ```
 
-# Prerequisites
+## Prerequisites
 
-## Docker and Docker Compose
+### Docker and Docker Compose
 
 To keep things simple all components will be run using [Docker](https://www.docker.com). **Docker** is a container
 technology which allows to different components isolated into their respective environments.
@@ -194,7 +197,7 @@ docker version
 Please ensure that you are using Docker version 20.10 or higher and Docker Compose 1.29 or higher and upgrade if
 necessary.
 
-# Troubleshooting
+## Troubleshooting
 
 If the following error will appear creating or starting the container
 ```
@@ -215,7 +218,7 @@ Then run the following command, in the root directory, to convert all the text f
 dos2unix ./.env ./docker-compose.yml ./import-data ./provision-devices ./services
 ```
 
-## CrateDB
+### CrateDB
 
 If the CrateDB container crashes after startup, run the following command:
 ```
@@ -223,7 +226,7 @@ sudo sysctl vm.max_map_count=262144
 ```
 This setting in included in the script case `sudo ./services up`.
 
-## Redis
+### Redis
 
 If the Redis container crashes after startup, run the following command:
 ```
