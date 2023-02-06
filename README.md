@@ -186,7 +186,7 @@ curl -X GET \
 -H 'fiware-service: opcua_plc' \
 -H 'fiware-servicepath: /demo'
 ```
-Will result in the following output>
+Will result in the following output:
 ```
 [
   {
