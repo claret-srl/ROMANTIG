@@ -39,6 +39,9 @@ You have to set the following variables:
 
 ### Machine States
 
+> **Warning**
+> Be sure that the name of the states written in the config file perfectly match those that are written by your process, so that the microservice can correctly identify them
+
 The machine states to be considered as a successful conclusion of the production cycle (i.e. an item is successfully created):
 
 	ENDSGOOD=In Placing	[syntax: State 01,State 02, ... ,State nn]
@@ -70,9 +73,6 @@ The date and time to be consider as starting point of the stats collected:
 
 	START_DATE=2023-01-01	[syntax: <YYYY-MM-DD>]
 	START_TIME=08:00:00	# syntax: <hh-mm-ss>
-
-> **Warning**
-> Be sure that the name of the states written in the config file perfectly match those that are written by your process, so that the microservice can correctly identify them
 
 ## Usage
 
