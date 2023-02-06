@@ -1,0 +1,239 @@
+#!/bin/bash
+#
+#  curl commands to reload the data
+#
+#
+
+set -e
+
+# # Set enviroment from .env file
+# setEnviroment () {
+# 	export $(cat .env | grep "#" -v)
+# }
+
+# setEnviroment
+
+printf "⏳ Provisioning IoT devices "
+
+# ####################################################
+# #
+# # Create a Service Groups for all OPC-UA IoT devices
+##
+
+# curl -s -o /dev/null -X POST \
+#   "http://iot-agent:4041/iot/services" \
+#   -H 'Content-Type: application/json' \
+#   -H 'fiware-service: opcua_car' \
+#   -H 'fiware-servicepath: /demo' \
+#   -d '{
+#  "services": [
+#    {
+#      "apikey":      "1068318794",
+#      "cbroker":     "http://localhost:1026",
+#      "entity_type": "PLC",
+#      "resource":    "/iot/d"    
+#    }
+#  ]
+# }'
+
+# ####################################################
+# #
+# # Provision device for localhost
+# #
+
+# curl -iX POST \
+#   'http://localhost:1026/v2/entities' \
+#   -H 'Content-Type: application/json' \
+#   -d '
+# {
+# 	"type": "PLC",
+# 	"id": "urn:ngsiv2:I40Asset:Area:001",
+# }'
+
+curl -iX POST \
+  'http://localhost:1026/v2/entities' \
+  -H 'Content-Type: application/json' \
+  -d '
+{
+	"type": "Area",
+	"id": "urn:ngsiv2:I40Asset:Area:001"
+}'
+
+curl -iX POST \
+  'http://localhost:1026/v2/entities' \
+  -H 'Content-Type: application/json' \
+  -d '
+{
+	"type": "Workstation",
+	"id": "urn:ngsiv2:I40Asset:Workstation:001"
+}'
+
+curl -iX POST \
+  'http://localhost:1026/v2/entities' \
+  -H 'Content-Type: application/json' \
+  -d '
+{
+	"type": "PLC",
+	"id": "urn:ngsiv2:I40Asset:PLC:001",
+	"Availability": {
+        "type": "Text",
+        "value": null
+    },
+	"Performance": {
+        "type": "Text",
+        "value": null
+    },
+	"Quality": {
+        "type": "Text",
+        "value": null
+    },
+	"OEE": {
+        "type": "Text",
+        "value": null
+    }
+}'
+
+# ####################################################
+# #
+# # Provision Relationship
+# #
+
+curl -X GET \
+  'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Workstation:001&options=values&type=PLC'
+
+curl -X GET \
+  'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Workstation:001&options=values'
+
+curl -X GET \
+  'http://localhost:1026/v2/entities/?q=hasParentI40Asset==urn:ngsiv2:I40Asset:Workstation:001' | jq
+
+curl -iX POST \
+  'http://localhost:1026/v2/op/update' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "actionType": "APPEND",
+  "entities": [
+    {
+      "id": "urn:ngsiv2:I40Asset:Workstation:001",
+      "type": "PLC",
+      "hasParentI40Asset": {
+        "type": "Relationship",
+        "value": "urn:ngsiv2:I40Asset:Area:001"
+      }
+    }
+  ]
+}'
+
+curl -iX POST \
+  'http://localhost:1026/v2/op/update' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "actionType": "APPEND",
+  "entities": [
+    {
+      "id": "urn:ngsiv2:I40Asset:PLC:001",
+      "type": "PLC",
+      "hasParentI40Asset": {
+        "type": "Relationship",
+        "value": "urn:ngsiv2:I40Asset:Workstation:001"
+      }
+    }
+  ]
+}'
+
+# ####################################################
+# #
+# # Provision subscriptions for QuantumLeap
+# #
+
+curl -s -o /dev/null -X POST \
+	'http://localhost:1026/v2/subscriptions/' \
+	-H 'Content-Type: application/json' \
+	-H 'fiware-service: opcua_car' \
+	-H 'fiware-servicepath: /demo' \
+	-d '{
+	"description": "Provision subscriptions for QuantumLeap",
+	"subject": {
+		"entities": [
+			{
+				"idPattern": ".*",
+				"type": "PLC"
+			}
+		],
+		"condition": {
+			"attrs": ["processStatus"]
+		}
+	},
+	"notification": {
+		"http": {
+			"url": "http://quantumleap:8668/v2/notify"
+		},
+		"attrs": ["processStatus"],
+		"metadata": ["dateCreated", "dateModified"]
+	},
+	"throttling": 1
+}'
+
+# ####################################################
+# #
+# # Altering Content
+# #
+
+{
+	"id": "urn:ngsiv2:I40Asset:PLC:001",
+	"type": "PLC",
+	"Availability": {
+        "type": "Float",
+        "value": null
+    },
+	"Performance": {
+        "type": "Float",
+        "value": null
+    },
+	"Quality": {
+        "type": "Float",
+        "value": null
+    },
+	"OEE": {
+        "type": "Float",
+        "value": null
+    }
+}'
+
+curl -iX POST \
+  --url 'http://localhost:1026/v2/op/update' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "actionType": "append",
+  "entities": [
+    {
+      "id": "urn:ngsiv2:I40Asset:PLC:001",
+      "type": "PLC",
+      "Availability": {
+        "type": "Float",
+        "value": null
+      },
+      "Performance": {
+        "type": "Float",
+        "value": null
+      },
+      "Quality": {
+        "type": "Float",
+        "value": null
+      },
+      "OEE": {
+        "type": "Float",
+        "value": null
+      }
+    }
+  ]
+}'
+
+
+# ####################################################
+# #
+# # Provision Sensors
+# #
+
+
+echo -e " \033[1;32mdone\033[0m"

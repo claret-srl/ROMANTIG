@@ -1,0 +1,44 @@
+{
+	"logLevel": "DEBUG",
+	"multiCore": false,
+	"relaxTemplateValidation": true,
+	"contextBroker": {
+		"host": "orion",
+		"port": 1026,
+		"service": "opcua_car",
+		"subservice": "/demo"
+	},
+	"server": {
+		"port": 4041,
+		"baseRoot": "/"
+	},
+	"deviceRegistry": {
+		"type": "memory"
+	},
+	"mongodb": {
+		"host": "iot_mongo",
+		"port": 27017,
+		"db": "iotagent",
+		"retries": 5,
+		"retryTime": 5
+	},
+	"types": {
+		"PLC": {
+			"service": "opcua_car",
+			"subservice": "/demo",
+			"active": [],
+			"lazy": [],
+			"commands": []
+		}
+	},
+	"browseServerOptions": null,
+	"service": "opcua_car",
+	"subservice": "/demo",
+	"providerUrl": "http://iotage:4041",
+	"pollingExpiration": 20000,
+	"pollingDaemonFrequency": 20000,
+	"deviceRegistrationDuration": "P1M",
+	"defaultType": null,
+	"contexts": [],
+	"contextSubscriptions": []
+}

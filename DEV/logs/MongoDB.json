@@ -1,0 +1,48 @@
+[
+	{
+		"t": {
+			"$date": "2022-08-03T12:47:23.129+00:00"
+		},
+		"s": "I",
+		"c": "CONTROL",
+		"id": 20712,
+		"ctx": "LogicalSessionCacheReap",
+		"msg": "Sessions collection is not set up; waiting until next sessions reap interval",
+		"attr": {
+			"error": "NamespaceNotFound: config.system.sessions does not exist"
+		}
+	},
+	{
+		"t": {
+			"$date": "2022-08-03T12:47:22.581+00:00"
+		},
+		"s": "I",
+		"c": "STORAGE",
+		"id": 22297,
+		"ctx": "initandlisten",
+		"msg": "Using the XFS filesystem is strongly recommended with the WiredTiger storage engine. See http://dochub.mongodb.org/core/prodnotes-filesystem",
+		"tags": ["startupWarnings"]
+	},
+	{
+		"t": {
+			"$date": "2022-08-03T12:47:23.085+00:00"
+		},
+		"s": "W",
+		"c": "CONTROL",
+		"id": 22120,
+		"ctx": "initandlisten",
+		"msg": "Access control is not enabled for the database. Read and write access to data and configuration is unrestricted",
+		"tags": ["startupWarnings"]
+	},
+	{
+		"t": {
+			"$date": "2022-08-03T12:47:23.085+00:00"
+		},
+		"s": "W",
+		"c": "CONTROL",
+		"id": 22178,
+		"ctx": "initandlisten",
+		"msg": "/sys/kernel/mm/transparent_hugepage/enabled is 'always'. We suggest setting it to 'never'",
+		"tags": ["startupWarnings"]
+	}
+]

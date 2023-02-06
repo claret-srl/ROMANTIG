@@ -1,0 +1,25 @@
+{
+	"actionType": "append",
+	"entities": [
+	  {
+		"id": "urn:ngsiv2:I40Asset:PLC:001",
+		"type": "PLC",
+		"Availability": {
+		  "type": "Float",
+		  "value": null
+		},
+		"Performance": {
+		  "type": "Float",
+		  "value": null
+		},
+		"Quality": {
+		  "type": "Float",
+		  "value": null
+		},
+		"OEE": {
+		  "type": "Float",
+		  "value": null
+		}
+	  }
+	]
+  }
