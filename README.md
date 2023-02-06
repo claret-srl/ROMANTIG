@@ -39,35 +39,41 @@ To do so, please change the `.config` file found in the `oee_service` folder, pr
 > **Warning**
 > Be sure that the name of the states written in the config file perfectly match those that are written by your process, so that the microservice can correctly identify them
 
-### Machine States
-
+### Good ends
 The machine states to be considered as a successful conclusion of the production cycle (i.e. an item is successfully created):
 
 	ENDSGOOD=In Placing	[syntax: State 01,State 02, ... ,State nn]
 
+### Bad ends
 The machine states to be considered as a bad conclusion of the production cycle (i.e. an item is defective or faulty and has to be discarded):
+	ENDSBAD=In Trashing	[syntax: State 01,State 02, ... ,State nn]
+
+### Up time
+The machine states to be considered as productive times:
+
+	TIMESUP=In Picking,In Welding,In QC,In Placing	[syntax: State 01,State 02,...,State nn]
+	
+### Down time
+The machine states to be considered as downtime:
 
 > **Note**
 > To avoid unexpected behavior (i.e., not updating statistics if the machine stops for any reason), a `Timeout` variable should be provided that fires cyclically when each new timeout is reached.
 
-	ENDSBAD=In Trashing	[syntax: State 01,State 02, ... ,State nn]
-
-The machine states to be considered as productive times:
-
-	TIMESUP=In Picking,In Welding,In QC,In Placing	[syntax: State 01,State 02,...,State nn]
-
-The machine states to be considered as downtime:
-
 	TIMESDOWN=Idle,In Reworking,In QC from rework,In Trashing,Timeout	[syntax: State 01,State 02,...,State nn]
 
+### Time step
 The timestep to group [OEE](https://www.oee.com/) stats:
+> **Note**
+> Since OEE values are calculated from the data stored in the database, it is possible to increase or decrease the timestep value by updating the data grouping over the entire stored range without losing any information.
 
 	TIMESTEP=5 minute	[syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
 
+### Ideal time
 The duration of the process in ideal condition, this represents a theoretical lower bound.
 
 	IDEALTIME=20 second	[syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
 
+### Initial date and time
 The date and time to be consider as starting point of the stats collected:
 
 	START_DATE=2023-01-01	[syntax: <YYYY-MM-DD>]
