@@ -86,12 +86,12 @@ The date and time to be consider as starting point of the stats collected:
 
 ## Usage
 
-Star the Docker deamon.
+Star the Docker daemon.
 
 Make the `./services` script executable
 `sudo chmod +x ./services`
 
-Build the Docker image for the OEE microservice (Remove the old image if any, build the new image and performa a vulnerability scan):
+Build the Docker image for the OEE microservice (Remove the old image if any, build the new image and performs a vulnerability scan):
 `./services --build`
 
 To apply required settings to the host, and start up all the services in the containers run:
@@ -281,7 +281,9 @@ necessary.
 
 ## Troubleshooting
 
-If the following error will appear creating or starting the container
+### /bin/bash^M: bad interpreter: No such file or directory
+
+If the following error will appear creating or starting the container:
 ```
 /bin/bash^M: bad interpreter: No such file or directory
 ```
@@ -295,9 +297,9 @@ or in Ubuntu/Debian:
 sudo apt update
 sudo apt install dos2unix
 ```
-Then run the following command, in the root directory, to convert all the text files from DOS/Mac to Unix environment 
+Then run the utility `dos2unix_Recursively.sh` command, in the root directory, to convert all the text files from DOS/Mac to Unix environment 
 ```
-dos2unix ./.env ./docker-compose.yml ./import-data ./provision-devices ./services
+./utility/dos2unix_Recursively.sh
 ```
 
 ### [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), [QuantumLeap](https://smartsdk.github.io/ngsi-timeseries-api/), [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/)
