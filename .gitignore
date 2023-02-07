@@ -1,6 +1,6 @@
 *.dccache
-oee-service\__pycache__
+oee-service/__pycache__
 *.pyc
-.vscode\
-dev\
-DEV\
+.vscode/
+dev/
+DEV/
