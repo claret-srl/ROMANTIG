@@ -31,9 +31,9 @@ services:
     networks:
       - default
     expose:
-      - "${ORION_PORT}"
+      - ${ORION_PORT}
     ports:
-      - "${ORION_PORT}:1026"
+      - ${ORION_PORT}:1026
     command: -dbhost ${MONGO} -logLevel ${LOG_LEVEL}
     healthcheck:
       test: curl --fail -s http://${ORION}:${ORION_PORT}/version || exit 1
@@ -47,7 +47,7 @@ services:
     image: orchestracities/quantumleap:${QUANTUMLEAP_VERSION}
     container_name: ${QUANTUMLEAP}
     ports:
-      - "${QUANTUMLEAP_PORT}:8668"
+      - ${QUANTUMLEAP_PORT}:8668
     depends_on:
       db-crate:
         condition: service_healthy
@@ -75,34 +75,35 @@ services:
     networks:
       - default
     ports:
-      - "${IOTA_NORTH_PORT}:4041"
-      - "${IOTA_SOUTH_PORT}:9229"
+      - ${IOTA_NORTH_PORT}:4041
+      - ${IOTA_SOUTH_PORT}:9229
     volumes:
       - ./iot-agent/config.js:/opt/iotagent-opcua/conf/config.js
     environment:
-      - "FIWARE_SERVICE=${FIWARE_SERVICE}"
-      - "FIWARE_SERVICEPATH=${FIWARE_SERVICEPATH}"
-      - "DEVICE_ID=${DEVICE_ID}"
-      - "DEVICE_TYPE=${DEVICE_TYPE}"
-      - "OCB_ID=${OCB_ID}"
-      - "OPCUA_ID=${OPCUA_ID}"
-      - "IOTA_OPCUA_MT_ENTITY_ID=${CONTEXTS_ID}"
-      - "IOTA_OPCUA_ENDPOINT=${IOTA_OPCUA_ENDPOINT}"	          # Endpoint of OPC UA Server
-      - "IOTA_FALLBACK_TENANT=${FIWARE_SERVICE}"
-      - "IOTA_FALLBACK_PATH=${FIWARE_SERVICEPATH}"
-      - "IOTA_OPCUA_SECURITY_MODE=None"						              # Security mode for OPC UA connection
-      - "IOTA_OPCUA_SECURITY_POLICY=None"					              # Security policy for OPC UA connection
-      - "IOTA_OPCUA_SECURITY_USERNAME=null"                     # Security username for OPC UA connection
-      - "IOTA_OPCUA_SECURITY_PASSWORD=null"                     # Security password for OPC UA connection
-      - "IOTA_CB_HOST=${ORION}"								                  # Hostname of the context broker to update context
-      - "IOTA_CB_PORT=${ORION_PORT}"									          # Port that context broker listens on to update context
-      - "IOTA_NORTH_PORT=${IOTA_NORTH_PORT}"							      # Port used for configuring the IoT Agent and receiving context updates from the context broker
-      - "IOTA_REGISTRY_TYPE=mongodb"						                # Whether to hold IoT device info in memory or in a database
-      - "IOTA_MONGO_HOST=${MONGO}"							                # The hostname of MongoDB - used for holding device and service information
-      - "IOTA_MONGO_PORT=${MONGO_PORT}"								          # The port that MongoDB is listening on
-      - "IOTA_MONGO=${IOTA}"						                        # The name of the database used in MongoDB
-      - "IOTA_PROVIDER_URL=http://${IOTA}:${IOTA_NORTH_PORT}"		# URL passed to the Context Broker when commands are registered, used as a forwarding URL location when the Context Broker issues a command to a device
-      - "IOTA_OPCUA_UNIQUE_SUBSCRIPTION=false"				          # Boolean property to assess whether subscribe once for multiple OPC UA nodes or not
+      - LOGLEVEL=${LOG_LEVEL}
+      - FIWARE_SERVICE=${FIWARE_SERVICE}
+      - FIWARE_SERVICEPATH=${FIWARE_SERVICEPATH}
+      - DEVICE_ID=${DEVICE_ID}
+      - DEVICE_TYPE=${DEVICE_TYPE}
+      - OCB_ID=${OCB_ID}
+      - OPCUA_ID=${OPCUA_ID}
+      - IOTA_OPCUA_MT_ENTITY_ID=${CONTEXTS_ID}
+      - IOTA_OPCUA_ENDPOINT=${IOTA_OPCUA_ENDPOINT}	          # Endpoint of OPC UA Server
+      - IOTA_FALLBACK_TENANT=${FIWARE_SERVICE}
+      - IOTA_FALLBACK_PATH=${FIWARE_SERVICEPATH}
+      - IOTA_OPCUA_SECURITY_MODE=None						              # Security mode for OPC UA connection
+      - IOTA_OPCUA_SECURITY_POLICY=None					              # Security policy for OPC UA connection
+      - IOTA_OPCUA_SECURITY_USERNAME=null                     # Security username for OPC UA connection
+      - IOTA_OPCUA_SECURITY_PASSWORD=null                     # Security password for OPC UA connection
+      - IOTA_CB_HOST=${ORION}								                  # Hostname of the context broker to update context
+      - IOTA_CB_PORT=${ORION_PORT}									          # Port that context broker listens on to update context
+      - IOTA_NORTH_PORT=${IOTA_NORTH_PORT}							      # Port used for configuring the IoT Agent and receiving context updates from the context broker
+      - IOTA_REGISTRY_TYPE=mongodb						                # Whether to hold IoT device info in memory or in a database
+      - IOTA_MONGO_HOST=${MONGO}							                # The hostname of MongoDB - used for holding device and service information
+      - IOTA_MONGO_PORT=${MONGO_PORT}								          # The port that MongoDB is listening on
+      - IOTA_MONGO=${IOTA}						                        # The name of the database used in MongoDB
+      - IOTA_PROVIDER_URL=http://${IOTA}:${IOTA_NORTH_PORT}		# URL passed to the Context Broker when commands are registered, used as a forwarding URL location when the Context Broker issues a command to a device
+      - IOTA_OPCUA_UNIQUE_SUBSCRIPTION=false				          # Boolean property to assess whether subscribe once for multiple OPC UA nodes or not
 
 
   # Databases
@@ -112,9 +113,9 @@ services:
     image: mongo:${MONGO_VERSION}
     container_name: ${MONGO}
     expose:
-      - "${MONGO_PORT}"
+      - ${MONGO_PORT}
     ports:
-      - "${MONGO_PORT}:27017"
+      - ${MONGO_PORT}:27017
     networks:
       - default
     #   - ${MONGO}_data:/data/db
@@ -124,6 +125,7 @@ services:
         host=`hostname --ip-address || echo '127.0.0.1'`; 
         mongo --quiet $host/test --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)' && echo 0 || echo 1
       interval: 5s
+  
   
   # Mongo GUI, to chek if Mongo it's working just for dev purpose
   # mongo-express:
@@ -151,8 +153,8 @@ services:
     image: crate:${CRATE_VERSION}
     container_name: ${CRATE}
     ports:
-      - "${CRATE_PORT_ADMIN}:4200"
-      - "${CRATE_PORT_TRANSPORT_PROTOCOL}:4300"
+      - ${CRATE_PORT_ADMIN}:4200
+      - ${CRATE_PORT_TRANSPORT_PROTOCOL}:4300
       - ${CRATE_PORT_POSTGRES}:5432
     command: crate -Cauth.host_based.enabled=false  -Ccluster.name=rampcluster -Chttp.cors.enabled=false -Chttp.cors.allow-origin="*"
     environment:
@@ -172,12 +174,13 @@ services:
     networks:
       - default
     ports:
-      - "${REDIS_PORT}:6379"
+      - ${REDIS_PORT}:6379
     volumes:
       - ${REDIS}:/data
     healthcheck:
       test: ["CMD", "redis-cli","ping"]
       interval: 5s
+
 
   # # Redis GUI, to chek if Redis it's working just for dev purpose
   # redisinsight:
@@ -210,13 +213,13 @@ services:
     ports:
       - "${GRAFANA_PORT}:3000"
     environment:
-      - "CRATE=${CRATE}"
-      - "CRATE_PORT_POSTGRES=${CRATE_PORT_POSTGRES}"
-      - "FIWARE_SERVICE=$FIWARE_SERVICE"
-      - "CRATE_SCHEMA=$CRATE_SCHEMA"
-      - "CRATE_TABLE=$CRATE_TABLE"
-      - "CRATE_TABLE_DURATION=$CRATE_TABLE_DURATION"
-      - "CRATE_TABLE_OEE=$CRATE_TABLE_OEE"
+      - CRATE=${CRATE}
+      - CRATE_PORT_POSTGRES=${CRATE_PORT_POSTGRES}
+      - FIWARE_SERVICE=$FIWARE_SERVICE
+      - CRATE_SCHEMA=$CRATE_SCHEMA
+      - CRATE_TABLE=$CRATE_TABLE
+      - CRATE_TABLE_DURATION=$CRATE_TABLE_DURATION
+      - CRATE_TABLE_OEE=$CRATE_TABLE_OEE
       # - GF_INSTALL_PLUGINS=https://github.com/orchestracities/grafana-map-plugin/archive/master.zip;grafana-map-plugin,grafana-clock-panel,grafana-worldmap-panel
     volumes:
       - ${GRAFANA}:/var/lib/grafana
@@ -230,8 +233,6 @@ services:
     labels:
       org.fiware: ${ORG_FIWARE}
     image: ${ROSEAP_OEE}
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
     container_name: ${ROSEAP_OEE}
     depends_on:
       db-crate:
@@ -242,9 +243,11 @@ services:
       - ./oee-service/.config:/oee-service/.config
       - ./.env:/oee-service/.env
     ports:
-      - "${ROSEAP_OEE_PORT}:8008"
+      - ${ROSEAP_OEE_PORT}:8008
     networks:
       - default
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
     # restart: 'always'
     # healthcheck:
     #   test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/version" == 200 || exit 1
