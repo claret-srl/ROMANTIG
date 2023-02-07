@@ -297,7 +297,7 @@ or in Ubuntu/Debian:
 sudo apt update
 sudo apt install dos2unix
 ```
-Then run the utility `dos2unix_Recursively.sh` command, in the root directory, to convert all the text files from DOS/Mac to Unix environment 
+Then run the utility `dos2unix_Recursively.sh`, in the root directory, to convert all the text files from DOS/Mac to Unix environment, with the following command>
 ```
 ./utility/dos2unix_Recursively.sh
 ```
