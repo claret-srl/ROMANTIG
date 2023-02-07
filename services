@@ -16,60 +16,47 @@ setEnviroment () {
     echo ""
 }
 
-provisionDevices () {
-	docker run --rm \
-	-v $(pwd)/provision-devices.sh:/provision-devices.sh \
-	--network fiware_default \
-	-e ORION="${ORION}" \
-	-e ORION_PORT="${ORION_PORT}" \
-	-e QUANTUMLEAP="${QUANTUMLEAP}" \
-	-e QUANTUMLEAP_PORT="${QUANTUMLEAP_PORT}" \
-	-e ROSEAP_OEE="${ROSEAP_OEE}" \
-	-e ROSEAP_OEE_PORT="${ROSEAP_OEE_PORT}" \
-	-e FIWARE_SERVICE="${FIWARE_SERVICE}" \
-	-e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
-	-e DEVICE_ID="${DEVICE_ID}" \
-	-e DEVICE_TYPE="${DEVICE_TYPE}" \
-	-e DEVICE_BASE_ID="${DEVICE_BASE_ID}" \
-	-e OCB_ID="${OCB_ID}" \
-	--entrypoint /bin/ash curlimages/curl provision-devices.sh
-}
-
-# importData () {
-# 	docker run --rm -v $(pwd)/import-data:/import-data \
-#     --network fiware_default \
-#     -e ORION="${ORION}" \
-#     -e ORION_PORT="${ORION_PORT}" \
-#     --entrypoint /bin/ash curlimages/curl import-data
+# provisionDevices () {
+# 	docker run --rm \
+# 	-v $(pwd)/provision-devices.sh:/provision-devices.sh \
+# 	--network fiware_default \
+# 	-e ORION="${ORION}" \
+# 	-e ORION_PORT="${ORION_PORT}" \
+# 	-e QUANTUMLEAP="${QUANTUMLEAP}" \
+# 	-e QUANTUMLEAP_PORT="${QUANTUMLEAP_PORT}" \
+# 	-e ROSEAP_OEE="${ROSEAP_OEE}" \
+# 	-e ROSEAP_OEE_PORT="${ROSEAP_OEE_PORT}" \
+# 	-e FIWARE_SERVICE="${FIWARE_SERVICE}" \
+# 	-e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
+# 	-e DEVICE_ID="${DEVICE_ID}" \
+# 	-e DEVICE_TYPE="${DEVICE_TYPE}" \
+# 	-e DEVICE_BASE_ID="${DEVICE_BASE_ID}" \
+# 	-e OCB_ID="${OCB_ID}" \
+# 	--entrypoint /bin/ash curlimages/curl provision-devices.sh
 # }
 
-waitForDockerService () {
-    echo -e "⏳ Waiting for \033[1;36m$1\033[0m to be available"
-    while ! [ `docker inspect --format='{{.State.Health.Status}}' $1` == "healthy" ]
-    do
-        sleep 1
-    done
-	echo -e "\t$1 \033[1;32mAvailable\033[0m\n"
+waitForService () {
+  echo -e -n "⏳ Waiting for \033[1;36m$1\033[0m to be available:"
+  while ! [ $TEST ]
+  do
+    if [ $# == 2 ]; then
+      TEST=$[`curl -s -o /dev/null -w %{http_code} "http://localhost:$2/version"` == 200]
+    else
+      TEST=$[`docker inspect --format="{{.State.Health.Status}}" $1` == "healthy"]
+    fi
+    sleep 1
+  done
+  echo -e "\t \033[1;32mAvailable\033[0m\n"
 }
 
-waitForDockerServiceVersion () {
-    echo -e "⏳ Waiting for \033[1;36m$1\033[0m to be available"
-    while ! [ `curl -s -o /dev/null -w %{http_code} "http://localhost:$2/version"` == 200 ]
-    do
-        sleep 1
-    done
-	echo -e "\t$1 \033[1;32mAvailable\033[0m\n"
-}
-
-loadData () {
+WaitingDocker () {
     echo ""
-	waitForDockerService ${MONGO}
-	waitForDockerService ${ORION}
-	waitForDockerServiceVersion ${IOTA} ${IOTA_NORTH_PORT}
-	waitForDockerService ${CRATE}
-	waitForDockerService ${QUANTUMLEAP}
+	waitForService ${MONGO}
+	waitForService ${ORION}
+	waitForService ${IOTA} ${IOTA_NORTH_PORT}
+	waitForService ${CRATE}
+	waitForService ${QUANTUMLEAP}
 	# provisionDevices
-	# importdata
 }
 
 startingServices () {
@@ -131,8 +118,7 @@ usage="usage: ./services <flag>
 -u	| --up		Startup the services in a Docker Container (require "sudo" to apply settings on the host).
 -d	| --down	Shoutdown the running services of the Docker Container.
 -rm	| --remove	Remove the Docker Volumes and the Docker Networks. This will cause the loss of data stored in the databases.
--d	| --debug	Convenient script to Shoutdown, Builds and Startup the services.
-"
+-d	| --debug	Convenient script to Shoutdown, Builds and Startup the services."
 
 dockerCmd="docker compose"
 if (( $# == 2 )); then
@@ -177,7 +163,8 @@ case "${command}" in
         stoppingServices
 		startingServices
         displayServices
-        loadData
+        WaitingDocker
+        # provisionDevices
     ;;
     "down"|"--down")
         stoppingServices
