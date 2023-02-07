@@ -128,7 +128,7 @@ usage="usage: ./services <flag>
 -h	| --help	Show this usage message.
 -b	| --build	Builds the Docker Images for the OEE-Service.
 -p	| --pull	Pulls images from Docker Hub.
--u	| --up		Startup the services in a Docker Container.
+-u	| --up		Startup the services in a Docker Container (require "sudo" to apply settings on the host).
 -d	| --down	Shoutdown the running services of the Docker Container.
 -rm	| --remove	Remove the Docker Volumes and the Docker Networks. This will cause the loss of data stored in the databases.
 -d	| --debug	Convenient script to Shoutdown, Builds and Startup the services.
