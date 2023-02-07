@@ -30,8 +30,8 @@
   "panels": [
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "description": "",
       "fieldConfig": {
@@ -111,95 +111,30 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\noee AS \"OEE\",\navailability AS \"Availability\",\nperformance AS \"Performance\",\nquality AS \"Quality\"\nFROM \"etoee\"\nORDER BY 1 DESC;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "oee"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "OEE"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "availability"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Availability"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "performance"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Performance"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "quality"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Quality"
-                ],
-                "type": "alias"
-              }
-            ]
-          ],
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee",
-          "timeColumn": "start_date",
-          "where": []
+          "panelId": 15,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Parts Bad": true,
+              "Parts Good": true,
+              "Parts Total": true,
+              "Quality": false,
+              "Time": false,
+              "Time Down": true,
+              "Time Total": true,
+              "Time Up": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "type": "timeseries"
@@ -283,7 +218,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT time_index AS \"time\", processstatus AS \"Proces Status\"\r\nFROM \"etplc\"\r\nORDER BY 1 DESC\r\nLIMIT 100;",
+          "rawSql": "SELECT time_index AS \"time\", processstatus AS \"Proces Status\"\r\nFROM \"etplc\"\r\nORDER BY 1 DESC;",
           "refId": "A",
           "select": [
             [
@@ -326,8 +261,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "description": "",
       "fieldConfig": {
@@ -375,103 +310,36 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\noee AS \"OEE\",\navailability AS \"Availability\",\nperformance AS \"Performance\",\nquality AS \"Quality\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 1;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "oee"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "OEE"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "availability"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Availability"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "performance"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Performance"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "quality"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Quality"
-                ],
-                "type": "alias"
-              }
-            ]
-          ],
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee",
-          "timeColumn": "start_date",
-          "where": []
+          "panelId": 15,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Parts Bad": true,
+              "Parts Good": true,
+              "Parts Total": true,
+              "Time Down": true,
+              "Time Total": true,
+              "Time Up": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "type": "gauge"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "fieldConfig": {
         "defaults": {
@@ -562,89 +430,38 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\nparts_good AS \"Parts Good\",\nparts_bad AS \"Parts Bad\",\nparts_total AS \"Parts Total\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 100;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "num_prod"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Produced"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "num_good"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Good"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "num_bad"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Bad"
-                ],
-                "type": "alias"
-              }
-            ]
-          ],
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee",
-          "timeColumn": "start_date",
-          "where": []
+          "panelId": 15,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Availability": true,
+              "OEE": true,
+              "Performance": true,
+              "Quality": true,
+              "Time": true,
+              "Time Down": true,
+              "Time Total": true,
+              "Time Up": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "type": "stat"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "fieldConfig": {
         "defaults": {
@@ -711,40 +528,39 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\"\r\nFROM \"etoee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee"
+          "panelId": 15,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Availability": true,
+              "OEE": true,
+              "Parts Total": true,
+              "Performance": true,
+              "Quality": true,
+              "Time": true,
+              "Time Down": true,
+              "Time Total": true,
+              "Time Up": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "type": "piechart"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "fieldConfig": {
         "defaults": {
@@ -835,89 +651,38 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\ntime_up AS \"Time Up\",\ntime_down AS \"Time Down\",\ntime_total AS \"Time Total\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 60;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "num_prod"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Produced"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "num_good"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Good"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "num_bad"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Bad"
-                ],
-                "type": "alias"
-              }
-            ]
-          ],
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee",
-          "timeColumn": "start_date",
-          "where": []
+          "panelId": 15,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Availability": true,
+              "OEE": true,
+              "Parts Bad": true,
+              "Parts Good": true,
+              "Parts Total": true,
+              "Performance": true,
+              "Quality": true,
+              "Time": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "type": "stat"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "fieldConfig": {
         "defaults": {
@@ -985,40 +750,39 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\"\r\nFROM \"etoee\"\r\nORDER BY 1 DESC\r\nLIMIT 1;",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee"
+          "panelId": 15,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Availability": true,
+              "OEE": true,
+              "Parts Bad": true,
+              "Parts Good": true,
+              "Parts Total": true,
+              "Performance": true,
+              "Quality": true,
+              "Time": true,
+              "Time Total": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "type": "piechart"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "fieldConfig": {
         "defaults": {
@@ -1123,89 +887,41 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\nparts_good AS \"Parts Good\",\nparts_bad AS \"Parts Bad\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 100;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "num_prod"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Produced"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "num_good"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Good"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "num_bad"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Bad"
-                ],
-                "type": "alias"
-              }
-            ]
-          ],
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee",
-          "timeColumn": "start_date",
-          "where": []
+          "panelId": 15,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Availability": true,
+              "OEE": true,
+              "Parts Bad": false,
+              "Parts Good": false,
+              "Parts Total": true,
+              "Performance": true,
+              "Quality": true,
+              "Time": false,
+              "Time Down": true,
+              "Time Total": true,
+              "Time Up": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "DoBGYczVz"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "fieldConfig": {
         "defaults": {
@@ -1310,81 +1026,30 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "DoBGYczVz"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\ntime_frame AS \"time\",\ntime_up AS \"Time Up\",\ntime_down AS \"Time Down\"\nFROM \"etoee\"\nORDER BY 1 DESC\nLIMIT 100;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "num_prod"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Produced"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "num_good"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Good"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "num_bad"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "Parts Bad"
-                ],
-                "type": "alias"
-              }
-            ]
-          ],
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "oee",
-          "timeColumn": "start_date",
-          "where": []
+          "panelId": 15,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Availability": true,
+              "OEE": true,
+              "Parts Bad": true,
+              "Parts Good": true,
+              "Parts Total": true,
+              "Performance": true,
+              "Quality": true,
+              "Time Total": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "type": "timeseries"
@@ -1496,7 +1161,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\noee AS \"OEE\",\r\navailability AS \"Availability\",\r\nperformance AS \"Performance\",\r\nquality AS \"Quality\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\",\r\nparts_total AS \"Parts Total\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\",\r\ntime_total AS \"Time Total\"\r\nFROM \"etoee\"\r\nORDER BY 1 DESC\r\nLIMIT 100;",
+          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\noee AS \"OEE\",\r\navailability AS \"Availability\",\r\nperformance AS \"Performance\",\r\nquality AS \"Quality\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\",\r\nparts_total AS \"Parts Total\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\",\r\ntime_total AS \"Time Total\"\r\nFROM \"etoee\"\r\nORDER BY 1 DESC;",
           "refId": "A",
           "select": [
             [
@@ -1573,7 +1238,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {
@@ -1582,6 +1247,6 @@
   "timezone": "browser",
   "title": "RomanTIG - Overall Equipment Effectiveness",
   "uid": "BDDTWez4z",
-  "version": 9,
+  "version": 2,
   "weekStart": ""
 }
