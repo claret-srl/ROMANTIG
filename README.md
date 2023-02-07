@@ -26,6 +26,11 @@ Availability refers to the percentage of time a machine is available to run, tak
 Measuring [OEE](https://www.oee.com/) is important in industrial applications as it provides a comprehensive view of the efficiency of the manufacturing process. By understanding the factors that contribute to inefficiencies, organizations can identify areas for improvement, increase production, and reduce costs. Additionally, [OEE](https://www.oee.com/) is a key indicator of the overall competitiveness of a company, as it is directly tied to production output and profitability.
 
 ## Install
+### Data Interface
+> **Warning**
+> The value of the `OCB_ID` .env variable must match with the data variable supllied.
+> You can indifferently replace the value of the environment variable to match that of your variable, or call your variable as it is defined in the .env file.
+#### OPC-UA
 If you would use the [OPC-UA](https://opcfoundation.org/) interface, in order to connect the IoT-Agent to an [OPC-UA](https://opcfoundation.org/) device, you just need to edit the relative section (OPC-UA Device Variables) in the beginning of the [`.env`](.env) file:
 - `IOTA_OPCUA_ENDPOINT` Endpoint of the [OPC-UA](https://opcfoundation.org/) Device to be reached by the IoT Agent (i.e. the PLC adress)
 - `OCB_ID` The name of the Variable which has values about the machine state
@@ -33,7 +38,11 @@ If you would use the [OPC-UA](https://opcfoundation.org/) interface, in order to
 
 You can check this value with any [OPC-UA](https://opcfoundation.org/) Client
 
-In order to compute the [OEE](https://www.oee.com/), the service must know if each possible process state that is found on the context has to be considered:
+#### Other protocols
+If you whis to use any other protocol, you need to replace the IoT-Agent, and configure it to make the data available to the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/).
+
+### ROSE-AP
+In order to compute the [OEE](https://www.oee.com/), the ROSE-AP service must know if each possible process state that is found on the context has to be considered:
  - An up-time or a down-time state.
  - A good or a bad end of the production cycle.
  - The ideal duration of a production cycle.
@@ -44,21 +53,21 @@ To do so, please change the `.config` file found in the `oee_service` folder, pr
 > **Warning**
 > Be sure that the name of the states written in the config file perfectly match those that are written by your process, so that the microservice can correctly identify them
 
-### Good ends
+- Good ends
 The machine states to be considered as a successful conclusion of the production cycle (i.e. an item is successfully created):
 
 	ENDSGOOD=In Placing	[syntax: State 01,State 02, ... ,State nn]
 
-### Bad ends
+- Bad ends
 The machine states to be considered as a bad conclusion of the production cycle (i.e. an item is defective or faulty and has to be discarded):
 	ENDSBAD=In Trashing	[syntax: State 01,State 02, ... ,State nn]
 
-### Up time
+- Up time
 The machine states to be considered as productive times:
 
 	TIMESUP=In Picking,In Welding,In QC,In Placing	[syntax: State 01,State 02,...,State nn]
 	
-### Down time
+- Down time
 The machine states to be considered as downtime:
 
 > **Note**
@@ -66,49 +75,48 @@ The machine states to be considered as downtime:
 
 	TIMESDOWN=Idle,In Reworking,In QC from rework,In Trashing,Timeout	[syntax: State 01,State 02,...,State nn]
 
-### Time step
+- Time step
 The timestep to group [OEE](https://www.oee.com/) stats:
 > **Note**
 > Since OEE values are calculated from the data stored in the database, it is possible to increase or decrease the timestep value by updating the data grouping over the entire stored range without losing any information.
 
 	TIMESTEP=5 minute	[syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
 
-### Ideal time
+- Ideal time
 The duration of the process in ideal condition, this represents a theoretical lower bound.
 
 	IDEALTIME=20 second	[syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
 
-### Initial date and time
-The date and time to be consider as starting point of the stats collected:
+- Initial date and time
+The date and time to be considered as the origin of data grouping:
 
 	START_DATE=2023-01-01	[syntax: <YYYY-MM-DD>]
 	START_TIME=08:00:00	# syntax: <hh-mm-ss>
 
 ## Usage
-
-Star the Docker daemon.
-
-Make the `./services` script executable
+- Follow the [installation instruction](#install)
+- Star the Docker daemon.
+- Make the `./services` script executable
 `sudo chmod +x ./services`
 
-Build the Docker image for the OEE microservice (Remove the old image if any, build the new image and performs a vulnerability scan):
+- Build the Docker image for the OEE microservice (Remove the old image if any, build the new image and performs a vulnerability scan):
 `./services --build`
 
-To apply required settings to the host, and start up all the services in the containers run:
+- To apply required settings to the host, and start up all the services in the containers run:
 `sudo ./services up`
 
-Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`dashboard.json`](.\grafana\dashboards\dashboard.json) file in `.\grafana\dashboards\` directory to persist the changes after rebooting the container or the Grafana service.
+- Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`dashboard.json`](.\grafana\dashboards\dashboard.json) file in `.\grafana\dashboards\` directory to persist the changes after rebooting the container or the Grafana service.
 
-To stop all the services in the containers execute:
+- To stop all the services in the containers execute:
 `./services down`
-To only pull all images from Docker Hub without start the services in the Docker Container:
+- To only pull all images from Docker Hub without start the services in the Docker Container:
 `./services --pull`
-To stop, build and start the services in the Docker Container:
+- To stop, build and start the services in the Docker Container:
 `sudo ./services --debug`
-To see the help function of the service script
+- To see the help function of the service script
 `./services --help`
 
-To delete the Volumes and the Networks
+- To delete the Volumes and the Networks
 > **Warning**
 > This operation will ERASE ALL the Docker Volumes and all the data stored in the databases!
 `./services --remove`
@@ -138,7 +146,7 @@ linkStyle 3,4,5,6,7,8 stroke:LightCoral;
 
 In general, we suggest you to adopt a state space representation similar to the one above for your target process, in order to clearly highlight every step in the cycle and attribute it the correct value for up or down time. The state representation (the ontology of the system) should not be too detailed (i.e. too many states) or too general (i.e. one or two states) because of unnecessary additional workload or possible loss of information.
 
-As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to Orion Context Broker through the [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our [OEE](https://www.oee.com/) calculator.
+As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) through the [IoT Agent for OPC-UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our [OEE](https://www.oee.com/) calculator.
 
 ## Architecture
 
