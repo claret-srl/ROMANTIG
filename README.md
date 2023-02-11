@@ -1,10 +1,16 @@
-# ROMANTIG ROSE-AP [OEE](https://www.oee.com/) Calculator
+[<img src="img/logo.png" alt="RAMP" width="250" height="auto">](https://github.com/ramp-eu)
 
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
+<!-- 
 [![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
-<!-- [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Time-Series-Data.svg)](https://opensource.org/licenses/MIT) -->
+[![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Time-Series-Data.svg)](https://opensource.org/licenses/MIT)
+[<img src="https://ramp.eu/assets/logo/ramp_logo_white.png" alt="RAMP" width="auto" height="20">](https://github.com/ramp-eu)
+ -->
+[<img src="https://ramp-eu.github.io/RAMP/img/ramp.png" alt="RAMP" width="auto" height="30">](https://github.com/ramp-eu)
 
+
+# ROMANTIG ROSE-AP [OEE](https://www.oee.com/) Calculator
 This ROSE-AP is intended as a microservice for automatic [OEE](https://www.oee.com/), and related metrics, calculation. The service works by connecting to a [CrateDB](https://crate.io/) database, where information about the context of your target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) through [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) services.
 
 ## Table of Contents
@@ -53,21 +59,22 @@ To do so, please change the `.config` file found in the `oee_service` folder, pr
 > **Warning**
 > Be sure that the name of the states written in the config file perfectly match those that are written by your process, so that the microservice can correctly identify them
 
-- Good ends
+#### Good ends
 The machine states to be considered as a successful conclusion of the production cycle (i.e. an item is successfully created):
 
 	ENDSGOOD=In Placing	[syntax: State 01,State 02, ... ,State nn]
 
-- Bad ends
+#### Bad ends
 The machine states to be considered as a bad conclusion of the production cycle (i.e. an item is defective or faulty and has to be discarded):
+
 	ENDSBAD=In Trashing	[syntax: State 01,State 02, ... ,State nn]
 
-- Up time
+#### Up time
 The machine states to be considered as productive times:
 
 	TIMESUP=In Picking,In Welding,In QC,In Placing	[syntax: State 01,State 02,...,State nn]
 	
-- Down time
+#### Down time
 The machine states to be considered as downtime:
 
 > **Note**
@@ -75,19 +82,19 @@ The machine states to be considered as downtime:
 
 	TIMESDOWN=Idle,In Reworking,In QC from rework,In Trashing,Timeout	[syntax: State 01,State 02,...,State nn]
 
-- Time step
+#### Time step
 The timestep to group [OEE](https://www.oee.com/) stats:
 > **Note**
 > Since OEE values are calculated from the data stored in the database, it is possible to increase or decrease the timestep value by updating the data grouping over the entire stored range without losing any information.
 
 	TIMESTEP=5 minute	[syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
 
-- Ideal time
+#### Ideal time
 The duration of the process in ideal condition, this represents a theoretical lower bound.
 
 	IDEALTIME=20 second	[syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
 
-- Initial date and time
+#### Initial date and time
 The date and time to be considered as the origin of data grouping:
 
 	START_DATE=2023-01-01	[syntax: <YYYY-MM-DD>]
