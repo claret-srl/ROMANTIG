@@ -28,10 +28,10 @@ Measuring [OEE](https://www.oee.com/) is important in industrial applications as
 ## Install
 ### Data Interface
 > **Warning**
-> The value of the `OCB_ID` .env variable must match with the data variable supllied.
+> The value of the `OCB_ID` variable inside the [.env](.env) file  must match with the name of variable supllied.
 > You can indifferently replace the value of the environment variable to match that of your variable, or call your variable as it is defined in the .env file.
 #### OPC-UA
-If you would use the [OPC-UA](https://opcfoundation.org/) interface, in order to connect the IoT-Agent to an [OPC-UA](https://opcfoundation.org/) device, you just need to edit the relative section (OPC-UA Device Variables) in the beginning of the [`.env`](.env) file:
+If you would use the [OPC-UA](https://opcfoundation.org/) interface, in order to connect the IoT-Agent to an [OPC-UA](https://opcfoundation.org/) device, you just need to edit the relative section (OPC-UA Device Variables) in the beginning of the [.env](.env) file:
 - `IOTA_OPCUA_ENDPOINT` Endpoint of the [OPC-UA](https://opcfoundation.org/) Device to be reached by the IoT Agent (i.e. the PLC adress)
 - `OCB_ID` The name of the Variable which has values about the machine state
 - `OPCUA_ID` The [OPC-UA](https://opcfoundation.org/) ID of the Variable which hold the machine state values
@@ -39,7 +39,7 @@ If you would use the [OPC-UA](https://opcfoundation.org/) interface, in order to
 You can check this value with any [OPC-UA](https://opcfoundation.org/) Client
 
 #### Other protocols
-If you whis to use any other protocol, you need to replace the IoT-Agent, and configure it to make the data available to the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/).
+If you whis to use any other protocol, you need to replace the OPC-UA IoT-Agent with another one from the [IoT Agent Catalogue](https://github.com/FIWARE/catalogue/tree/master/iot-agents), and configure it to make the data available to the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/).
 
 ### ROSE-AP
 In order to compute the [OEE](https://www.oee.com/), the ROSE-AP service must know if each possible process state that is found on the context has to be considered:
