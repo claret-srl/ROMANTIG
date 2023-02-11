@@ -1,10 +1,14 @@
 # Build the service from the base image
 FROM python:3.9.16-alpine3.17
 
-# During building, run the following commands to install dependecies
-RUN apk --no-cache add openssl-dev curl curl-dev gcc g++ libgcc
-RUN pip install --upgrade pip
-RUN pip install pycurl crate requests python-dotenv
+# During building, run the following commands to update, upgrade and install the required dependecies
+RUN 	apk update \
+	&&	apk add --upgrade apk-tools \
+	&&	apk upgrade \
+	&&	apk --no-cache add openssl-dev curl curl-dev gcc g++ libgcc
+
+RUN		pip install --upgrade pip \
+	&&	pip install pycurl crate requests python-dotenv
 
 # Set the work directory
 WORKDIR /oee-service
