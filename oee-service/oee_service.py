@@ -233,13 +233,13 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
 config = configparser.ConfigParser()
 config.read(script_dir + "//" + ".config")
 
-TIMESUP = envArrayToString(config["MACHINE_STATES"]["TIMESUP"])
-TIMESDOWN = envArrayToString(config["MACHINE_STATES"]["TIMESDOWN"])
-ENDSGOOD = envArrayToString(config["MACHINE_STATES"]["ENDSGOOD"])
-ENDSBAD = envArrayToString(config["MACHINE_STATES"]["ENDSBAD"])
-STARTDATETIME = (config["TIMING"]["START_DATE"] + "T" + config["TIMING"]["START_TIME"] + "Z")
-IDEALTIME = str(convert_to_seconds(config["TIMING"]["IDEALTIME"]))
-TIMESTEP = str(config["TIMING"]["TIMESTEP"])
+TIMES_UP = envArrayToString(config["MACHINE_STATES"]["TIMES_UP"])
+TIMES_DOWN = envArrayToString(config["MACHINE_STATES"]["TIMES_DOWN"])
+ENDS_GOOD = envArrayToString(config["MACHINE_STATES"]["ENDS_GOOD"])
+ENDS_BAD = envArrayToString(config["MACHINE_STATES"]["ENDS_BAD"])
+START_DATE_TIME = (config["TIMING"]["START_DATE"] + "T" + config["TIMING"]["START_TIME"] + "Z")
+TIME_IDEAL = str(convert_to_seconds(config["TIMING"]["TIME_IDEAL"]))
+TIME_STEP = str(config["TIMING"]["TIME_STEP"])
 
 # <-- .env
 
@@ -298,7 +298,7 @@ GRAFANA_PORT = os.getenv("GRAFANA_PORT")  # 3000
 # .env -->
 
 
-print(f"[INFO] Timestep is {TIMESTEP}.")
+print(f"[INFO] Timestep is {TIME_STEP}.")
 
 # Configuration -->
 # <-- Script
@@ -339,13 +339,13 @@ oee = _query.oee(
     CRATE_TABLE_OEE,
     CRATE_TABLE_DURATION,
     OCB_ID,
-    ENDSGOOD,
-    ENDSBAD,
-    TIMESUP,
-    TIMESDOWN,
-    IDEALTIME,
-    TIMESTEP,
-    STARTDATETIME,
+    ENDS_GOOD,
+    ENDS_BAD,
+    TIMES_UP,
+    TIMES_DOWN,
+    TIME_IDEAL,
+    TIME_STEP,
+    START_DATE_TIME,
 )
 
 provisioning_ARGS = _curl_calls.provisioning_ARGS(
