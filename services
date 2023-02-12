@@ -144,7 +144,7 @@ case "${command}" in
     	cd oee-service
 		docker image rm -f ${ROSEAP_OEE}
     	docker build -t ${ROSEAP_OEE} .
-		docker scan ${ROSEAP_OEE}
+		# docker scan ${ROSEAP_OEE}
     	cd ..
         echo -e " \033[1;32mdone\033[0m\n"
     ;;
