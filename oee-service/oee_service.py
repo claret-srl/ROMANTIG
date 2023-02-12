@@ -135,7 +135,7 @@ print(f"[INFO] Timestep is {TIME_STEP}.")
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_version(self):
-        self.wfile.write(b'''{"service" : "ROSE-AP OEE-Service", "version" : 0.1}''')
+        self.wfile.write(b'''{"service" : "ROSE-AP OEE-Service", "version" : 1.0}''')
 
     def do_notify(self):
         updateContexBroker()
@@ -146,9 +146,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(content)
 
         if LOG_LEVEL == "debug":
-            print("[INFO]" + "[WebServer]" + "Headers:" + "\n")
+            print("[INFO] [WebServer] Headers:")
             print(self.headers)
-            print("[INFO]" + "[WebServer]" + "Content:" + "\n")
+            print("[INFO] [WebServer] Content:")
             print(content.decode("utf-8"))
 
     def do_GET(self):
@@ -172,10 +172,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 def httpWebServer(_BIND_HOST="0.0.0.0", _PORT=8008):
     try:
         httpd = HTTPServer((_BIND_HOST, _PORT), SimpleHTTPRequestHandler)
-        print("[INFO]" + "[WebServer]" + f"Listening on http://{_BIND_HOST}:{_PORT}\n")
+        print(f"[INFO] [WebServer] Listening on http://{_BIND_HOST}:{_PORT}")
         httpd.serve_forever()
     except Exception as e:
-        print("[ERROR]" + "[WebServer]" + f"Fail on http://{_BIND_HOST}:{_PORT}\n" + str(e) + "\n")
+        print(f"[ERROR] [WebServer] Fail on http://{_BIND_HOST}:{_PORT} \n {str(e)}")
 
 
 # nickjj Web server > https://github.com/nickjj/webserver -->
@@ -183,56 +183,50 @@ def httpWebServer(_BIND_HOST="0.0.0.0", _PORT=8008):
 
 def query_CrateDB(_sqlCommands):
     try:
-        print("[INFO]" + "[CrateDB]" + "Connecting...")
+        print("[INFO] [CrateDB] Connecting...")
         connection = client.connect(CRATE + ":" + CRATE_PORT_ADMIN, error_trace=True)
-        print("[INFO]" + "[CrateDB]" + "Connection Successful.")
+        print("[INFO] [CrateDB] Connection Successful.")
         try:
             cursor = connection.cursor()
-            print("[INFO]" + "[CrateDB]" + "Cursor created." + "\n")
+            print("[INFO] [CrateDB] Cursor created.")
 
             if LOG_LEVEL == "debug":
                 print(_sqlCommands)
 
             for command in _sqlCommands:
-                print(command)
                 try:
                     cursor.execute(command)
-                    if command.startswith("SELECT"):
-                        records = cursor.fetchall()
-                        return records
-                    print("[INFO]" + "[CrateDB]" + "Exectuded query -->\n")
+                    print("[INFO] [CrateDB] Exectuded query:")
                 except Exception as e:
-                    print(
-                        "[ERROR]"
-                        + "[CrateDB]"
-                        + "Error in query execution:\n"
-                        + str(e)
-                        + "\n"
-                    )
-                print(command + "\n")
-                print(" #####   #####   #####   #####   #####   #####   #####   ##### \n")
+                    print(f"[ERROR] [CrateDB] Error in query execution: {str(e)}")
+                    
+                print(f"\n  {command}\n")
+
+                if command.startswith("SELECT"):
+                    
+                    # return cause the hard ends of the loop
+                    # so it can cause unintended behavior
+                    return cursor.fetchall()
+
         except Exception as e:
-            print(
-                "[ERROR]" + "[CrateDB]" + "Error in cursor creation:\n" + str(e) + "\n"
-            )
+            print(f"[ERROR] [CrateDB] Error in cursor creation: {str(e)}")
         finally:
             cursor.close()
-            print("[INFO]" + "[CrateDB]" + "Cursor Closed.")
+            print("[INFO] [CrateDB] Cursor Closed.")
             connection.close()
-            print("[INFO]" + "[CrateDB]" + "Connection Closed.")
+            print("[INFO] [CrateDB] Connection Closed.")
     except Exception as e:
-        print("[ERROR]" + "[CrateDB]" + "Connection fail:\n" + str(e) + "\n")
-
+        print(f"[ERROR] [CrateDB] Connection fail:{str(e)}")
 
 # Crate-DB -->
 # <-- Update Orion Contex Broker
 
-def update_ARGS(_data):
+def updateAttributes(_data):
     return [
         # ##### Contex Broker
-        # ##### Append Attribute
+        # ##### Append or Update attribute
         # ##### OEE, Availability, Performance, Quality
-        # ##### to
+        # ##### of
         # ##### urn:ngsiv2:I40Asset:PLC:001
         {
             "method": "POST",
@@ -243,10 +237,10 @@ def update_ARGS(_data):
             "path": DEVICE_ID + "/attrs",
             "header": [Service, ServicePath, contentType["json"]],
             "payload": '''{
-    "OEE"           :    {"type": "Float", "value": '''+ str(_data[0][0])+ '''},
-    "Availability"  :    {"type": "Float", "value": '''+ str(_data[0][1])+ '''},
-    "Performance"   :    {"type": "Float", "value": '''+ str(_data[0][2])+ '''},
-    "Quality"       :    {"type": "Float", "value": '''+ str(_data[0][3])+ '''}
+    "OEE"           :    {"type": "Float", "value": ''' + str(_data[0][0]) + '''},
+    "Availability"  :    {"type": "Float", "value": ''' + str(_data[0][1]) + '''},
+    "Performance"   :    {"type": "Float", "value": ''' + str(_data[0][2]) + '''},
+    "Quality"       :    {"type": "Float", "value": ''' + str(_data[0][3]) + '''}
 }'''
         }
     ]
@@ -254,13 +248,14 @@ def update_ARGS(_data):
 def updateContexBroker():
     oeeCallBackQuery = _query.oeeCallBack(CRATE_SCHEMA, CRATE_TABLE_OEE)
     oeeCallBackQueryResults = query_CrateDB([oeeCallBackQuery])
-    print("oeeCallBackQueryResults: ", oeeCallBackQueryResults)
+    if LOG_LEVEL == "debug":
+        print("oeeCallBackQueryResults: ", oeeCallBackQueryResults)
     
     for i in range(len(oeeCallBackQueryResults[0])):
         if oeeCallBackQueryResults[0][i] == None:
             oeeCallBackQueryResults[0][i] = "Null"
     
-    cUrl_call = update_ARGS(oeeCallBackQueryResults)
+    cUrl_call = updateAttributes(oeeCallBackQueryResults)
     
     curl_calls_function(cUrl_call)
 
@@ -277,7 +272,8 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
 
     try:
         cursor = pycurl.Curl()
-        print("[INFO]" + "[cUrl]" + "Cursor created.\n")
+        print("[INFO] [cUrl] Cursor created.")
+        print("[INFO] [cUrl] Exectuded call:")
 
         for call in _cUrl_calls:
 
@@ -291,14 +287,14 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
                     call["payload"] = _payload_OverRide
 
                 # if LOG_LEVEL == "debug":
-                print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
-                print(f"curl {call['method']} \\")
-                print(f"{url} \\")
+                print("\n")
+                print(f"  curl -X {call['method']} \\")
+                print(f"    {url} \\")
 
                 for header in call["header"]:
-                    print(f"-H '{header}' \\")
+                    print(f"    -H '{header}' \\")
 
-                print(f"-d '{call['payload']}'", "\n")
+                print(f"    -d '{call['payload']}'", "\n")
 
                 try:
                     cursor.reset()
@@ -317,20 +313,21 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
                     cursor.perform()
 
                     if call["method"] == "GET":
+                        
+                        # return cause the hard ends of the loop
+                        # so it can cause unintended behavior
                         return data
 
                 except Exception as e:
-                    print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
+                    print(f"[ERROR] [cUrl] Error in cUrl execution: {str(e)}")
 
             except Exception as e:
-                print("[ERROR]" + "[cUrl]" + "Error in cUrl defenition:\n" + str(e) + "\n")
+                print(f"[ERROR] [cUrl] Error in cUrl defenition:\n{str(e)}")
             
-            print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
-
         cursor.close()
 
     except Exception as e:
-        print("[ERROR]" + "[cUrl]" + "Error in cUrl function:\n" + str(e) + "\n")
+        print(f"[ERROR] [cUrl] Error in cUrl function:\n{str(e)}")
 
 
 # Curl Calls -->
@@ -414,7 +411,7 @@ def provisioning_subscription(NOTIFY_DESCRIPTION, NOTIFY_HOST, NOTIFY_PORT):
     }]
 
 # ## Provisioning Subscriptions
-print(print(f"[INFO] [ROSE-AP] [RomanTIG] Provisioning subscriptions."))
+print(print(f"[INFO] [Orion] Provisioning subscriptions."))
 
 # ### Check Subscriptions
 def get_subscriptions():
@@ -448,9 +445,9 @@ def notifySubscription(NOTIFY_HOST, NOTIFY_PORT):
     notifyDescription = f"{DEVICE_TYPE}:{DEVICE_ID}:{OCB_ID}:{NOTIFY_HOST}"
     if notifyDescription not in SubscriptionsProvisioned:
         curl_calls_function(provisioning_subscription(notifyDescription, NOTIFY_HOST, NOTIFY_PORT))
-        print(f"[INFO] [ROSE-AP] [RomanTIG] Subscription {notifyDescription} provisioned.")
+        print(f"[INFO] [Orion] Subscription {notifyDescription} provisioned.")
     else:
-        print(f"[INFO] [ROSE-AP] [RomanTIG] Subscription {notifyDescription} already provisioned.")
+        print(f"[INFO] [Orion] Subscription {notifyDescription} already provisioned.")
 
 
 SubscriptionsToBeProvisioned = [
