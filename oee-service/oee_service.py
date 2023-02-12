@@ -176,7 +176,6 @@ def httpWebServer(_BIND_HOST="0.0.0.0", _PORT=8008):
 # nickjj Web server > https://github.com/nickjj/webserver -->
 # <-- Crate-DB
 
-
 def query_CrateDB(_sqlCommands):
     try:
         print("[INFO]" + "[CrateDB]" + "Connecting...")
@@ -236,21 +235,7 @@ def updateContexBroker():
     curl_calls_function(cUrl_call)
 
 # Update Orion Contex Broker -->
-
-# <-- cUrl Calls
-# def curl_call(_cursor, _method, _url, _header=None, _payload=None):
-#     try:
-#         _cursor.reset()
-#         _cursor.setopt(_cursor.URL, _url)
-#         _cursor.setopt(_cursor.CUSTOMREQUEST, _method)
-#         if _header:
-#             _cursor.setopt(_cursor.HTTPHEADER, _header)
-#         if _payload:
-#             _cursor.setopt(_cursor.POSTFIELDS, _payload)
-#         _cursor.perform()
-#     except Exception as e:
-#         print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
-
+# <-- Curl Calls
 
 def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
 
@@ -373,23 +358,6 @@ provisioning_ARGS = _curl_calls.provisioning_ARGS(
     contentType,
 )
 
-# def replace_in_string(replaces, dirSurce, dirTarget):
-#     with open(f"{script_dir}\{dirSurce}", "r") as inputFile:
-#         fileContent = inputFile.read()
-
-#     for key, value in replaces.items():
-#         fileContent = fileContent.replace(key, value.lower())
-
-#     with open(f"{script_dir}\{dirTarget}", "w") as outputFile:
-#         outputFile.write(fileContent)
-
-# replacesGrafana = {
-#     "mtopcua_car": CRATE_SCHEMA,
-#     "process_status_oee": CRATE_TABLE_OEE,
-#     "etplc": CRATE_TABLE_DEVICE
-# }
-
-# replace_in_string(replacesGrafana, "..\\grafana\\dashboards\\dashboard.src", "..\\grafana\\dashboards\\dashboard.json")
 
 ## Set CrateDB Views
 query_CrateDB([processDuration, oee])
