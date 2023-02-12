@@ -40,7 +40,7 @@ FIWARE_SERVICEPATH = os.getenv("FIWARE_SERVICEPATH")  # /demo
 IOTA = os.getenv("IOTA")  # iot-agent
 IOTA_NORTH_PORT = os.getenv("IOTA_NORTH_PORT")  # 4041
 IOTA_SOUTH_PORT = os.getenv("IOTA_SOUTH_PORT")  # 9229
-OPCUA_ID = os.getenv("OPCUA_ID")  # "ns=4;i=198"
+IOTA_OPCUA_ID = os.getenv("IOTA_OPCUA_ID")  # "ns=4;i=198"
 
 ORION = os.getenv("ORION")  # orion
 ORION_PORT = os.getenv("ORION_PORT")  # 1026

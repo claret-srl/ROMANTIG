@@ -278,3 +278,29 @@ def update_ARGS(ORION, ORION_PORT, Service, ServicePath, contentType, DEVICE_ID,
         #     'payload'   :    None
         # }
     ]
+
+
+# curl -X GET \
+#   --url 'http://localhost:1026/v2/subscriptions' \
+#   -H 'fiware-service: opcua_plc' \
+#   -H 'fiware-servicepath: /demo' | jq
+
+
+
+def get_subscriptions(ORION, ORION_PORT, Service, ServicePath, contentType, DEVICE_ID, DEVICE_TYPE, _data
+):
+    return [
+        # ##### Contex Broker
+        # ##### Get subscriptions
+        {
+            "method": "GET",
+            "service": ORION,
+            "port": ORION_PORT,
+            "NGSI": "v2",
+            "endpoint": "subscriptions" ,
+            "path": None,
+            "header": [Service, ServicePath],
+            "payload": None
+        }
+    ]
+

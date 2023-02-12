@@ -40,7 +40,7 @@ Measuring [OEE](https://www.oee.com/) is important in industrial applications as
 If you would use the [OPC UA](https://opcfoundation.org/) interface, in order to connect the IoT-Agent to an [OPC UA](https://opcfoundation.org/) device, you just need to edit the relative section (OPC UA Device Variables) in the beginning of the [.env](.env) file:
 - `IOTA_OPCUA_ENDPOINT` Endpoint of the [OPC UA](https://opcfoundation.org/) Device to be reached by the IoT Agent (i.e. the PLC adress)
 - `OCB_ID` The name of the Variable which has values about the machine state
-- `OPCUA_ID` The [OPC UA](https://opcfoundation.org/) ID of the Variable which hold the machine state values
+- `IOTA_OPCUA_ID` The [OPC UA](https://opcfoundation.org/) ID of the Variable which hold the machine state values
 
 You can check this value with any [OPC UA](https://opcfoundation.org/) Client
 

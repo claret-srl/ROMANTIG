@@ -189,7 +189,7 @@ config.iota = {
 			mappings: [
 				{
 					ocb_id: process.env.OCB_ID,
-					opcua_id: process.env.OPCUA_ID,
+					opcua_id: process.env.IOTA_OPCUA_ID,
 					inputArguments: []
 				}
 			]

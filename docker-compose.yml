@@ -86,7 +86,7 @@ services:
       - DEVICE_ID=${DEVICE_ID}
       - DEVICE_TYPE=${DEVICE_TYPE}
       - OCB_ID=${OCB_ID}
-      - OPCUA_ID=${OPCUA_ID}
+      - IOTA_OPCUA_ID=${IOTA_OPCUA_ID}
       - IOTA_OPCUA_MT_ENTITY_ID=${CONTEXTS_ID}
       - IOTA_OPCUA_ENDPOINT=${IOTA_OPCUA_ENDPOINT}	          # Endpoint of OPC UA Server
       - IOTA_FALLBACK_TENANT=${FIWARE_SERVICE}
