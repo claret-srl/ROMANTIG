@@ -237,65 +237,74 @@ def updateContexBroker():
 # Update Orion Contex Broker -->
 
 # <-- cUrl Calls
-def curl_call(_cursor, _method, _url, _header=None, _payload=None):
-    try:
-        _cursor.reset()
-        _cursor.setopt(_cursor.URL, _url)
-        _cursor.setopt(_cursor.CUSTOMREQUEST, _method)
-        if _header:
-            _cursor.setopt(_cursor.HTTPHEADER, _header)
-        if _payload:
-            _cursor.setopt(_cursor.POSTFIELDS, _payload)
-        _cursor.perform()
-    except Exception as e:
-        print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
+# def curl_call(_cursor, _method, _url, _header=None, _payload=None):
+#     try:
+#         _cursor.reset()
+#         _cursor.setopt(_cursor.URL, _url)
+#         _cursor.setopt(_cursor.CUSTOMREQUEST, _method)
+#         if _header:
+#             _cursor.setopt(_cursor.HTTPHEADER, _header)
+#         if _payload:
+#             _cursor.setopt(_cursor.POSTFIELDS, _payload)
+#         _cursor.perform()
+#     except Exception as e:
+#         print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
 
 
 def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
+
     try:
         cursor = pycurl.Curl()
         print("[INFO]" + "[cUrl]" + "Cursor created:\n")
+
         for call in _cUrl_calls:
+
+            print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
+
             try:         
                 paths = [call['NGSI'], call['endpoint'], call['path']]
-                pathFiltered = []
-                for path in paths:
-                    if path != None:
-                        pathFiltered.append(path)
-                urlSeparator = "/"
-                urlPath = urlSeparator.join(pathFiltered)
-
+                pathFiltered = [path for path in paths if path is not None]
+                urlPath = "/".join(pathFiltered)
                 url = f"http://{call['service']}:{call['port']}/{urlPath}"
  
-                print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
+                if _payload_OverRide != False:
+                    call["payload"] = _payload_OverRide
 
                 if LOG_LEVEL == "debug":
-                    print(url, "\n")
-                    print(call, "\n")
-                 
-                print(f"curl {call['method']} \\")
-                print(f"{url} \\")
-                for header in call["header"]:
-                    print(f"-H {header} \\")
+                    print(f"curl {call['method']} \\")
+                    print(f"{url} \\")
 
-                if _payload_OverRide == False:
+                    for header in call["header"]:
+                        print(f"-H {header} \\")
+
                     print(f"-d {call['payload']}", "\n")
-                    curl_call(
-                        cursor, call["method"], url, call["header"], call["payload"]
-                    )
-                else:
-                    print(f"-d {_payload_OverRide}", "\n")
-                    curl_call(
-                        cursor, call["method"], url, call["header"], _payload_OverRide
-                    )
 
-                print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
+                try:
+                    cursor.reset()
+                    cursor.setopt(cursor.URL, url)
+                    cursor.setopt(cursor.CUSTOMREQUEST, call["method"])
+
+                    if call["method"]:
+                        cursor.setopt(cursor.HTTPHEADER, call["method"])
+
+                    if call["payload"]:
+                        cursor.setopt(cursor.POSTFIELDS, call["payload"])
+
+                    cursor.perform()
+
+                except Exception as e:
+                    print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
 
             except Exception as e:
                 print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
+            
+            print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
+
         cursor.close()
+
     except Exception as e:
         print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
+
 
 # Curl Calls -->
 # <-- Script
