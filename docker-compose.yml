@@ -118,8 +118,9 @@ services:
       - ${MONGO_PORT}:27017
     networks:
       - default
-    #   - ${MONGO}_data:/data/db
-    #   - ${MONGO}_config:/data/configdb
+    volumes:
+      - ${MONGO}_data:/data/db
+      - ${MONGO}_config:/data/configdb
     healthcheck:
       test: |
         host=`hostname --ip-address || echo '127.0.0.1'`; 
@@ -260,8 +261,8 @@ networks:
 
 
 volumes:
-  # db-mongo_data: ~
-  # db-mongo_config: ~
+  db-mongo_data: ~
+  db-mongo_config: ~
   db-crate: ~
   db-redis: ~
   # redisinsight: ~

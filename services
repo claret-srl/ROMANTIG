@@ -72,9 +72,9 @@ startingServices () {
         echo -e "- \033[1mOEE-calculator\033[0m is a ROSE-AP module to calculate OEE data from CrateDB."
         echo ""
         ${dockerCmd} up -d --remove-orphans
-        echo ""
-		echo "Removing orphans volumes:"
-		docker volume rm $(docker volume ls -q --filter dangling=true) || echo "No volumes to remove."
+        # echo ""
+		# echo "Removing orphans volumes:"
+		# docker volume rm $(docker volume ls -q --filter dangling=true) || echo "No volumes to remove."
         echo ""
 }
 

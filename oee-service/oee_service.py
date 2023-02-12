@@ -7,7 +7,10 @@ import os
 from dotenv import load_dotenv
 
 import function._query as _query
-import function._curl_calls as _curl_calls
+# import function._curl_calls as _curl_calls
+
+from io import BytesIO
+import json
 
 
 # <-- Docker
@@ -23,6 +26,8 @@ script_dir = os.path.dirname(__file__)
 load_dotenv(script_dir + "//" + ".env")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL")  # debug
+if LOG_LEVEL == "debug":
+    import pprint
 
 COMPOSE_PROJECT_NAME = os.getenv("COMPOSE_PROJECT_NAME")  # fiware
 ORG_FIWARE = os.getenv("ORG_FIWARE")  # claret-romantig
@@ -222,6 +227,30 @@ def query_CrateDB(_sqlCommands):
 # Crate-DB -->
 # <-- Update Orion Contex Broker
 
+def update_ARGS(_data):
+    return [
+        # ##### Contex Broker
+        # ##### Append Attribute
+        # ##### OEE, Availability, Performance, Quality
+        # ##### to
+        # ##### urn:ngsiv2:I40Asset:PLC:001
+        {
+            "method": "POST",
+            "service": ORION,
+            "port": ORION_PORT,
+            "NGSI": "v2",
+            "endpoint": "entities" ,
+            "path": DEVICE_ID + "/attrs",
+            "header": [Service, ServicePath, contentType["json"]],
+            "payload": '''{
+    "OEE"           :    {"type": "Float", "value": '''+ str(_data[0][0])+ '''},
+    "Availability"  :    {"type": "Float", "value": '''+ str(_data[0][1])+ '''},
+    "Performance"   :    {"type": "Float", "value": '''+ str(_data[0][2])+ '''},
+    "Quality"       :    {"type": "Float", "value": '''+ str(_data[0][3])+ '''}
+}'''
+        }
+    ]
+
 def updateContexBroker():
     oeeCallBackQuery = _query.oeeCallBack(CRATE_SCHEMA, CRATE_TABLE_OEE)
     oeeCallBackQueryResults = query_CrateDB([oeeCallBackQuery])
@@ -229,23 +258,28 @@ def updateContexBroker():
     
     for i in range(len(oeeCallBackQueryResults[0])):
         if oeeCallBackQueryResults[0][i] == None:
-            oeeCallBackQueryResults[0][i] = 0
+            oeeCallBackQueryResults[0][i] = "Null"
     
-    cUrl_call = _curl_calls.update_ARGS(ORION, ORION_PORT, Service, ServicePath, contentType, DEVICE_ID, DEVICE_TYPE, oeeCallBackQueryResults)
+    cUrl_call = update_ARGS(oeeCallBackQueryResults)
+    
     curl_calls_function(cUrl_call)
 
 # Update Orion Contex Broker -->
 # <-- Curl Calls
 
+def body(buf):
+    # Print body data to stdout
+    import sys
+    sys.stdout.write(buf)
+    # Returning None implies that all bytes were written
+
 def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
 
     try:
         cursor = pycurl.Curl()
-        print("[INFO]" + "[cUrl]" + "Cursor created:\n")
+        print("[INFO]" + "[cUrl]" + "Cursor created.\n")
 
         for call in _cUrl_calls:
-
-            print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
 
             try:         
                 paths = [call['NGSI'], call['endpoint'], call['path']]
@@ -256,14 +290,15 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
                 if _payload_OverRide != False:
                     call["payload"] = _payload_OverRide
 
-                if LOG_LEVEL == "debug":
-                    print(f"curl {call['method']} \\")
-                    print(f"{url} \\")
+                # if LOG_LEVEL == "debug":
+                print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
+                print(f"curl {call['method']} \\")
+                print(f"{url} \\")
 
-                    for header in call["header"]:
-                        print(f"-H '{header}' \\")
+                for header in call["header"]:
+                    print(f"-H '{header}' \\")
 
-                    print(f"-d '{call['payload']}'", "\n")
+                print(f"-d '{call['payload']}'", "\n")
 
                 try:
                     cursor.reset()
@@ -275,8 +310,14 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
 
                     if call["payload"]:
                         cursor.setopt(cursor.POSTFIELDS, call["payload"])
+                        
+                    data = BytesIO()
+                    cursor.setopt(cursor.WRITEFUNCTION, data.write)
 
                     cursor.perform()
+
+                    if call["method"] == "GET":
+                        return data
 
                 except Exception as e:
                     print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
@@ -339,31 +380,89 @@ oee = _query.oee(
     TIME_STEP,
     START_DATE_TIME,
 )
+# External Variables -->
 
-provisioning_ARGS = _curl_calls.provisioning_ARGS(
-    IOTA,
-    IOTA_NORTH_PORT,
-    ORION,
-    ORION_PORT,
-    DEVICE_BASE_ID,
-    DEVICE_ID,
-    DEVICE_TYPE,
-    OCB_ID,
-    ROSEAP_OEE,
-    ROSEAP_OEE_PORT,
-    QUANTUMLEAP,
-    QUANTUMLEAP_PORT,
-    Service,
-    ServicePath,
-    contentType,
-)
+def provisioning_subscription(NOTIFY_DESCRIPTION, NOTIFY_HOST, NOTIFY_PORT):
+    return [{
+        "method": "POST",
+        "service": ORION,
+        "port": ORION_PORT,
+        "NGSI": "v2",
+        "endpoint": "subscriptions",
+        "path": None,
+        "header": [Service, ServicePath, contentType["json"]],
+        "payload": '''{
+            "description": "''' + NOTIFY_DESCRIPTION + '''",
+            "subject": {
+                "entities": [
+                    {
+                        "id": "''' + DEVICE_ID + '''",
+                        "type": "''' + DEVICE_TYPE + '''"
+                    }
+                ],
+                "condition": {
+                    "attrs": ["''' + OCB_ID + '''"]
+                }
+            },
+            "notification": {
+                "http": {
+                    "url": "http://''' + NOTIFY_HOST + ''':'''+ NOTIFY_PORT + '''/v2/notify"
+                },
+                "attrs": ["''' + OCB_ID + '''"]
+            }
+        }'''
+    }]
 
+# ## Provisioning Subscriptions
+print(print(f"[INFO] [ROSE-AP] [RomanTIG] Provisioning subscriptions."))
+
+# ### Check Subscriptions
+def get_subscriptions():
+    # ##### Get subscriptions from the Contex Broker
+    return [
+        {
+            "method": "GET",
+            "service": ORION,
+            "port": ORION_PORT,
+            "NGSI": "v2",
+            "endpoint": "subscriptions" ,
+            "path": None,
+            "header": [Service, ServicePath],
+            "payload": None
+        }
+    ]
+    
+data = curl_calls_function(get_subscriptions())
+
+# ### Load Orion json respond
+subscriptions = json.loads(data.getvalue())
+
+# ### For each subscription in Orion json respond
+SubscriptionsProvisioned = []
+
+for subscription in subscriptions:
+    SubscriptionsProvisioned.append(subscription["description"])
+
+
+def notifySubscription(NOTIFY_HOST, NOTIFY_PORT): 
+    notifyDescription = f"{DEVICE_TYPE}:{DEVICE_ID}:{OCB_ID}:{NOTIFY_HOST}"
+    if notifyDescription not in SubscriptionsProvisioned:
+        curl_calls_function(provisioning_subscription(notifyDescription, NOTIFY_HOST, NOTIFY_PORT))
+        print(f"[INFO] [ROSE-AP] [RomanTIG] Subscription {notifyDescription} provisioned.")
+    else:
+        print(f"[INFO] [ROSE-AP] [RomanTIG] Subscription {notifyDescription} already provisioned.")
+
+
+SubscriptionsToBeProvisioned = [
+    {"host": QUANTUMLEAP,   "port": QUANTUMLEAP_PORT},
+    {"host": ROSEAP_OEE,    "port": ROSEAP_OEE_PORT}
+]
+
+for SubscriptionToBeProvisioned in SubscriptionsToBeProvisioned:
+    notifySubscription(SubscriptionToBeProvisioned["host"], SubscriptionToBeProvisioned["port"])
 
 ## Set CrateDB Views
 query_CrateDB([processDuration, oee])
-
-## Provisioning
-curl_calls_function(provisioning_ARGS)
 
 # Star webserver, listening for notification
 httpWebServer(BIND_HOST, PORT)
