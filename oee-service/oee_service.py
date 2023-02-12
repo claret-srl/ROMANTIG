@@ -11,6 +11,7 @@ import function._curl_calls as _curl_calls
 
 
 # <-- Docker
+# Docker = False
 Docker = True
 # Docker -->
 
@@ -275,17 +276,17 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
                     print(f"{url} \\")
 
                     for header in call["header"]:
-                        print(f"-H {header} \\")
+                        print(f"-H '{header}' \\")
 
-                    print(f"-d {call['payload']}", "\n")
+                    print(f"-d '{call['payload']}'", "\n")
 
                 try:
                     cursor.reset()
                     cursor.setopt(cursor.URL, url)
                     cursor.setopt(cursor.CUSTOMREQUEST, call["method"])
 
-                    if call["method"]:
-                        cursor.setopt(cursor.HTTPHEADER, call["method"])
+                    if call["header"]:
+                        cursor.setopt(cursor.HTTPHEADER, call["header"])
 
                     if call["payload"]:
                         cursor.setopt(cursor.POSTFIELDS, call["payload"])
@@ -296,14 +297,14 @@ def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
                     print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
 
             except Exception as e:
-                print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
+                print("[ERROR]" + "[cUrl]" + "Error in cUrl defenition:\n" + str(e) + "\n")
             
             print("\n #####   #####   #####   #####   #####   #####   #####   ##### \n")
 
         cursor.close()
 
     except Exception as e:
-        print("[ERROR]" + "[cUrl]" + "Error in cUrl execution:\n" + str(e) + "\n")
+        print("[ERROR]" + "[cUrl]" + "Error in cUrl function:\n" + str(e) + "\n")
 
 
 # Curl Calls -->
