@@ -144,7 +144,7 @@ case "${command}" in
     docker build -t ${ROSEAP_OEE} .
     # docker scan ${ROSEAP_OEE}
     cd ..
-    echo -e " \033[1;32mdone\n"
+    echo -e "\t \033[1;32m Done \033[0m\n"
   ;;
   "-d"|"--debug")
     ./services --down
