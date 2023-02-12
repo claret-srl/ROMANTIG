@@ -1,4 +1,5 @@
 # Dev
+- [ ] Restore docker scan in services
 - [ ] Undesired behavior:
  - Since the stats keep updating at each variable state changes, if the machine goes to idle the stat do not updates anymore, solutions:
 	- [ ] Cycling firing a "Timeout" state, followed by an "Idle" state:
