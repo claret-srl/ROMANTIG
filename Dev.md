@@ -1,5 +1,6 @@
 # Dev
-- [ ] Restore docker scan in services
+- [ ] Restore docker scan in ./services
+- [ ] Since the OEE computation is made inside Crate-DB, with views, should a place a dedicate service in the docker-compose?
 - [ ] Undesired behavior:
  - Since the stats keep updating at each variable state changes, if the machine goes to idle the stat do not updates anymore, solutions:
 	- [ ] Cycling firing a "Timeout" state, followed by an "Idle" state:
@@ -23,7 +24,6 @@
 	- Could be only screen capture?
 - [ ] Github docs
 	- Any suggestions?
-
 
 ## Business
 - [ ] Business Plan.
@@ -114,7 +114,3 @@
 
 ## RAMP in remoto
 - Connessione remota RAMP
-
-
-
-

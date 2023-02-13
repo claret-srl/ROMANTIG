@@ -1,5 +1,32 @@
 [<img src="img/logo.png" alt="RAMP" width="250" height="auto">](https://github.com/ramp-eu)
 
+# Dev
+- [ ] Restore docker scan in ./services
+- [ ] Since the OEE computation is made inside Crate-DB, with views, should a place a dedicate service in the docker-compose?
+- [ ] Undesired behavior:
+ - Since the stats keep updating at each variable state changes, if the machine goes to idle the stat do not updates anymore, solutions:
+	- [ ] Cycling firing a "Timeout" state, followed by an "Idle" state:
+		- From the PLC
+		- From the ROSE-AP
+	- [ ] Check if the machine should be in production
+		- Checking the shift scheduling
+		- Provision and HTTP endpoint to turn on/off the calculator
+- [ ] ROSE AP naming convention
+	- [ ] Repository
+	- [ ] Folder or subfolder
+		- oee-service 
+		- ROSE-AP/Romantig
+		- rose-ap/romantig
+		- rose-ap_romantig
+		- iot-agent
+		- iot-agent/OPC-UA
+- [ ] The Docker service images should be pushed to Docker Hub/Github registry?
+- [ ] Step-by-Step video tutorial
+	- Any reference?
+	- Could be only screen capture?
+- [ ] Github docs
+	- Any suggestions?
+
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
 <!-- 
