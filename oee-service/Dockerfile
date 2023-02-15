@@ -8,7 +8,7 @@ RUN 	apk update \
 	&&	apk --no-cache add openssl-dev curl curl-dev gcc g++ libgcc
 
 RUN		pip install --upgrade pip \
-	&&	pip install pycurl crate requests python-dotenv
+	&&	pip install pycurl requests python-dotenv
 
 # Set the work directory
 WORKDIR /oee-service

@@ -1,22 +1,18 @@
 import configparser
-from crate import client
-import pycurl
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from sys import argv
-import os
-from dotenv import load_dotenv
-
-import function._query as _query
-# import function._curl_calls as _curl_calls
-
-from io import BytesIO
 import json
+import os
+import pycurl
+
+
+from dotenv import load_dotenv
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from io import BytesIO
+from sys import argv
 
 
 # <-- Docker
 # Docker = False
 Docker = True
-# Docker -->
 
 
 script_dir = os.path.dirname(__file__)
@@ -26,8 +22,6 @@ script_dir = os.path.dirname(__file__)
 load_dotenv(script_dir + "//" + ".env")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL")  # debug
-if LOG_LEVEL == "debug":
-    import pprint
 
 COMPOSE_PROJECT_NAME = os.getenv("COMPOSE_PROJECT_NAME")  # fiware
 ORG_FIWARE = os.getenv("ORG_FIWARE")  # claret-romantig
@@ -77,6 +71,22 @@ GRAFANA_PORT = os.getenv("GRAFANA_PORT")  # 3000
 
 # ROSEAP_OEE_CONTAINER = os.getenv('ROSEAP_OEE_CONTAINER')
 
+# Docker -->
+
+if Docker == False:
+    ORION = IOTA = CRATE = BIND_HOST = "localhost"
+else:
+    BIND_HOST = "0.0.0.0"
+
+PORT = 8008
+
+if len(argv) > 1:
+    arg = argv[1].split(":")
+    BIND_HOST = arg[0]
+    PORT = int(arg[1])
+
+# Docker -->
+
 # .env -->
 # <-- Configuration
 
@@ -90,7 +100,7 @@ def envArrayToString(_Array):
     for element in _Array :
         element = element.strip()
         if len(element) != 0:
-            output += f"'{element}'" + spacing
+            output += f"'{element}'{spacing}"
 
     if output[-spacingLen:] == spacing:
         output = output[:-spacingLen]
@@ -114,7 +124,6 @@ def convert_to_seconds(s):
     s = s.split(" ")
     return int(s[0]) * SECONDS_PER_UNIT[s[1]]
 
-
 # Units to Seconds -->
 
 config = configparser.ConfigParser()
@@ -131,6 +140,13 @@ TIME_STEP = str(config["TIMING"]["TIME_STEP"])
 print(f"[INFO] Timestep is {TIME_STEP}.")
 
 # Configuration -->
+# <-- Main Variables
+    
+Service = f"fiware-service: {FIWARE_SERVICE}"
+ServicePath = f"fiware-servicepath: {FIWARE_SERVICEPATH}"
+contentType = {"json": "Content-Type: application/json"}
+
+# Main Variables -->
 # <-- nickjj Web server https://github.com/nickjj/webserver
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -179,208 +195,70 @@ def httpWebServer(_BIND_HOST="0.0.0.0", _PORT=8008):
 
 
 # nickjj Web server > https://github.com/nickjj/webserver -->
-# <-- Crate-DB
-
-def query_CrateDB(_sqlCommands):
-    try:
-        print("[INFO] [CrateDB] Connecting...")
-        connection = client.connect(CRATE + ":" + CRATE_PORT_ADMIN, error_trace=True)
-        print("[INFO] [CrateDB] Connection Successful.")
-        try:
-            cursor = connection.cursor()
-            print("[INFO] [CrateDB] Cursor created.")
-
-            if LOG_LEVEL == "debug":
-                print(_sqlCommands)
-
-            for command in _sqlCommands:
-                try:
-                    cursor.execute(command)
-                    print("[INFO] [CrateDB] Exectuded query:")
-                except Exception as e:
-                    print(f"[ERROR] [CrateDB] Error in query execution: {str(e)}")
-                    
-                print(f"\n  {command}\n")
-
-                if command.startswith("SELECT"):
-                    
-                    # return cause the hard ends of the loop
-                    # so it can cause unintended behavior
-                    return cursor.fetchall()
-
-        except Exception as e:
-            print(f"[ERROR] [CrateDB] Error in cursor creation: {str(e)}")
-        finally:
-            cursor.close()
-            print("[INFO] [CrateDB] Cursor Closed.")
-            connection.close()
-            print("[INFO] [CrateDB] Connection Closed.")
-    except Exception as e:
-        print(f"[ERROR] [CrateDB] Connection fail:{str(e)}")
-
-# Crate-DB -->
-# <-- Update Orion Contex Broker
-
-def updateAttributes(_data):
-    return [
-        # ##### Contex Broker
-        # ##### Append or Update attribute
-        # ##### OEE, Availability, Performance, Quality
-        # ##### of
-        # ##### urn:ngsiv2:I40Asset:PLC:001
-        {
-            "method": "POST",
-            "service": ORION,
-            "port": ORION_PORT,
-            "NGSI": "v2",
-            "endpoint": "entities" ,
-            "path": DEVICE_ID + "/attrs",
-            "header": [Service, ServicePath, contentType["json"]],
-            "payload": '''{
-    "OEE"           :    {"type": "Float", "value": ''' + str(_data[0][0]) + '''},
-    "Availability"  :    {"type": "Float", "value": ''' + str(_data[0][1]) + '''},
-    "Performance"   :    {"type": "Float", "value": ''' + str(_data[0][2]) + '''},
-    "Quality"       :    {"type": "Float", "value": ''' + str(_data[0][3]) + '''}
-}'''
-        }
-    ]
-
-def updateContexBroker():
-    oeeCallBackQuery = _query.oeeCallBack(CRATE_SCHEMA, CRATE_TABLE_OEE)
-    oeeCallBackQueryResults = query_CrateDB([oeeCallBackQuery])
-    if LOG_LEVEL == "debug":
-        print("oeeCallBackQueryResults: ", oeeCallBackQueryResults)
-    
-    for i in range(len(oeeCallBackQueryResults[0])):
-        if oeeCallBackQueryResults[0][i] == None:
-            oeeCallBackQueryResults[0][i] = "Null"
-    
-    cUrl_call = updateAttributes(oeeCallBackQueryResults)
-    
-    curl_calls_function(cUrl_call)
-
-# Update Orion Contex Broker -->
 # <-- Curl Calls
 
-def body(buf):
-    # Print body data to stdout
-    import sys
-    sys.stdout.write(buf)
-    # Returning None implies that all bytes were written
-
-def curl_calls_function(_cUrl_calls, _payload_OverRide=False):
+def curl_calls_function(call, _payload_OverRide=False):
 
     try:
         cursor = pycurl.Curl()
         print("[INFO] [cUrl] Cursor created.")
         print("[INFO] [cUrl] Exectuded call:")
 
-        for call in _cUrl_calls:
+        try:         
+            paths = [call['NGSI'], call['endpoint'], call['path']]
+            pathFiltered = [path for path in paths if path is not None]
+            urlPath = "/".join(pathFiltered)
+            url = f"http://{call['service']}:{call['port']}/{urlPath}"
+            
+            if _payload_OverRide != False:
+                call["payload"] = json.dumps(_payload_OverRide)
+                
+            # if LOG_LEVEL == "debug":
+            print(f"  curl -X {call['method']} \\")
+            print(f"    {url} \\")
 
-            try:         
-                paths = [call['NGSI'], call['endpoint'], call['path']]
-                pathFiltered = [path for path in paths if path is not None]
-                urlPath = "/".join(pathFiltered)
-                url = f"http://{call['service']}:{call['port']}/{urlPath}"
- 
-                if _payload_OverRide != False:
-                    call["payload"] = _payload_OverRide
+            for header in call["header"]:
+                print(f"    -H '{header}' \\")
 
-                # if LOG_LEVEL == "debug":
-                print("\n")
-                print(f"  curl -X {call['method']} \\")
-                print(f"    {url} \\")
+            print(f"    -d '{call['payload']}'", "\n")
 
-                for header in call["header"]:
-                    print(f"    -H '{header}' \\")
+            try:
+                cursor.reset()
+                cursor.setopt(cursor.URL, url)
+                cursor.setopt(cursor.CUSTOMREQUEST, call["method"])
 
-                print(f"    -d '{call['payload']}'", "\n")
+                if call["header"]:
+                    cursor.setopt(cursor.HTTPHEADER, call["header"])
 
-                try:
-                    cursor.reset()
-                    cursor.setopt(cursor.URL, url)
-                    cursor.setopt(cursor.CUSTOMREQUEST, call["method"])
+                if call["payload"]:
+                    cursor.setopt(cursor.POSTFIELDS, call["payload"])
+                    
+                data = BytesIO()
 
-                    if call["header"]:
-                        cursor.setopt(cursor.HTTPHEADER, call["header"])
+                cursor.setopt(cursor.WRITEFUNCTION, data.write)
 
-                    if call["payload"]:
-                        cursor.setopt(cursor.POSTFIELDS, call["payload"])
-                        
-                    data = BytesIO()
-                    cursor.setopt(cursor.WRITEFUNCTION, data.write)
+                cursor.perform()
+                cursor.close()
+                
+                data = data.getvalue()
 
-                    cursor.perform()
-
-                    if call["method"] == "GET":
-                        
-                        # return cause the hard ends of the loop
-                        # so it can cause unintended behavior
-                        return data
-
-                except Exception as e:
-                    print(f"[ERROR] [cUrl] Error in cUrl execution: {str(e)}")
+                if len(data):
+                    return json.loads(data)
 
             except Exception as e:
-                print(f"[ERROR] [cUrl] Error in cUrl defenition:\n{str(e)}")
-            
-        cursor.close()
+                print(f"[ERROR] [cUrl] Error in cUrl execution: {str(e)}")
+
+        except Exception as e:
+            print(f"[ERROR] [cUrl] Error in cUrl defenition:\n{str(e)}")
 
     except Exception as e:
         print(f"[ERROR] [cUrl] Error in cUrl function:\n{str(e)}")
 
-
 # Curl Calls -->
-# <-- Script
-# <-- Docker
-
-if Docker == False:
-    ORION = IOTA = CRATE = BIND_HOST = "localhost"
-else:
-    BIND_HOST = "0.0.0.0"
-
-PORT = 8008
-
-# Docker -->
-# <-- Main Variables
-
-if len(argv) > 1:
-    arg = argv[1].split(":")
-    BIND_HOST = arg[0]
-    PORT = int(arg[1])
-    
-Service = f"fiware-service: {FIWARE_SERVICE}"
-ServicePath = f"fiware-servicepath: {FIWARE_SERVICEPATH}"
-contentType = {"json": "Content-Type: application/json"}
-
-# Main Variables -->
-# <-- External Variables
-
-processDuration = _query.processDuration(
-    CRATE_SCHEMA,
-    CRATE_TABLE_DURATION,
-    OCB_ID,
-    DEVICE_ID,
-    CRATE_TABLE_DEVICE
-)
-
-oee = _query.oee(
-    CRATE_SCHEMA,
-    CRATE_TABLE_OEE,
-    CRATE_TABLE_DURATION,
-    OCB_ID,
-    ENDS_GOOD,
-    ENDS_BAD,
-    TIMES_UP,
-    TIMES_DOWN,
-    TIME_IDEAL,
-    TIME_STEP,
-    START_DATE_TIME,
-)
-# External Variables -->
+# <-- Update Orion Contex Broker
 
 def provisioning_subscription(NOTIFY_DESCRIPTION, NOTIFY_HOST, NOTIFY_PORT):
-    return [{
+    return {
         "method": "POST",
         "service": ORION,
         "port": ORION_PORT,
@@ -408,38 +286,17 @@ def provisioning_subscription(NOTIFY_DESCRIPTION, NOTIFY_HOST, NOTIFY_PORT):
                 "attrs": ["''' + OCB_ID + '''"]
             }
         }'''
-    }]
+    }
 
-# ## Provisioning Subscriptions
-print(print(f"[INFO] [Orion] Provisioning subscriptions."))
-
-# ### Check Subscriptions
-def get_subscriptions():
-    # ##### Get subscriptions from the Contex Broker
-    return [
-        {
-            "method": "GET",
-            "service": ORION,
-            "port": ORION_PORT,
-            "NGSI": "v2",
-            "endpoint": "subscriptions" ,
-            "path": None,
-            "header": [Service, ServicePath],
-            "payload": None
-        }
-    ]
+def updateContexBroker():
+    oeeCallBackQueryResults = curl_calls_function(CrateDB, {"stmt": oeeCallBack})
     
-data = curl_calls_function(get_subscriptions())
-
-# ### Load Orion json respond
-subscriptions = json.loads(data.getvalue())
-
-# ### For each subscription in Orion json respond
-SubscriptionsProvisioned = []
-
-for subscription in subscriptions:
-    SubscriptionsProvisioned.append(subscription["description"])
-
+    values = {}
+    
+    for item in oeeCallBackQueryResults["cols"]:
+        values[item] = {"type": "Float", "value": oeeCallBackQueryResults["rows"][0][oeeCallBackQueryResults["cols"].index(item)]}
+        
+    curl_calls_function(updateAttributes, values)
 
 def notifySubscription(NOTIFY_HOST, NOTIFY_PORT): 
     notifyDescription = f"{DEVICE_TYPE}:{DEVICE_ID}:{OCB_ID}:{NOTIFY_HOST}"
@@ -449,17 +306,119 @@ def notifySubscription(NOTIFY_HOST, NOTIFY_PORT):
     else:
         print(f"[INFO] [Orion] Subscription {notifyDescription} already provisioned.")
 
+processDuration = f"""CREATE OR REPLACE VIEW {CRATE_SCHEMA.lower()}.{CRATE_TABLE_DURATION.lower()} AS
+	SELECT
+		{OCB_ID.lower()},
+		time_index,
+		lag(time_index, + 1, time_index) OVER (
+			ORDER BY
+				time_index DESC
+		) - time_index AS duration
+	FROM
+		{CRATE_SCHEMA.lower()}.{CRATE_TABLE_DEVICE.lower()}
+	WHERE
+ 		"entity_id"='{DEVICE_ID}' 
+	ORDER BY
+		time_index DESC;"""
+
+oee = f"""CREATE OR REPLACE VIEW {CRATE_SCHEMA.lower()}.{CRATE_TABLE_OEE.lower()} AS WITH
+	subquery_01 AS (
+		SELECT
+			date_bin('{TIME_STEP}' :: INTERVAL, time_index, '{START_DATE_TIME}' :: TIMESTAMP) + '{TIME_STEP}' :: INTERVAL AS time_frame,
+			sum(CASE WHEN {OCB_ID.lower()} IN ({ENDS_GOOD}) THEN 1 ELSE 0 END) AS parts_good,
+			sum(CASE WHEN {OCB_ID.lower()} IN ({ENDS_BAD}) THEN 1 ELSE 0 END) AS parts_bad,
+			sum(CASE WHEN {OCB_ID.lower()} IN ({TIMES_UP}) THEN duration ELSE 0 END) AS time_up,
+			sum(CASE WHEN {OCB_ID.lower()} IN ({TIMES_DOWN}) THEN duration ELSE 0 END) AS time_down
+		FROM
+			{CRATE_SCHEMA.lower()}.{CRATE_TABLE_DURATION.lower()}
+		GROUP BY
+			time_frame
+	),
+	subquery_02 AS (
+		SELECT
+			*,
+			parts_good + parts_bad AS parts_total,
+			time_up + time_down AS time_total
+		FROM
+			subquery_01
+	),
+	subquery_03 AS (
+		SELECT
+			*,
+			{TIME_IDEAL} * 1000 * parts_total / NULLIF(time_total :: DECIMAL, 0) AS performance,
+			parts_good / NULLIF(parts_total :: DECIMAL, 0) AS quality,
+			time_up / NULLIF(time_total :: DECIMAL, 0) AS availability
+		FROM
+			subquery_02
+	)
+	SELECT
+		*,
+		performance * quality * availability AS oee
+	FROM
+		subquery_03;"""
+
+CrateDB = {
+    "method": "POST",
+    "service": CRATE,
+    "port": CRATE_PORT_ADMIN,
+    "NGSI": None,
+    "endpoint": "_sql" ,
+    "path": None,
+    "header": [contentType["json"]],
+    "payload": None
+}
+
+get_subscriptions = {
+    "method": "GET",
+    "service": ORION,
+    "port": ORION_PORT,
+    "NGSI": "v2",
+    "endpoint": "subscriptions" ,
+    "path": None,
+    "header": [Service, ServicePath],
+    "payload": None
+}
+
+updateAttributes = {
+    "method": "POST",
+    "service": ORION,
+    "port": ORION_PORT,
+    "NGSI": "v2",
+    "endpoint": "entities" ,
+    "path": DEVICE_ID + "/attrs",
+    "header": [Service, ServicePath, contentType["json"]],
+    "payload": None
+}
 
 SubscriptionsToBeProvisioned = [
     {"host": QUANTUMLEAP,   "port": QUANTUMLEAP_PORT},
     {"host": ROSEAP_OEE,    "port": ROSEAP_OEE_PORT}
 ]
 
+oeeCallBack = f'''SELECT oee, availability, performance, quality FROM "{CRATE_SCHEMA.lower()}"."{CRATE_TABLE_OEE.lower()}" ORDER BY time_frame DESC LIMIT 1;'''
+
+# Update Orion Contex Broker -->
+# <-- Script
+# <-- External Variables
+
+# ## Provisioning Subscriptions
+
+# ### Check Subscriptions  
+subscriptions = curl_calls_function(get_subscriptions)
+print(f"[INFO] [Orion] Provisioning subscriptions.")
+
+# ### For each subscription in Orion json respond
+SubscriptionsProvisioned = []
+
+for subscription in subscriptions:
+    SubscriptionsProvisioned.append(subscription["description"])
+
 for SubscriptionToBeProvisioned in SubscriptionsToBeProvisioned:
     notifySubscription(SubscriptionToBeProvisioned["host"], SubscriptionToBeProvisioned["port"])
 
 ## Set CrateDB Views
-query_CrateDB([processDuration, oee])
+curl_calls_function(CrateDB, {"stmt": processDuration})
+curl_calls_function(CrateDB, {"stmt": oee})
 
 # Star webserver, listening for notification
 httpWebServer(BIND_HOST, PORT)
