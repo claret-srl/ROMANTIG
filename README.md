@@ -72,7 +72,7 @@ If you would use the [OPC UA](https://opcfoundation.org/) interface, in order to
 You can check this value with any [OPC UA](https://opcfoundation.org/) Client
 
 #### Other protocols
-If you whis to use any other protocol, you need to replace the OPC UA IoT-Agent with another one from the [IoT Agent Catalogue](https://github.com/FIWARE/catalogue/tree/master/iot-agents), and configure it to make the data available to the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/).
+If you whis to use any other protocol, you need to replace the OPC UA IoT-Agent with another one from the [FIWARE Catalogue](https://github.com/FIWARE/catalogue/), and configure it to make the data available to the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/).
 
 ### ROSE-AP
 In order to compute the [OEE](https://www.oee.com/), the ROSE-AP service must know if each possible process state that is found on the context has to be considered:
