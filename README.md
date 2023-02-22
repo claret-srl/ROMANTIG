@@ -152,6 +152,15 @@ The date and time to be considered as the origin of data grouping:
 - To apply required settings to the host, and start up all the services in the containers run:
 `sudo ./services up`
 
+### Demo
+For demo purspose only, add `demo` after the flag `--build` and `up` in order to build and startup also the demo server.
+
+- To build the Docker image for the OPC-UA Server demo (Remove the old image if any, build the new image and performs a vulnerability scan):
+`./services --build demo`
+
+- To apply the required settings to the host and start all services in the containers, including the OPC/UA demo server, run:
+`sudo ./services up demo`
+
 - Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`dashboard.json`](.\grafana\dashboards\dashboard.json) file in `.\grafana\dashboards\` directory to persist the changes after rebooting the container or the Grafana service.
 
 - To stop all the services in the containers execute: `./services down`
@@ -188,25 +197,27 @@ linkStyle 3,4,5,6,7 stroke:LightCoral;
 
 In general, we suggest you to adopt a state space representation similar to the one above for your target process, in order to clearly highlight every step in the cycle and attribute it the correct value for up or down time. The state representation (the ontology of the system) should not be too detailed (i.e. too many states) or too general (i.e. one or two states) because of unnecessary additional workload or possible loss of information.
 
-As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) through the [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/) servers, which is used to write the process states directly on the CrateDB (through QuantumLeap) where they will be read and processed by our [OEE](https://www.oee.com/) calculator.
+As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) through the [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/), which is used to write the process states on the CrateDB (through QuantumLeap) where they will be read and processed by our [OEE](https://www.oee.com/) calculator.
 
 ## Architecture
 
-This application builds on the following components [ROSE-AP RomanTIG](https://github.com/claret-srl/romantig_RAMP_ROSEAP). It will use the following FIWARE components: the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), the [QuantumLeap](https://smartsdk.github.io/ngsi-timeseries-api/) and the [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/).
+ [ROSE-AP RomanTIG](https://github.com/claret-srl/romantig_RAMP_ROSEAP) use the following FIWARE components:
+ - [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/)
+ - [QuantumLeap](https://smartsdk.github.io/ngsi-timeseries-api/)
+ - [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/)
 
 Therefore the overall architecture will consist of the following elements:
 -   The **FIWARE Generic Enablers**:
     -   The FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests using [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
-    -   The FIWARE [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/) which will receive northbound measurements from the dummy IoT devices in [OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/)
-        format and convert them to [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the context broker to alter the state of the context entities
     -   FIWARE [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) subscribed to context changes and persisting them into a **CrateDB** database
+    -   The Engineering [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/) which will receive northbound measurements from the dummy IoT devices in [OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/) format and convert them to [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the context broker to alter the state of the context entities.
 -   A [MongoDB](https://www.mongodb.com/) database:
     -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions and registrations
     -   Used by the **IoT Agent** to hold device information such as device URLs and Keys
 -   A [CrateDB](https://crate.io/) database:
     -   Used as a data sink to hold time-based historical context data
     -   offers an HTTP endpoint to interpret time-based data queries
--   A **Context Provider**: - Should be supplied by integrator, as an active OPC UA device. It could be replaced with any other protocol as far as the relative IoT Agent is used instead of the [OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/) one.
+-   A **Context Provider**: - For demo purpose a dummy OPC-UA server has been provided. In production should be supplied by integrator, as an active OPC UA device. It could be replaced with any other protocol as far as the relative IoT Agent is used instead of the [OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/) one. 
 
 Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run from exposed ports.
 
