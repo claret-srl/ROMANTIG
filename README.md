@@ -3,6 +3,7 @@
 # Dev
 - [ ] Restore docker scan in ./services
 - [ ] Since the OEE computation is made inside Crate-DB, with views, should a place a dedicate service in the docker-compose?
+    - No, should use crate DB API
 - [ ] Undesired behavior:
  - Since the stats keep updating at each variable state changes, if the machine goes to idle the stat do not updates anymore, solutions:
 	- [ ] Cycling firing a "Timeout" state, followed by an "Idle" state:
@@ -11,6 +12,7 @@
 	- [ ] Check if the machine should be in production
 		- Checking the shift scheduling
 		- Provision and HTTP endpoint to turn on/off the calculator
+    - [x] Check the shif production from plc
 - [ ] ROSE AP naming convention
 	- [ ] Repository
 	- [ ] Folder or subfolder
@@ -24,8 +26,13 @@
 - [ ] Step-by-Step video tutorial
 	- Any reference?
 	- Could be only screen capture?
+    - Dataset:
+        - csv, json from crateDB
+        - oppure simulare il PLC
 - [ ] Github docs
 	- Any suggestions?
+    - Specificare la necessità di modificare il type nel config.js
+- [ ] Flexibility
 
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
