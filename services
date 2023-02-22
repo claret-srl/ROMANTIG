@@ -6,14 +6,14 @@
 set -e
 
 setRedisCrateHostMemory () {
-  sudo sysctl -w vm.max_map_count=262144 # CrateDB
-  sudo sysctl vm.overcommit_memory=1 # Redis
-  echo ""
+    sudo sysctl -w vm.max_map_count=262144 # CrateDB
+    sudo sysctl vm.overcommit_memory=1 # Redis
+    echo ""
 }
 
 setEnviroment () {
-  export $(cat .env | grep "#" -v)
-  echo ""
+    export $(cat .env | grep "#" -v)
+    echo ""
 }
 
 # provisionDevices () {
@@ -36,40 +36,46 @@ setEnviroment () {
 # }
 
 waitForService () {
-  echo -e -n "⏳ Waiting for $1 to be available:"
-  while ! [ $TEST ]
-  do
-  if [ $# == 2 ]; then
-    TEST=$[`curl -s -o /dev/null -w %{http_code} "http://localhost:$2/version"` == 200]
-  else
-    TEST=$[`docker inspect --format="{{.State.Health.Status}}" $1` == "healthy"]
-  fi
-  sleep 1
-  done
-  echo -e "\t \033[1;32m Available \033[0m\n"
+    echo -e -n "⏳ Waiting for $1 to be available:"
+    while ! [ $TEST ]
+    do
+        if [ $# == 2 ]; then
+            TEST=$[`curl -s -o /dev/null -w %{http_code} "http://localhost:$2/version"` == 200]
+        else
+            TEST=$[`docker inspect --format="{{.State.Health.Status}}" $1` == "healthy"]
+        fi
+        sleep 1
+    done
+    echo -e "\t \033[1;32m Available \033[0m"
 }
 
 WaitingDocker () {
-  echo ""
-  waitForService ${MONGO}
-  waitForService ${ORION}
-  waitForService ${IOTA} ${IOTA_NORTH_PORT}
-  waitForService ${CRATE}
-  waitForService ${QUANTUMLEAP}
-  # provisionDevices
+    waitForService ${MONGO}
+    waitForService ${ORION}
+    waitForService ${IOTA} ${IOTA_NORTH_PORT}
+    waitForService ${CRATE}
+    waitForService ${QUANTUMLEAP}
+    # provisionDevices
+    echo ""
 }
 
 startingServices () {
     echo -e "Starting Services:"
-    echo -e "- FIWARE Orion Context Brokerconfigured for NGSI-v2."
+    echo -e "- FIWARE Orion Context Broker configured for NGSI-v2."
     echo -e "- FIWARE QuantumLeap subscribed to context changes and persisting them into a Crate-DB database."
     echo -e "- Engineering IoT-Agent for OPC-UA, receive northbound measurements in OPC-UA format and convert them to NGSI-v2 requests for the context broker to alter the state of the context entities."
     echo -e "- Mongo-DB is the Orion Context Broker and IoT-Agent database to hold context data information such as data entities, subscriptions and registrations."
     echo -e "- Crate-DB as a data sink to hold time-based historical context data and HTTP endpoint to interpret time-based data queries."
-    echo -e "- Grafana is a time series analytics tool will visualise data from CrateDB."
-    echo -e "- oee-calculator is a ROSE-AP module to calculate OEE data from CrateDB."
+    echo -e "- Grafana is a time series analytics tool will visualize data from CrateDB."
+    echo -e "- ${ROSEAP_OEE} is a ROSE-AP module to calculate OEE data from CrateDB."
     echo ""
-    ${dockerCmd} up -d --remove-orphans
+    ARG=''
+    if [ $1 == 'demo' ];
+    then
+        ARG='--profile demo '
+    fi
+    ${dockerCmd} $ARG up -d
+    # ${dockerCmd} up -d --remove-orphans
     # echo ""
     # echo "Removing orphans volumes:"
     # docker volume rm $(docker volume ls -q --filter dangling=true) || echo "No volumes to remove."
@@ -77,115 +83,124 @@ startingServices () {
 }
 
 stoppingServices () {
-  SERVICES=$(docker ps --filter "label=org.fiware=${ORG_FIWARE}" -aq)
-  if [[ -n $SERVICES ]]; then
-    echo "Stopping Services:"
-       echo ""
-    docker rm -f $SERVICES || true
-  fi
-  echo ""
+    SERVICES=$(docker ps --filter "label=org.fiware=${ORG_FIWARE}" -aq)
+    if [[ -n $SERVICES ]]; then
+        echo "Stopping Services:"
+        echo ""
+        docker rm -f $SERVICES || true
+    fi
+    echo ""
 }
 
 deletingVolumesNetwork () {
-  stoppingServices
-  VOLUMES=$(docker volume ls -qf dangling=true)
-  if [[ -n $VOLUMES ]]; then
-    echo "Removing all the Volumes of Docker:"
-    sudo docker volume rm $VOLUMES || true
-  fi
-  NETWORKS=$(docker network ls  --filter "label=org.fiware=${ORG_FIWARE}" -q)
-  if [[ -n $NETWORKS ]]; then
-    echo "Removing all Networks of Docker:"
-    docker network rm $NETWORKS || true
-  fi
-  echo ""
+    stoppingServices
+    VOLUMES=$(docker volume ls -qf dangling=true)
+    if [[ -n $VOLUMES ]]; then
+        echo "Removing all the Volumes of Docker:"
+        sudo docker volume rm $VOLUMES || true
+    fi
+    NETWORKS=$(docker network ls  --filter "label=org.fiware=${ORG_FIWARE}" -q)
+    if [[ -n $NETWORKS ]]; then
+        echo "Removing all Networks of Docker:"
+        docker network rm $NETWORKS || true
+    fi
+    echo ""
 }
 
 displayServices () {
-  docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter "label=org.fiware=${ORG_FIWARE}"
-  (gp ports list 2> /dev/null) || true
-  echo ""
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter "label=org.fiware=${ORG_FIWARE}"
+    (gp ports list 2> /dev/null) || true
+    echo ""
 }
 
 setEnviroment
 
 usage="usage: ./services <flag>
 -h  | --help   Show this usage message.
--b  | --build  Builds the Docker Images for the OEE-Service.
+-b  | --build  Builds the Docker Images for the ${ROSEAP_OEE}.
 -p  | --pull   Pulls images from Docker Hub.
--u  | --up     Startup the services in a Docker Container (require "sudo" to apply settings to the host).
+-u  | --up     Startup the services in a Docker Container (require 'sudo' to apply settings to the host).
 -d  | --down   Shoutdown the running services of the Docker Container.
 -rm | --remove Remove the Docker Volumes and the Docker Networks. This will cause the loss of data stored in the databases.
 -d  | --debug  Convenient script to Shoutdown, Builds and Startup the services."
 
 dockerCmd="docker compose"
 if (( $# == 2 )); then
-  dockerCmd="docker-compose"
+    dockerCmd="docker-compose"
 fi
 
 if (( $# < 1 )); then
-  echo "Illegal number of parameters"
-  echo "$usage"
-  echo ""
-  exit 1
+    echo "Illegal number of parameters."
+    echo "$usage"
+    echo ""
+    exit 1
 fi
 
 command="$1"
 case "${command}" in
-  "-h"|"--help")
-    echo "$usage"
-    echo ""
-  ;;
-  "-b"|"--build")
-    echo "Building Rose-AP Docker images"
-    echo ""
-    cd oee-service
-    docker image rm -f ${ROSEAP_OEE}
-    docker build -t ${ROSEAP_OEE} .
-    # docker scan ${ROSEAP_OEE}
-    cd ..
-    echo -e "\t \033[1;32m Done \033[0m\n"
-  ;;
-  "-d"|"--debug")
-    ./services --down
-    ./services --build
-    sudo ./services --up
-  ;;
-  "-p"|"--pull")
-    echo "Pulling Docker images"
-    docker pull curlimages/curl
-    ${dockerCmd} pull
-  ;;
-  "up"|"--up")
-    setRedisCrateHostMemory
-    stoppingServices
-    startingServices
-    displayServices
-    WaitingDocker
-    # provisionDevices
-  ;;
-  "down"|"--down")
-    stoppingServices
-  ;;
-  "-rm"|"--remove")
-    read -p "This operation will ERASE ALL the Docker Volumes and als the data stored in the database, continue (y/n)?" choice
-    case "$choice" in
-      y|Y|[yY][eE][sS] )
-        echo "Deleting..."
-        deletingVolumesNetwork
-      ;;
-      n|N|[nN][oO] )
-        echo "Continer removal skipped."
-      ;;
-      * )
-        echo "Invalid"
-      ;;
-    esac
-  ;;
-  *)
-    echo "Command not Found."
-    echo "$usage"
-    echo ""
-    exit 127;
-  ;;
+    "-h"|"--help")
+        echo "$usage"
+        echo ""
+    ;;
+    "-b"|"--build")
+        if [ $2 == 'demo' ];
+        then
+            ARG=${DEMO_SERVER}
+        else
+            ARG=${ROSEAP_OEE}
+        fi
+        echo "Building $ARG Docker images..."
+        echo ""
+        cd $ARG
+        docker image rm -f $ARG
+        docker build -t $ARG .
+        # docker scan $ARG
+        cd ..
+        echo -e "\t \033[1;32m Done \033[0m\n"
+    ;;
+    "-d"|"--debug")
+        ./services --down
+        ./services --build $2
+        sudo ./services --up $2
+    ;;
+    "-p"|"--pull")
+        ./services --build
+        ./services --build demo
+        echo "Pulling Docker images..."
+        docker pull curlimages/curl
+        ${dockerCmd} pull
+    ;;
+    "up"|"--up")
+        setRedisCrateHostMemory
+        stoppingServices
+        startingServices $2
+        displayServices
+        WaitingDocker
+        # provisionDevices
+    ;;
+    "down"|"--down")
+        stoppingServices
+    ;;
+    "-rm"|"--remove")
+        read -p "This operation will ERASE ALL the Docker Volumes and als the data stored in the database, continue (y/n)?" choice
+        case "$choice" in
+            y|Y|[yY][eE][sS] )
+                echo "Deleting..."
+                deletingVolumesNetwork
+            ;;
+            n|N|[nN][oO] )
+                echo "Continer removal skipped."
+            ;;
+            * )
+                echo "Invalid selection."
+                echo "Continer removal skipped."
+            ;;
+        esac
+    ;;
+    *)
+        echo "Command not Found."
+        echo "$usage"
+        echo ""
+        exit 127;
+    ;;
 esac
