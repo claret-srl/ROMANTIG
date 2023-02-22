@@ -241,18 +241,35 @@ services:
       orion:
         condition: service_healthy
     volumes:
-      - ./oee-service/.config:/oee-service/.config
-      - ./.env:/oee-service/.env
+      - ./${ROSEAP_OEE}/.config:/${ROSEAP_OEE}/.config
+      - ./.env:/${ROSEAP_OEE}/.env
     ports:
       - ${ROSEAP_OEE_PORT}:8008
     networks:
       - default
     stdin_open: true # docker run -i
     tty: true        # docker run -t
-    # restart: 'always'
     # healthcheck:
     #   test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/version" == 200 || exit 1
     #   interval: 5s
+
+  # OPC-UA Demo Server
+  opc-ua-demo-server:
+    labels:
+      org.fiware: ${ORG_FIWARE}
+    image: ${DEMO_SERVER}
+    container_name: ${DEMO_SERVER}
+    hostname: ${OPCUA_ENDPOINT}
+    volumes:
+      - ./.env:/${DEMO_SERVER}/.env
+    ports:
+      - ${DEMO_SERVER_PORT}:4880
+    networks:
+      - default
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    profiles:
+        - demo
 
 networks:
   default:
