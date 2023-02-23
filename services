@@ -39,7 +39,8 @@ waitForService () {
     echo -e -n "⏳ Waiting for $1 to be available:"
     while ! [ $TEST ]
     do
-        if [ $# == 2 ]; then
+        if [ $# = 2 ]
+        then
             TEST=$[`curl -s -o /dev/null -w %{http_code} "http://localhost:$2/version"` == 200]
         else
             TEST=$[`docker inspect --format="{{.State.Health.Status}}" $1` == "healthy"]
@@ -69,8 +70,8 @@ startingServices () {
     echo -e "- Grafana is a time series analytics tool will visualize data from CrateDB."
     echo -e "- ${ROSEAP_OEE} is a ROSE-AP module to calculate OEE data from CrateDB."
     echo ""
-    ARG=''
-    if [ $1 == 'demo' ];
+    ARG=""
+    if [[ $1 = 'demo' ]]
     then
         ARG='--profile demo '
     fi
@@ -84,7 +85,8 @@ startingServices () {
 
 stoppingServices () {
     SERVICES=$(docker ps --filter "label=org.fiware=${ORG_FIWARE}" -aq)
-    if [[ -n $SERVICES ]]; then
+    if [[ -n $SERVICES ]]
+    then
         echo "Stopping Services:"
         echo ""
         docker rm -f $SERVICES || true
@@ -95,12 +97,14 @@ stoppingServices () {
 deletingVolumesNetwork () {
     stoppingServices
     VOLUMES=$(docker volume ls -qf dangling=true)
-    if [[ -n $VOLUMES ]]; then
+    if [[ -n $VOLUMES ]]
+    then
         echo "Removing all the Volumes of Docker:"
         sudo docker volume rm $VOLUMES || true
     fi
-    NETWORKS=$(docker network ls  --filter "label=org.fiware=${ORG_FIWARE}" -q)
-    if [[ -n $NETWORKS ]]; then
+    NETWORKS=$(docker network ls --filter "label=org.fiware=${ORG_FIWARE}" -q)
+    if [[ -n $NETWORKS ]]
+    then
         echo "Removing all Networks of Docker:"
         docker network rm $NETWORKS || true
     fi
@@ -125,11 +129,13 @@ usage="usage: ./services <flag>
 -d  | --debug  Convenient script to Shoutdown, Builds and Startup the services."
 
 dockerCmd="docker compose"
-if (( $# == 2 )); then
+if (( $# == 2 ))
+then
     dockerCmd="docker-compose"
 fi
 
-if (( $# < 1 )); then
+if (( $# < 1 ))
+then
     echo "Illegal number of parameters."
     echo "$usage"
     echo ""
@@ -143,7 +149,7 @@ case "${command}" in
         echo ""
     ;;
     "-b"|"--build")
-        if [ $2 == 'demo' ];
+        if [[ $2 = 'demo' ]]
         then
             ARG=${DEMO_SERVER}
         else
