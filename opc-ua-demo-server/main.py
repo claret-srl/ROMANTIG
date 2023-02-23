@@ -13,14 +13,15 @@ load_dotenv(script_dir + "//" + ".env")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL")  # debug
 
-DEMO_SERVER = os.getenv("DEMO_SERVER")  # opc-ua-demo-server
-DEMO_SERVER_PORT = os.getenv("DEMO_SERVER_PORT")  # 4880
+OPCUA_PORT = os.getenv("OPCUA_PORT")  # 4840
 
-OCB_ID_process = os.getenv("OCB_ID_process")  # processStatus
-OCB_ID_machine = os.getenv("OCB_ID_machine")  # machineStatus
+OCB_ID_PROCESS = os.getenv("OCB_ID_PROCESS")  # processStatus
+OCB_ID_MACHINE = os.getenv("OCB_ID_MACHINE")  # machineStatus
 
-IOTA_OPCUA_ID_process = os.getenv("IOTA_OPCUA_ID_process")  # ns=4;i=198
-IOTA_OPCUA_ID_machine = os.getenv("IOTA_OPCUA_ID_machine")  # ns=4;i=339
+OPCUA_ID_PROCESS = os.getenv("OPCUA_ID_PROCESS")  # ns=4;i=198
+OPCUA_ID_MACHINE = os.getenv("OPCUA_ID_MACHINE")  # ns=4;i=339
+
+print(LOG_LEVEL)
 
 
 async def main():
@@ -31,7 +32,7 @@ async def main():
     server = Server()
     await server.init()
 
-    server.set_endpoint(f"opc.tcp://0.0.0.0:{DEMO_SERVER_PORT}/")
+    server.set_endpoint(f"opc.tcp://0.0.0.0:{OPCUA_PORT}/")
 
     # # set up the namespace, not really necessary but should as spec
     # uri = "https://examples.freeopcua.github.io"
@@ -44,12 +45,8 @@ async def main():
     parentObj = await server.nodes.objects.add_object("ns=4;i=1", "DIH_Welding")
 
     # Set Variables matching the same nemeSpace and Id of the real PLC
-    processStatusVar = await parentObj.add_variable(
-        IOTA_OPCUA_ID_process, OCB_ID_process, "Idle"
-    )
-    machineStatusVar = await parentObj.add_variable(
-        IOTA_OPCUA_ID_machine, OCB_ID_machine, True
-    )
+    processStatusVar = await parentObj.add_variable(OPCUA_ID_PROCESS, OCB_ID_PROCESS, "Idle")
+    machineStatusVar = await parentObj.add_variable(OPCUA_ID_MACHINE, OCB_ID_MACHINE, True)
 
     # Set variable to be writable by clients
     await processStatusVar.set_writable()
@@ -60,42 +57,36 @@ async def main():
     async with server:
 
         cycleCounter = 0
+        CycleCounterToSwitch = 2
+        pseudoRandom = 85
 
         while True:
-
+            
             processStates = ["Idle", "In Picking", "In Welding", "In QC"]
 
             for status in processStates:
-                print(
-                    f"""
-                    cycleCounter:  [{cycleCounter}]
-                    processStatus: [{status}]
-                    machineStatus: [{await machineStatusVar.get_value()}]
-                    -------------
-                """
-                )
+                print(f"""\ncycleCounter:  [{cycleCounter}]\nprocessStatus: [{status}]\nmachineStatus: [{await machineStatusVar.get_value()}]""")
                 # print(f"\nprocessStates are: {processStates}")
 
                 if status == "In Placing" or status == "In Trashing":
                     cycleCounter += 1
-                    if cycleCounter % 2 == 0:
+                    if cycleCounter % CycleCounterToSwitch == 0:
                         oldValue = await machineStatusVar.get_value()
                         await machineStatusVar.write_value(not oldValue)
-                    break
 
                 elif status == "In QC":
                     nextStatus = ["In Placing", "In Reworking"]
-                    processStates.append(nextStatus[random.randint(0, 1)])
+                    processStates.append(nextStatus[int(random.randint(0, pseudoRandom) / pseudoRandom)])
 
                 elif status == "In Reworking":
                     nextStatus = "In QC from rework"
                     processStates.append(nextStatus)
 
                 elif status == "In QC from rework":
-                    nextStatus = ["In Trashing", "In Placing"]
-                    processStates.append(nextStatus[random.randint(0, 1)])
+                    nextStatus = ["In Placing", "In Trashing"]
+                    processStates.append(nextStatus[int(random.randint(0, pseudoRandom) / pseudoRandom)])
 
-                await asyncio.sleep(random.randint(2, 4))
+                await asyncio.sleep(random.randint(4, 7))
                 await processStatusVar.write_value(status)
 
                 # _logger.info("Set value of %s to %s", processStatusVar, status)

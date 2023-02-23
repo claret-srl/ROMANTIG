@@ -39,7 +39,7 @@ FIWARE_SERVICEPATH = os.getenv("FIWARE_SERVICEPATH")  # /demo
 IOTA = os.getenv("IOTA")  # iot-agent
 IOTA_NORTH_PORT = os.getenv("IOTA_NORTH_PORT")  # 4041
 IOTA_SOUTH_PORT = os.getenv("IOTA_SOUTH_PORT")  # 9229
-IOTA_OPCUA_ID = os.getenv("IOTA_OPCUA_ID")  # "ns=4;i=198"
+OPCUA_ID = os.getenv("OPCUA_ID")  # "ns=4;i=198"
 
 ORION = os.getenv("ORION")  # orion
 ORION_PORT = os.getenv("ORION_PORT")  # 1026
@@ -384,7 +384,13 @@ def provisionSubscription(NOTIFY_HOST, NOTIFY_PORT):
 
     payload = {
         "description": subscriptionDescription,
-        "subject": {"entities": [{"id": DEVICE_ID, "type": DEVICE_TYPE}]},
+        "subject": {
+            "entities": [{"id": DEVICE_ID, "type": DEVICE_TYPE}],
+            "condition": {
+                "attrs": [ "processStatus" ],
+                "alterationTypes": [ "entityChange" ]
+            }
+        },
         "notification": {
             "attrs": [OCB_ID],
             "http": {"url": f"http://{NOTIFY_HOST}:{NOTIFY_PORT}/v2/notify"},

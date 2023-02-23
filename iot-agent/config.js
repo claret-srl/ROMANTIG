@@ -174,8 +174,12 @@ config.iota = {
 		PLC: {
 			active: [
 				{
-					name: process.env.OCB_ID,
+					name: process.env.OCB_ID_PROCESS,
 					type: 'Text'
+				},
+                {
+					name: process.env.OCB_ID_MACHINE,
+					type: 'Boolean'
 				}
 			],
 			lazy: [],
@@ -188,8 +192,13 @@ config.iota = {
 			type: process.env.DEVICE_TYPE,
 			mappings: [
 				{
-					ocb_id: process.env.OCB_ID,
-					opcua_id: process.env.IOTA_OPCUA_ID,
+					ocb_id: process.env.OCB_ID_PROCESS,
+					opcua_id: process.env.OPCUA_ID_PROCESS,
+					inputArguments: []
+				},
+                {
+					ocb_id: process.env.OCB_ID_MACHINE,
+					opcua_id: process.env.OPCUA_ID_MACHINE,
 					inputArguments: []
 				}
 			]

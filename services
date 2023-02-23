@@ -50,15 +50,15 @@ waitForService () {
     echo -e "\t \033[1;32m Available \033[0m"
 }
 
-WaitingDocker () {
-    waitForService ${MONGO}
-    waitForService ${ORION}
-    waitForService ${IOTA} ${IOTA_NORTH_PORT}
-    waitForService ${CRATE}
-    waitForService ${QUANTUMLEAP}
-    # provisionDevices
-    echo ""
-}
+# WaitingDocker () {
+#     waitForService ${MONGO}
+#     waitForService ${ORION}
+#     waitForService ${IOTA} ${IOTA_NORTH_PORT}
+#     waitForService ${CRATE}
+#     waitForService ${QUANTUMLEAP}
+#     # provisionDevices
+#     echo ""
+# }
 
 startingServices () {
     echo -e "Starting Services:"
@@ -181,7 +181,7 @@ case "${command}" in
         stoppingServices
         startingServices $2
         displayServices
-        WaitingDocker
+        # WaitingDocker
         # provisionDevices
     ;;
     "down"|"--down")

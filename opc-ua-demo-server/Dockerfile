@@ -11,10 +11,10 @@ RUN		pip install --upgrade pip \
 	&&	pip install asyncio asyncua python-dotenv
 
 # Set the work directory
-WORKDIR /opc-ua-demo-server
+WORKDIR /app
 
 # Copy in the continer the following files
 COPY ./ ./
 
 # Run this command at startup
-CMD ["python3","-u","opc-ua-demo-server.py"]
+CMD ["python3", "-u", "main.py"]

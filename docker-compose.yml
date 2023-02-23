@@ -85,10 +85,16 @@ services:
       - FIWARE_SERVICEPATH=${FIWARE_SERVICEPATH}
       - DEVICE_ID=${DEVICE_ID}
       - DEVICE_TYPE=${DEVICE_TYPE}
-      - OCB_ID=${OCB_ID}
-      - IOTA_OPCUA_ID=${IOTA_OPCUA_ID}
+
+      - OCB_ID_PROCESS=${OCB_ID_PROCESS}
+      - OCB_ID_MACHINE=${OCB_ID_MACHINE}
+
+      - OPCUA_ID_PROCESS=${OPCUA_ID_PROCESS}
+      - OPCUA_ID_MACHINE=${OPCUA_ID_MACHINE}
+
+      - IOTA_OPCUA_ENDPOINT=opc.tcp://${OPCUA_ENDPOINT}:${OPCUA_PORT}/         # Endpoint of OPC UA Server
+  
       - IOTA_OPCUA_MT_ENTITY_ID=${CONTEXTS_ID}
-      - IOTA_OPCUA_ENDPOINT=${IOTA_OPCUA_ENDPOINT}	          # Endpoint of OPC UA Server
       - IOTA_FALLBACK_TENANT=${FIWARE_SERVICE}
       - IOTA_FALLBACK_PATH=${FIWARE_SERVICEPATH}
       - IOTA_OPCUA_SECURITY_MODE=None						              # Security mode for OPC UA connection
@@ -129,23 +135,23 @@ services:
   
   
   # Mongo GUI, to chek if Mongo it's working just for dev purpose
-  # mongo-express:
-  #   image: mongo-express:1.0.0-alpha
-  #   labels:
-  #     org.fiware: ${ORG_FIWARE}
-  #   container_name: mongo-express
-  #   environment:
-  #     # ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-  #     # ME_CONFIG_MONGODB_ADMINPASSWORD: admin
-  #     ME_CONFIG_MONGODB_SERVER: "${MONGO}"
-  #     ME_CONFIG_MONGODB_PORT: "${MONGO_PORT}"
-  #   ports:
-  #     - "8081:8081"
-  #   networks:
-  #     - default
-  #   depends_on:
-  #     db-mongo:
-  #       condition: service_healthy
+  mongo-express:
+    image: mongo-express:1.0.0-alpha
+    labels:
+      org.fiware: ${ORG_FIWARE}
+    container_name: mongo-express
+    environment:
+      # ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      # ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: "${MONGO}"
+      ME_CONFIG_MONGODB_PORT: "${MONGO_PORT}"
+    ports:
+      - "8081:8081"
+    networks:
+      - default
+    depends_on:
+      db-mongo:
+        condition: service_healthy
 
 
   db-crate:
@@ -241,8 +247,8 @@ services:
       orion:
         condition: service_healthy
     volumes:
-      - ./${ROSEAP_OEE}/.config:/${ROSEAP_OEE}/.config
-      - ./.env:/${ROSEAP_OEE}/.env
+      - ./${ROSEAP_OEE}/.config:/app/.config
+      - ./.env:/app/.env
     ports:
       - ${ROSEAP_OEE_PORT}:8008
     networks:
@@ -259,11 +265,10 @@ services:
       org.fiware: ${ORG_FIWARE}
     image: ${DEMO_SERVER}
     container_name: ${DEMO_SERVER}
-    hostname: ${OPCUA_ENDPOINT}
     volumes:
-      - ./.env:/${DEMO_SERVER}/.env
+      - ./.env:/app/.env
     ports:
-      - ${DEMO_SERVER_PORT}:4880
+      - ${DEMO_SERVER_PORT}:${DEMO_SERVER_PORT}
     networks:
       - default
     stdin_open: true # docker run -i
