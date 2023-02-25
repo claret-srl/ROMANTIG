@@ -1,7 +1,4 @@
-import asyncio
-import logging
-import random
-import os
+import asyncio, logging, random, os, time
 
 from asyncua import Server
 from dotenv import load_dotenv
@@ -45,8 +42,12 @@ async def main():
     parentObj = await server.nodes.objects.add_object("ns=4;i=1", "DIH_Welding")
 
     # Set Variables matching the same nemeSpace and Id of the real PLC
-    processStatusVar = await parentObj.add_variable(OPCUA_ID_PROCESS, OCB_ID_PROCESS, "Idle")
-    machineStatusVar = await parentObj.add_variable(OPCUA_ID_MACHINE, OCB_ID_MACHINE, True)
+    processStatusVar = await parentObj.add_variable(
+        OPCUA_ID_PROCESS, OCB_ID_PROCESS, "Idle"
+    )
+    machineStatusVar = await parentObj.add_variable(
+        OPCUA_ID_MACHINE, OCB_ID_MACHINE, True
+    )
 
     # Set variable to be writable by clients
     await processStatusVar.set_writable()
@@ -56,40 +57,53 @@ async def main():
 
     async with server:
 
-        cycleCounter = 0
+        cycleCounter = 1
         CycleCounterToSwitch = 2
-        pseudoRandom = 85
+        pseudoRandom = 75
 
         while True:
-            
+
             processStates = ["Idle", "In Picking", "In Welding", "In QC"]
+            # machineState = await machineStatusVar.get_value()
 
-            for status in processStates:
-                print(f"""\ncycleCounter:  [{cycleCounter}]\nprocessStatus: [{status}]\nmachineStatus: [{await machineStatusVar.get_value()}]""")
-                # print(f"\nprocessStates are: {processStates}")
+            if cycleCounter % CycleCounterToSwitch == 0:
 
-                if status == "In Placing" or status == "In Trashing":
-                    cycleCounter += 1
-                    if cycleCounter % CycleCounterToSwitch == 0:
-                        oldValue = await machineStatusVar.get_value()
-                        await machineStatusVar.write_value(not oldValue)
+                # oldMachineStatusVar = await machineStatusVar.get_value()
+                # newMachineStatusVar = not oldMachineStatusVar
 
-                elif status == "In QC":
-                    nextStatus = ["In Placing", "In Reworking"]
-                    processStates.append(nextStatus[int(random.randint(0, pseudoRandom) / pseudoRandom)])
-
-                elif status == "In Reworking":
-                    nextStatus = "In QC from rework"
-                    processStates.append(nextStatus)
-
-                elif status == "In QC from rework":
-                    nextStatus = ["In Placing", "In Trashing"]
-                    processStates.append(nextStatus[int(random.randint(0, pseudoRandom) / pseudoRandom)])
-
+                await machineStatusVar.write_value(False)
+                _logger.info("Set value of %s to %s", machineStatusVar, "False")
+                
                 await asyncio.sleep(random.randint(4, 7))
-                await processStatusVar.write_value(status)
+                
+                await machineStatusVar.write_value(True)
+                _logger.info("Set value of %s to %s", machineStatusVar, "True")
+                
+                cycleCounter += 1
+                               
+            else:
+                for status in processStates:
 
-                # _logger.info("Set value of %s to %s", processStatusVar, status)
+                    if status == "In Placing" or status == "In Trashing":
+                        cycleCounter += 1
+
+                    elif status == "In QC":
+                        nextStatus = ["In Placing", "In Reworking"]
+                        processStates.append(nextStatus[round(random.randint(0, pseudoRandom) / pseudoRandom)])
+
+                    elif status == "In Reworking":
+                        nextStatus = "In QC from rework"
+                        processStates.append(nextStatus)
+
+                    elif status == "In QC from rework":
+                        nextStatus = ["In Placing", "In Trashing"]
+                        processStates.append(nextStatus[round(random.randint(0, pseudoRandom) / pseudoRandom)])
+
+                    await asyncio.sleep(random.randint(4, 7))
+                    await processStatusVar.write_value(status)
+                    _logger.info("Set value of %s to %s", processStatusVar, status)
+
+                    # print(f"""\ncycleCounter:  [{cycleCounter}]\nprocessStatus: [{status}]\nmachineStatus: [{machineState}]""")
 
 
 if __name__ == "__main__":
