@@ -166,6 +166,7 @@ case "${command}" in
     ;;
     "-d"|"--debug")
         ./services --down
+        ./services --build
         ./services --build $2
         sudo ./services --up $2
     ;;
