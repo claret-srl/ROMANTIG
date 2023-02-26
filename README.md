@@ -230,45 +230,73 @@ class Crate,Mongo,Redis,Welder,Robot,QC,Actuator,PLC Gainsboro
 ```
 
 ## Context
-The provisioned device holding the Process Status information, it get a call back of the OEE values, because of that enquiring the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) about the entity, with the GET request to `v2/entities` endpoint:
+The provisioned device holding the Process Status information, it get a call back of the OEE values, because of that enquiring the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) about the entity, with the GET request to `v2/entities/<device-id>` endpoint:
 
 ```
 curl -X GET \
---url 'http://localhost:1026/v2/entities' \
+'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001' \
 -H 'fiware-service: opcua_plc' \
 -H 'fiware-servicepath: /demo'
 ```
 Will result in the following output:
 ```
-[
-  ... ,
-  {
-    "id": "urn:ngsiv2:I40Asset:PLC:001",
-    "type": "PLC",
-    "Availability": {
-      "type": "Float",
-      "value": 0.646473505
-    },
-    "OEE": {
-      "type": "Float",
-      "value": 0.302358872
-    },
-    "Performance": {
-      "type": "Float",
-      "value": 0.701557458
-    },
-    "Quality": {
-      "type": "Float",
-      "value": 0.666666667
-    },
-    "processStatus": {
-      "type": "Text",
-      "value": "In Placing"
-    }
+{
+  "id": "urn:ngsiv2:I40Asset:PLC:001",
+  "type": "PLC",
+  "availability": {
+    "type": "Float",
+    "value": 0.710598327,
+    "metadata": {}
   },
-  ...
-]
+  "oee": {
+    "type": "Float",
+    "value": 0.280455057,
+    "metadata": {}
+  },
+  "performance": {
+    "type": "Float",
+    "value": 0.394674525,
+    "metadata": {}
+  },
+  "processStatus": {
+    "type": "Text",
+    "value": "Offline",
+    "metadata": {}
+  },
+  "quality": {
+    "type": "Float",
+    "value": 1,
+    "metadata": {}
+  }
+}
 ```
+
+Atrributes can be filtered, with the GET request to `v2/entities/<device-id>/attrs/<atrribute>` endpoint:
+```
+curl -X GET \
+'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/oee' \
+-H 'fiware-service: opcua_plc' \
+-H 'fiware-servicepath: /demo'
+```
+Will result in the following output:
+```
+{
+  "type": "Float",
+  "value": 0.226730018,
+  "metadata": {}
+}
+```
+
+Or to get just the value of an attribute, with the GET request to `v2/entities/<device-id>/attrs/<attribute>/value` endpoint:
+```
+curl -X GET \
+'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/oee/value' \
+-H 'fiware-service: opcua_plc' \
+-H 'fiware-servicepath: /demo'
+```
+Will result in the following output:
+`0.359682661`
+
 The attribute it's updated each time the processStatus values change.
 
 ### HTTP Request endpoint

@@ -104,6 +104,10 @@ def envArrayToString(array, spacing, backTick=""):
 
     return output
 
+def sStrip(s):
+    if s[-1:] == "s":
+        s = s[:-1]
+    return s
 
 # <-- Units to Seconds
 
@@ -140,8 +144,8 @@ TIMES_PRODUCTION_NOT_PLANNED_GRAFANA = envArrayToString(config["MACHINE_STATES"]
 ENDS_GOOD = envArrayToString(config["MACHINE_STATES"]["ENDS_GOOD"], ", ", "'")
 ENDS_BAD = envArrayToString(config["MACHINE_STATES"]["ENDS_BAD"], ", ", "'")
 START_DATE_TIME = (config["TIMING"]["START_DATE"] + "T" + config["TIMING"]["START_TIME"] + "Z")
-TIME_IDEAL = str(convert_to_seconds(config["TIMING"]["TIME_IDEAL"]))
-TIME_STEP = str(config["TIMING"]["TIME_STEP"])
+TIME_IDEAL = str(convert_to_seconds(sStrip(config["TIMING"]["TIME_IDEAL"])))
+TIME_STEP = str(sStrip(config["TIMING"]["TIME_STEP"]))
 
 
 print(f"[INFO] Timestep is {TIME_STEP}.")
@@ -213,23 +217,23 @@ def cUrlCall(method, service, port, NGSI, endpoint, path, headers: list, payload
 
         cursor.reset()
 
-        # print(f"curl -X {method} \\")
+        print(f"curl -X {method} \\")
         cursor.setopt(cursor.CUSTOMREQUEST, method)
 
-        # print(f"'{url}' \\")
+        print(f"'{url}' \\")
         cursor.setopt(cursor.URL, url)
 
         if headers:
-            # for header in headers:
-                # print(f"-H '{header}' \\")
+            for header in headers:
+                print(f"-H '{header}' \\")
             cursor.setopt(cursor.HTTPHEADER, headers)
 
         if payload is not False:
             payload = json.dumps(payload)
-            # print(f"-d '{payload}'", "\n")
+            print(f"-d '{payload}'", "\n")
             cursor.setopt(cursor.POSTFIELDS, payload)
         
-        # print()
+        print()
 
         cursor.setopt(cursor.WRITEFUNCTION, data.write)
 
@@ -273,7 +277,6 @@ def updateCB():
 
 
 # Update Contex Broker -->
-
 # <-- Main Variables
 
 Service = f"fiware-service: {FIWARE_SERVICE}"
@@ -305,13 +308,11 @@ def provisionSubscription(notify_host, notify_port, notify_attrs):
             "entities": [{"id": DEVICE_ID, "type": DEVICE_TYPE}],
             "condition": {
                 "attrs": [notify_attrs],
-                # "attrs": [OCB_ID_PROCESS, OCB_ID_MACHINE],
                 "alterationTypes": ["entityChange"],
             },
         },
         "notification": {
             "attrs": [notify_attrs],
-            # "attrs": [OCB_ID_PROCESS, OCB_ID_MACHINE],
             "http": {"url": f"http://{notify_host}:{notify_port}/v2/notify"},
         },
     }
@@ -321,8 +322,6 @@ def provisionSubscription(notify_host, notify_port, notify_attrs):
 
 
 subscriptions = [
-    # {"host": QUANTUMLEAP, "port": QUANTUMLEAP_PORT, "attrs": OCB_ID_MACHINE},
-    # {"host": ROSEAP_OEE, "port": ROSEAP_OEE_PORT, "attrs": OCB_ID_MACHINE},
     {"host": QUANTUMLEAP, "port": QUANTUMLEAP_PORT, "attrs": OCB_ID_PROCESS},
     {"host": ROSEAP_OEE, "port": ROSEAP_OEE_PORT, "attrs": OCB_ID_PROCESS}
 ]
@@ -374,14 +373,6 @@ oee = f"""CREATE OR REPLACE VIEW {CRATE_SCHEMA.lower()}.{CRATE_TABLE_OEE.lower()
 	FROM
 		subquery_03;"""
 
-# print(oee)
-
-# qualcosa = """CREATE OR REPLACE VIEW "qualcosa" AS SELECT 10 AS time_index, 20 AS processstatus;"""
-# cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": qualcosa})
-# time.sleep(15)
-# qualcosa = """CREATE OR REPLACE VIEW "qualcosa" AS SELECT time_index AS time, entity_id, entity_type, processstatus FROM "mtopcua_plc"."etplc" LIMIT 100;"""
-# cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": qualcosa})
-
 
 Health = f"""SELECT processstatus FROM "{CRATE_SCHEMA.lower()}"."{CRATE_TABLE_DEVICE.lower()}" LIMIT 1;"""
 
@@ -393,19 +384,18 @@ HealthResults['rowcount'] = 0
 while test:
     HealthResults = cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": Health})
     print(HealthResults)
-    # {'error': {'message': "SchemaUnknownException[Schema 'mtopcua_plc' unknown]", 'code': 4045}}
     
     if 'error' in HealthResults:
-        print("not ok")
+        print("Waiting for IoT Agent provisioning...")
         time.sleep(1)
     else:   
-        print("ok")
+        print("IoT Agent provisioning completed.")
         test = False
         print(HealthResults['rowcount'])
-        cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": processDuration})
-        cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": oee})
         cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": varTableDrop})
         cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": varTableCreate})
         cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": varTableValue})
+        cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": processDuration})
+        cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": oee})
     
 httpWebServer(BIND_HOST, PORT)
