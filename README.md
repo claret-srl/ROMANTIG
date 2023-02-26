@@ -183,8 +183,6 @@ linkStyle 3,4,5,6,7,8 stroke:LightCoral;
 
 In general, we suggest you to adopt a state space representation similar to the one above for your target process, in order to clearly highlight every step in the cycle and attribute it the correct value for up or down time. The state representation (the ontology of the system) should not be too detailed (i.e. too many states) or too general (i.e. one or two states) because of unnecessary additional workload or possible loss of information.
 
-As it can be seen in the docker-compose file, the PLC responsible for controlling our process is directly connected to [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) through the [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/), which is used to write the process states on the CrateDB (through QuantumLeap) where they will be read and processed by our [OEE](https://www.oee.com/) calculator.
-
 ## Architecture
 
  [ROSE-AP RomanTIG](https://github.com/claret-srl/romantig_RAMP_ROSEAP) use the following FIWARE components:
@@ -206,6 +204,7 @@ Therefore the overall architecture will consist of the following elements:
 -   A **Context Provider**: - For demo purpose a dummy OPC-UA server has been provided. In production should be supplied by integrator, as an active OPC UA device. It could be replaced with any other protocol as far as the relative IoT Agent is used instead of the [OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/) one. 
 
 Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run from exposed ports.
+
 
 The overall architecture can be seen below:
 
@@ -240,8 +239,10 @@ classDef Claret fill:#0999D0,Stroke:#F8F8F8,color:#F8F8F8
 
 class Crate,Mongo,Redis,Welder,Robot,QC,Actuator,PLC Gainsboro
 ```
+As it can be seen in the chart, the PLC responsible for controlling our process is connected to [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) through the [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/), which is used to write the process states on the CrateDB (through [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/)) where they will processed and read by our [OEE](https://www.oee.com/) calculator.
 
 ## Context
+
 The provisioned device holding the Process Status information, it get a call back of the OEE values, because of that enquiring the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) about the entity, with the GET request to `v2/entities/<device-id>` endpoint:
 
 ```
