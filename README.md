@@ -126,25 +126,37 @@ The date and time to be considered as the origin of data grouping:
 `sudo ./services up`
 
 ### Demo
-For demo purspose only, add `demo` after the flag `--build` and `up` in order to build and startup also the demo server.
+For demo purspose only, add `demo` after the flag `--build` and `up` in order to build and startup also the demo OPC-UA server.
 
 - To build the Docker image for the OPC-UA Server demo (Remove the old image if any, build the new image and performs a vulnerability scan):
+
 `./services --build demo`
 
 - To apply the required settings to the host and start all services in the containers, including the OPC/UA demo server, run:
+
 `sudo ./services up demo`
 
 - Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`dashboard.json`](.\grafana\dashboards\dashboard.json) file in `.\grafana\dashboards\` directory to persist the changes after rebooting the container or the Grafana service.
 
-- To stop all the services in the containers execute: `./services down`
-- To only pull all images from Docker Hub without start the services in the Docker Container: `./services --pull`
-- To stop, build and start the services in the Docker Container: `sudo ./services --debug`
-- To see the help function of the service script `./services --help`
+- To stop all the services in the containers execute:
+
+`./services down`
+- To only pull all images from Docker Hub without start the services in the Docker Container:
+
+`./services --pull`
+- To stop, build and start the services in the Docker Container:
+
+`sudo ./services --debug`
+- To see the help function of the service script:
+
+`./services --help`
 
 > **Warning**
 > 
 > Teh following operation will **erase** all the Docker Volumes and **all the data stored in the databases!**
-- To delete the Volumes and the Networks `./services --remove`
+- To delete the Volumes and the Networks
+
+`./services --remove`
 
 ## Example
 ![Dashboard](./img/dashboard.png)
