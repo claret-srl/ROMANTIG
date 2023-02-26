@@ -107,7 +107,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "9.0.5",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -133,11 +133,90 @@
               "Time Up": true
             },
             "indexByName": {},
-            "renameByName": {}
+            "renameByName": {
+              "Time Down": ""
+            }
           }
         }
       ],
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "string"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "id": 13,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "first"
+          ],
+          "fields": "/^Proces Status$/",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 27,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        },
+        {
+          "id": "limit",
+          "options": {
+            "limitField": 1
+          }
+        }
+      ],
+      "type": "stat"
     },
     {
       "datasource": {
@@ -151,7 +230,7 @@
           },
           "custom": {
             "align": "center",
-            "displayMode": "auto",
+            "displayMode": "color-text",
             "filterable": false,
             "inspect": false
           },
@@ -160,7 +239,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "text",
                 "value": null
               }
             ]
@@ -183,12 +262,12 @@
         ]
       },
       "gridPos": {
-        "h": 12,
+        "h": 8,
         "w": 4,
         "x": 20,
-        "y": 0
+        "y": 4
       },
-      "id": 13,
+      "id": 27,
       "options": {
         "footer": {
           "enablePagination": true,
@@ -298,7 +377,7 @@
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "firstNotNull"
+            "first"
           ],
           "fields": "",
           "values": false
@@ -313,7 +392,7 @@
             "type": "datasource",
             "uid": "-- Dashboard --"
           },
-          "panelId": 15,
+          "panelId": 28,
           "refId": "A"
         }
       ],
@@ -419,7 +498,7 @@
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "firstNotNull"
+            "first"
           ],
           "fields": "",
           "values": false
@@ -433,7 +512,7 @@
             "type": "datasource",
             "uid": "-- Dashboard --"
           },
-          "panelId": 15,
+          "panelId": 28,
           "refId": "A"
         }
       ],
@@ -514,7 +593,7 @@
         "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "firstNotNull"
+            "first"
           ],
           "fields": "",
           "values": false
@@ -531,7 +610,7 @@
             "type": "datasource",
             "uid": "-- Dashboard --"
           },
-          "panelId": 15,
+          "panelId": 28,
           "refId": "A"
         }
       ],
@@ -640,7 +719,7 @@
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "firstNotNull"
+            "first"
           ],
           "fields": "",
           "values": false
@@ -654,7 +733,7 @@
             "type": "datasource",
             "uid": "-- Dashboard --"
           },
-          "panelId": 15,
+          "panelId": 28,
           "refId": "A"
         }
       ],
@@ -736,7 +815,7 @@
         "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "firstNotNull"
+            "first"
           ],
           "fields": "",
           "values": false
@@ -753,7 +832,7 @@
             "type": "datasource",
             "uid": "-- Dashboard --"
           },
-          "panelId": 15,
+          "panelId": 28,
           "refId": "A"
         }
       ],
@@ -824,8 +903,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -963,8 +1041,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -1076,8 +1153,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -1095,7 +1171,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 198
+                "value": 200
               }
             ]
           },
@@ -1135,9 +1211,9 @@
       "options": {
         "footer": {
           "enablePagination": true,
-          "fields": "",
+          "fields": [],
           "reducer": [
-            "sum"
+            "max"
           ],
           "show": false
         },
@@ -1208,12 +1284,159 @@
         "type": "postgres",
         "uid": "DoBGYczVz"
       },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "custom": {
+            "align": "center",
+            "displayMode": "auto",
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              },
+              {
+                "id": "custom.width",
+                "value": 200
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "(OEE|Availability|Performance|Quality)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "(Time Up|Time Down|Time Total)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 43
+      },
+      "id": 28,
+      "options": {
+        "footer": {
+          "enablePagination": false,
+          "fields": [],
+          "reducer": [
+            "max"
+          ],
+          "show": false
+        },
+        "showHeader": false,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Time"
+          }
+        ]
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "DoBGYczVz"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\ntime_frame AS \"time\",\r\noee AS \"OEE\",\r\navailability AS \"Availability\",\r\nperformance AS \"Performance\",\r\nquality AS \"Quality\",\r\nparts_good AS \"Parts Good\",\r\nparts_bad AS \"Parts Bad\",\r\nparts_total AS \"Parts Total\",\r\ntime_up AS \"Time Up\",\r\ntime_down AS \"Time Down\",\r\ntime_total AS \"Time Total\"\r\nFROM \"mtopcua_plc\".\"etoee\"\r\nWHERE \"time_frame\" > NOW() - INTERVAL '$timebin'\r\nORDER BY \"time_frame\" DESC\r\nLIMIT 1;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "DoBGYczVz"
+      },
       "description": "",
       "gridPos": {
         "h": 16,
         "w": 24,
         "x": 0,
-        "y": 43
+        "y": 44
       },
       "id": 17,
       "options": {
@@ -1235,10 +1458,103 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "1 minute",
+          "value": "1 minute"
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "DoBGYczVz"
+        },
+        "definition": "SELECT timebin FROM \"etvars\" LIMIT 1;",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "timebin",
+        "options": [],
+        "query": "SELECT timebin FROM \"etvars\" LIMIT 1;",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "(In Picking|In Welding|In QC|In Placing)",
+          "value": "(In Picking|In Welding|In QC|In Placing)"
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "DoBGYczVz"
+        },
+        "definition": "SELECT green FROM \"etvars\" LIMIT 1;",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "green",
+        "options": [],
+        "query": "SELECT green FROM \"etvars\" LIMIT 1;",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "(Idle|In Reworking|In QC from rework|In Trashing|Timeout)",
+          "value": "(Idle|In Reworking|In QC from rework|In Trashing|Timeout)"
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "DoBGYczVz"
+        },
+        "definition": "SELECT orange FROM \"etvars\" LIMIT 1;",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "orange",
+        "options": [],
+        "query": "SELECT orange FROM \"etvars\" LIMIT 1;",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "(Offline)",
+          "value": "(Offline)"
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "DoBGYczVz"
+        },
+        "definition": "SELECT red FROM \"etvars\" LIMIT 1;",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "red",
+        "options": [],
+        "query": "SELECT red FROM \"etvars\" LIMIT 1;",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {
@@ -1247,6 +1563,6 @@
   "timezone": "browser",
   "title": "RomanTIG - Overall Equipment Effectiveness",
   "uid": "BDDTWez4z",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }

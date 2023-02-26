@@ -74,11 +74,20 @@ services:
         condition: service_healthy
     networks:
       - default
+    # healthcheck:
+    #   test: |
+    #     #!/bin/bash
+    #     exec 3<>/dev/tcp/localhost/"$1"
+    #     echo -e "GET /version/ HTTP/1.1
+    #     host: localhost:$1
+    #     " >&3
+    #     timeout 1 cat <&3 | grep status | grep UP || exit 1
+
     ports:
       - ${IOTA_NORTH_PORT}:4041
       - ${IOTA_SOUTH_PORT}:9229
     volumes:
-      - ./iot-agent/config.js:/opt/iotagent-opcua/conf/config.js
+      - ./iot-agent/opcua-plc.js:/opt/iotagent-opcua/conf/config.js
     environment:
       - LOGLEVEL=${LOG_LEVEL}
       - FIWARE_SERVICE=${FIWARE_SERVICE}
@@ -93,7 +102,7 @@ services:
       - OPCUA_ID_MACHINE=${OPCUA_ID_MACHINE}
 
       - IOTA_OPCUA_ENDPOINT=opc.tcp://${OPCUA_ENDPOINT}:${OPCUA_PORT}/         # Endpoint of OPC UA Server
-  
+
       - IOTA_OPCUA_MT_ENTITY_ID=${CONTEXTS_ID}
       - IOTA_FALLBACK_TENANT=${FIWARE_SERVICE}
       - IOTA_FALLBACK_PATH=${FIWARE_SERVICEPATH}
@@ -246,6 +255,8 @@ services:
         condition: service_healthy
       orion:
         condition: service_healthy
+      iot-agent:
+        condition: service_started
     volumes:
       - ./${ROSEAP_OEE}/.config:/app/.config
       - ./.env:/app/.env

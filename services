@@ -95,7 +95,6 @@ stoppingServices () {
 }
 
 deletingVolumesNetwork () {
-    stoppingServices
     VOLUMES=$(docker volume ls -qf dangling=true)
     if [[ -n $VOLUMES ]]
     then
@@ -189,10 +188,11 @@ case "${command}" in
         stoppingServices
     ;;
     "-rm"|"--remove")
-        read -p "This operation will ERASE ALL the Docker Volumes and als the data stored in the database, continue (y/n)?" choice
+        read -p "This operation will ERASE ALL the Docker Volumes and ALL THE DATA stored in the database, continue (y/n)? " choice
         case "$choice" in
             y|Y|[yY][eE][sS] )
-                echo "Deleting..."
+                stoppingServices
+                echo "Deleting Volumens and Networks..."
                 deletingVolumesNetwork
             ;;
             n|N|[nN][oO] )

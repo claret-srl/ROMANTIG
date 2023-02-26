@@ -176,11 +176,11 @@ config.iota = {
 				{
 					name: process.env.OCB_ID_PROCESS,
 					type: 'Text'
-				},
-                {
-					name: process.env.OCB_ID_MACHINE,
-					type: 'Boolean'
 				}
+                // {
+				// 	name: process.env.OCB_ID_MACHINE,
+				// 	type: 'Boolean'
+				// }
 			],
 			lazy: [],
 			commands: []
@@ -195,12 +195,12 @@ config.iota = {
 					ocb_id: process.env.OCB_ID_PROCESS,
 					opcua_id: process.env.OPCUA_ID_PROCESS,
 					inputArguments: []
-				},
-                {
-					ocb_id: process.env.OCB_ID_MACHINE,
-					opcua_id: process.env.OPCUA_ID_MACHINE,
-					inputArguments: []
 				}
+                // {
+				// 	ocb_id: process.env.OCB_ID_MACHINE,
+				// 	opcua_id: process.env.OPCUA_ID_MACHINE,
+				// 	inputArguments: []
+				// }
 			]
 		}
 	],

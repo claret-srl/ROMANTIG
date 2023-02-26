@@ -1,8 +1,4 @@
-import configparser
-import json
-import os
-import pycurl
-
+import json, os, configparser, pycurl, time
 
 from dotenv import load_dotenv
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -92,17 +88,16 @@ if len(argv) > 1:
 # <-- Configuration
 
 
-def envArrayToString(_Array):
+def envArrayToString(array, spacing, backTick=""):
     output = str()
-    spacing = ", "
     spacingLen = len(spacing)
 
-    _Array = _Array.split(",")
+    array = array.split(",")
 
-    for element in _Array:
+    for element in array:
         element = element.strip()
         if len(element) != 0:
-            output += f"'{element}'{spacing}"
+            output += f"{backTick}{element}{backTick}{spacing}"
 
     if output[-spacingLen:] == spacing:
         output = output[:-spacingLen]
@@ -133,15 +128,21 @@ def convert_to_seconds(s):
 config = configparser.ConfigParser()
 config.read(script_dir + "//" + ".config")
 
-TIMES_UP = envArrayToString(config["MACHINE_STATES"]["TIMES_UP"])
-TIMES_DOWN = envArrayToString(config["MACHINE_STATES"]["TIMES_DOWN"])
-ENDS_GOOD = envArrayToString(config["MACHINE_STATES"]["ENDS_GOOD"])
-ENDS_BAD = envArrayToString(config["MACHINE_STATES"]["ENDS_BAD"])
-START_DATE_TIME = (
-    config["TIMING"]["START_DATE"] + "T" + config["TIMING"]["START_TIME"] + "Z"
-)
+TIMES_UP = envArrayToString(config["MACHINE_STATES"]["TIMES_UP"], ", ", "'")
+TIMES_DOWN = envArrayToString(config["MACHINE_STATES"]["TIMES_DOWN"], ", ", "'")
+
+TIMES_PRODUCTION_NOT_PLANNED = envArrayToString(config["MACHINE_STATES"]["TIMES_PRODUCTION_NOT_PLANNED"], ", ", "'")
+
+TIMES_UP_GRAFANA = envArrayToString(config["MACHINE_STATES"]["TIMES_UP"], "|")
+TIMES_DOWN_GRAFANA = envArrayToString(config["MACHINE_STATES"]["TIMES_DOWN"], "|")
+TIMES_PRODUCTION_NOT_PLANNED_GRAFANA = envArrayToString(config["MACHINE_STATES"]["TIMES_PRODUCTION_NOT_PLANNED"], "|")
+
+ENDS_GOOD = envArrayToString(config["MACHINE_STATES"]["ENDS_GOOD"], ", ", "'")
+ENDS_BAD = envArrayToString(config["MACHINE_STATES"]["ENDS_BAD"], ", ", "'")
+START_DATE_TIME = (config["TIMING"]["START_DATE"] + "T" + config["TIMING"]["START_TIME"] + "Z")
 TIME_IDEAL = str(convert_to_seconds(config["TIMING"]["TIME_IDEAL"]))
 TIME_STEP = str(config["TIMING"]["TIME_STEP"])
+
 
 print(f"[INFO] Timestep is {TIME_STEP}.")
 
@@ -196,7 +197,8 @@ def httpWebServer(_BIND_HOST="0.0.0.0", _PORT=8008):
 # nickjj Web server > https://github.com/nickjj/webserver -->
 # <-- Curl Calls
 
-def cUrlCall(method, service, port, NGSI, endpoint, path, headers:list, payload=False):
+
+def cUrlCall(method, service, port, NGSI, endpoint, path, headers: list, payload=False):
 
     try:
         cursor = pycurl.Curl()
@@ -211,21 +213,23 @@ def cUrlCall(method, service, port, NGSI, endpoint, path, headers:list, payload=
 
         cursor.reset()
 
-        print(f"curl -X {method} \\")
+        # print(f"curl -X {method} \\")
         cursor.setopt(cursor.CUSTOMREQUEST, method)
 
-        print(f"{url} \\")
+        # print(f"'{url}' \\")
         cursor.setopt(cursor.URL, url)
 
         if headers:
-            for header in headers:
-                print(f"-H '{header}' \\")
+            # for header in headers:
+                # print(f"-H '{header}' \\")
             cursor.setopt(cursor.HTTPHEADER, headers)
 
         if payload is not False:
             payload = json.dumps(payload)
-            print(f"-d '{payload}'", "\n")
+            # print(f"-d '{payload}'", "\n")
             cursor.setopt(cursor.POSTFIELDS, payload)
+        
+        # print()
 
         cursor.setopt(cursor.WRITEFUNCTION, data.write)
 
@@ -240,43 +244,32 @@ def cUrlCall(method, service, port, NGSI, endpoint, path, headers:list, payload=
     except Exception as e:
         print(f"[ERROR][cUrl] Error in cUrl function:\n{str(e)}")
 
+
 # Curl Calls -->
 # <-- Update Contex Broker
 
+callBack = f"SELECT oee, availability, performance, quality FROM {CRATE_SCHEMA.lower()}.{CRATE_TABLE_OEE.lower()} ORDER BY time_frame DESC LIMIT 1;"
 
 def updateCB():
 
-    # callBackResults = cUrlCall(CrateDB, {"stmt": callBack})
     callBackResults = cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": callBack})
-    
-    machineStatus = cUrlCall("GET", ORION, ORION_PORT, "v2", f"entities/{DEVICE_ID}", "attrs/machineStatus/value", [Service, ServicePath])
-    # machineStatus = cUrlCall(getEntityDetail)
-    
-    print(machineStatus)
-    print(machineStatus is False)
-    print(machineStatus == False)
-    
-    # print(callBackResults)
-    # print(type(callBackResults))
-    
-    # callBackResults = json.loads(callBackResults)
+    # machineStatus = cUrlCall("GET", ORION, ORION_PORT, "v2", f"entities/{DEVICE_ID}", "attrs/machineStatus/value", [Service, ServicePath])
 
     values = {}
 
     for col in callBackResults["cols"]:
         values[col] = {
             "type": "Float",
-            "value": callBackResults["rows"][0][callBackResults["cols"].index(col)]
+            "value": callBackResults["rows"][0][callBackResults["cols"].index(col)],
         }
 
-    if machineStatus is False:
-        for col in callBackResults["cols"]:
-            values[col]["value"] = None
+    # if machineStatus is False:
+    #     for col in callBackResults["cols"]:
+    #         values[col]["value"] = None
 
     # del values[OCB_ID_MACHINE]
 
     cUrlCall("POST", ORION, ORION_PORT, "v2", "entities", f"{DEVICE_ID}/attrs", [Service, ServicePath, contentType["json"]], values)
-    # cUrlCall(updateAttributes, values)
 
 
 # Update Contex Broker -->
@@ -288,19 +281,62 @@ ServicePath = f"fiware-servicepath: {FIWARE_SERVICEPATH}"
 contentType = {"json": "Content-Type: application/json"}
 
 # Main Variables -->
+# <-- Script
+# <-- Provisioning Subscriptions
+print(f"[INFO][Orion] Provisioning subscriptions.")
+
+# ### Get Existings Subscriptions
+activeSubscriptions = cUrlCall("GET", ORION, ORION_PORT, "v2", "subscriptions", None, [Service, ServicePath])
+
+# ### For each subscription in Orion json respond, grab the description
+for subscription in activeSubscriptions:
+    cUrlCall("DELETE", ORION, ORION_PORT, "v2", "subscriptions", subscription["id"], [Service, ServicePath]) 
 
 
-processDuration = f"""CREATE OR REPLACE VIEW {CRATE_SCHEMA.lower()}.{CRATE_TABLE_DURATION.lower()} AS
-	SELECT
-        (CASE WHEN {OCB_ID_MACHINE.lower()} = False THEN 'Offline' ELSE {OCB_ID_PROCESS.lower()} END) AS {OCB_ID_PROCESS.lower()},
-		time_index,
-		lag(time_index, 1, now()) OVER (ORDER BY time_index DESC) - time_index AS duration
-	FROM
-		{CRATE_SCHEMA.lower()}.{CRATE_TABLE_DEVICE.lower()}
-	WHERE
- 		entity_id='{DEVICE_ID}'
-	ORDER BY
-		time_index DESC;"""
+def provisionSubscription(notify_host, notify_port, notify_attrs):
+
+    subscriptionDescription = (
+        f"{DEVICE_TYPE}:{DEVICE_ID}:{OCB_ID_PROCESS}:{notify_host}"
+    )
+
+    payload = {
+        "description": subscriptionDescription,
+        "subject": {
+            "entities": [{"id": DEVICE_ID, "type": DEVICE_TYPE}],
+            "condition": {
+                "attrs": [notify_attrs],
+                # "attrs": [OCB_ID_PROCESS, OCB_ID_MACHINE],
+                "alterationTypes": ["entityChange"],
+            },
+        },
+        "notification": {
+            "attrs": [notify_attrs],
+            # "attrs": [OCB_ID_PROCESS, OCB_ID_MACHINE],
+            "http": {"url": f"http://{notify_host}:{notify_port}/v2/notify"},
+        },
+    }
+
+    print(f"[INFO][Orion] Subscription {subscriptionDescription} will be provisioned")
+    cUrlCall("POST", ORION, ORION_PORT, "v2", "subscriptions", None, [Service, ServicePath, contentType["json"]], payload)
+
+
+subscriptions = [
+    # {"host": QUANTUMLEAP, "port": QUANTUMLEAP_PORT, "attrs": OCB_ID_MACHINE},
+    # {"host": ROSEAP_OEE, "port": ROSEAP_OEE_PORT, "attrs": OCB_ID_MACHINE},
+    {"host": QUANTUMLEAP, "port": QUANTUMLEAP_PORT, "attrs": OCB_ID_PROCESS},
+    {"host": ROSEAP_OEE, "port": ROSEAP_OEE_PORT, "attrs": OCB_ID_PROCESS}
+]
+
+# ### If the grabbed description match the
+for sub in subscriptions:
+    provisionSubscription(sub["host"], sub["port"], sub["attrs"])
+
+## Set CrateDB Stmt
+varTableDrop = f"DROP TABLE IF EXISTS {CRATE_SCHEMA.lower()}.etvars;"
+varTableCreate = f"CREATE TABLE {CRATE_SCHEMA.lower()}.etvars (timeBin text, green text, orange text, red text);"
+varTableValue = f"INSERT INTO {CRATE_SCHEMA.lower()}.etvars (timeBin, green, orange, red) VALUES ('{TIME_STEP}', '({TIMES_UP_GRAFANA})', '({TIMES_DOWN_GRAFANA})', '({TIMES_PRODUCTION_NOT_PLANNED_GRAFANA})') ON CONFLICT DO NOTHING;"
+
+processDuration = f"""CREATE OR REPLACE VIEW {CRATE_SCHEMA.lower()}.{CRATE_TABLE_DURATION.lower()} AS SELECT {OCB_ID_PROCESS.lower()}, time_index, lag(time_index, 1, now()) OVER (ORDER BY time_index DESC) - time_index AS duration FROM {CRATE_SCHEMA.lower()}.{CRATE_TABLE_DEVICE.lower()} WHERE entity_id='{DEVICE_ID}' ORDER BY time_index DESC;"""
 
 oee = f"""CREATE OR REPLACE VIEW {CRATE_SCHEMA.lower()}.{CRATE_TABLE_OEE.lower()} AS WITH
 	subquery_01 AS (
@@ -338,89 +374,38 @@ oee = f"""CREATE OR REPLACE VIEW {CRATE_SCHEMA.lower()}.{CRATE_TABLE_OEE.lower()
 	FROM
 		subquery_03;"""
 
-callBack = f"SELECT oee, availability, performance, quality FROM {CRATE_SCHEMA.lower()}.{CRATE_TABLE_OEE.lower()} ORDER BY time_frame DESC LIMIT 1;"
+# print(oee)
 
-# <-- Script
-# <-- Provisioning Subscriptions
-print(f"[INFO][Orion] Provisioning subscriptions.")
-
-# ### Get Existings Subscriptions
-activeSubscriptions = cUrlCall("GET", ORION, ORION_PORT, "v2", "subscriptions", None, [Service, ServicePath])
-# activeSubscriptions = cUrlCall(getSubscriptions)
-
-print("HEREEEEEEEEEEEEEEEEEEEEEEEEEEE")
-print(activeSubscriptions)
-print("HEREEEEEEEEEEEEEEEEEEEEEEEEEEE")
-
-activeSubscriptionsDescription = []
-activeSubscriptionsID = []
-activeSubscriptionsArr = []
-
-# ### For each subscription in Orion json respond, grab the description
-for subscription in activeSubscriptions:
-    cUrlCall("DELETE", ORION, ORION_PORT, "v2", "subscriptions", subscription["id"], [Service, ServicePath])
+# qualcosa = """CREATE OR REPLACE VIEW "qualcosa" AS SELECT 10 AS time_index, 20 AS processstatus;"""
+# cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": qualcosa})
+# time.sleep(15)
+# qualcosa = """CREATE OR REPLACE VIEW "qualcosa" AS SELECT time_index AS time, entity_id, entity_type, processstatus FROM "mtopcua_plc"."etplc" LIMIT 100;"""
+# cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": qualcosa})
 
 
-def provisionSubscription(NOTIFY_HOST, NOTIFY_PORT):
+Health = f"""SELECT processstatus FROM "{CRATE_SCHEMA.lower()}"."{CRATE_TABLE_DEVICE.lower()}" LIMIT 1;"""
 
-    subscriptionDescription = f"{DEVICE_TYPE}:{DEVICE_ID}:{OCB_ID_PROCESS}:{NOTIFY_HOST}"
+test = True
 
-    # print(f"[INFO][Orion] Subscription {subscriptionDescription}", end=" ")
+HealthResults = {}
+HealthResults['rowcount'] = 0
 
-    # payload = {
-    #     "description": subscriptionDescription,
-    #     "subject": {
-    #         "entities": [{"id": DEVICE_ID, "type": DEVICE_TYPE}],
-    #         "condition": {
-    #             "attrs": [OCB_ID_PROCESS, OCB_ID_MACHINE],
-    #             "alterationTypes": [ "entityChange" ]
-    #         }
-    #     },
-    #     "notification": {
-    #         "attrs": [OCB_ID_PROCESS, OCB_ID_MACHINE],
-    #         "http": {"url": f"http://{NOTIFY_HOST}:{NOTIFY_PORT}/v2/notify"},
-    #     }
-    # }
+while test:
+    HealthResults = cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": Health})
+    print(HealthResults)
+    # {'error': {'message': "SchemaUnknownException[Schema 'mtopcua_plc' unknown]", 'code': 4045}}
     
-    payload = {
-        "description": subscriptionDescription,
-        "subject": {
-            "entities": [{"id": DEVICE_ID, "type": DEVICE_TYPE}],
-            "condition": {
-                "attrs": [OCB_ID_PROCESS],
-                "alterationTypes": [ "entityChange" ]
-            }
-        },
-        "notification": {
-            "attrs": [OCB_ID_PROCESS],
-            "http": {"url": f"http://{NOTIFY_HOST}:{NOTIFY_PORT}/v2/notify"},
-        }
-    }
-
-    # if subscriptionDescription not in activeSubscriptionsDescription:
-    #     print("will be provisioned:")
-    #     cUrlCall("POST", ORION, ORION_PORT, "v2", "subscriptions", None, [Service, ServicePath, contentType["json"]], payload)
-    #     cUrlCall(templateSubscription, payload)
-    # else:
-    #     print("was already provisioned.")
-
-    print(f"[INFO][Orion] Subscription {subscriptionDescription} will be provisioned")
-    cUrlCall("POST", ORION, ORION_PORT, "v2", "subscriptions", None, [Service, ServicePath, contentType["json"]], payload)
-
-Subscriptions = [
-    {"host": QUANTUMLEAP, "port": QUANTUMLEAP_PORT},
-    {"host": ROSEAP_OEE, "port": ROSEAP_OEE_PORT},
-]
-
-# ### If the grabbed description match the
-for Subscription in Subscriptions:
-    provisionSubscription(Subscription["host"], Subscription["port"])
-
-## Set CrateDB Views
-cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": processDuration})
-# cUrlCall(CrateDB, {"stmt": processDuration})
-
-cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": oee})
-# cUrlCall(CrateDB, {"stmt": oee})
-
+    if 'error' in HealthResults:
+        print("not ok")
+        time.sleep(1)
+    else:   
+        print("ok")
+        test = False
+        print(HealthResults['rowcount'])
+        cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": processDuration})
+        cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": oee})
+        cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": varTableDrop})
+        cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": varTableCreate})
+        cUrlCall("POST", CRATE, CRATE_PORT_ADMIN, None, "_sql", None, [contentType["json"]], {"stmt": varTableValue})
+    
 httpWebServer(BIND_HOST, PORT)
