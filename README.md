@@ -167,18 +167,18 @@ The process cycle and the respective up and down time states are shown below:
 
 ```mermaid
 flowchart LR
-    Picking --> Welding --> QC
-    QC -- &nbspGood Part&nbsp--> Placing
-    QC <--> Rework
-    QC -- &nbspBad Part&nbsp--> Trashing
-    Placing & Trashing --> Idle --> Picking
+    Picking(Picking) --> Welding(Welding) --> QC(QC)
+    QC -- &nbspGood Part&nbsp--> Placing(Placing)
+    QC <--> Rework(Rework)
+    QC -- &nbspBad Part&nbsp--> Trashing(Trashing)
+    Placing & Trashing --> Idle(Idle) --> production{Production\nis planned?} --> Picking
 
 classDef Gainsboro fill:Gainsboro,stroke:#333,color:#333
 
-class Picking,Placing,QC,Welding,upTime,Idle,Trashing,Rework,QC_Rework Gainsboro
+class Picking,Placing,QC,Welding,upTime,Idle,Trashing,Rework,QC_Rework,production Gainsboro
 
 linkStyle 0,1,2 stroke:lightgreen,border-color:lightgreen;
-linkStyle 3,4,5,6,7 stroke:LightCoral;
+linkStyle 3,4,5,6,7,8 stroke:LightCoral;
 ```
 
 In general, we suggest you to adopt a state space representation similar to the one above for your target process, in order to clearly highlight every step in the cycle and attribute it the correct value for up or down time. The state representation (the ontology of the system) should not be too detailed (i.e. too many states) or too general (i.e. one or two states) because of unnecessary additional workload or possible loss of information.
