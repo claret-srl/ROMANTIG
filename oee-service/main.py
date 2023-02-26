@@ -22,13 +22,12 @@ LOG_LEVEL = os.getenv("LOG_LEVEL")  # debug
 COMPOSE_PROJECT_NAME = os.getenv("COMPOSE_PROJECT_NAME")  # fiware
 ORG_FIWARE = os.getenv("ORG_FIWARE")  # claret-romantig
 
-CONTEXTS_ID = os.getenv("CONTEXTS_ID")  # age01_PLC
+IOTA_OPCUA_MT_ENTITY_ID = os.getenv("IOTA_OPCUA_MT_ENTITY_ID")  # age01_PLC
 
-DEVICE_BASE_ID = os.getenv("DEVICE_BASE_ID")  # urn:ngsiv2:I40Asset
 DEVICE_ID = os.getenv("DEVICE_ID")  # urn:ngsiv2:I40Asset:PLC:001
 DEVICE_TYPE = os.getenv("DEVICE_TYPE")  # PLC
 OCB_ID_PROCESS = os.getenv("OCB_ID_PROCESS")  # processStatus
-OCB_ID_MACHINE = os.getenv("OCB_ID_MACHINE")  # machineStatus
+# OCB_ID_MACHINE = os.getenv("OCB_ID_MACHINE")  # machineStatus
 
 FIWARE_SERVICE = os.getenv("FIWARE_SERVICE")  # opcua_plc
 FIWARE_SERVICEPATH = os.getenv("FIWARE_SERVICEPATH")  # /demo

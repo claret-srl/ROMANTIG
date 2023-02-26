@@ -37,15 +37,15 @@ Measuring [OEE](https://www.oee.com/) is important in industrial applications as
 
 > **Warning**
 > 
-> The value of the `OCB_ID` variable inside the [.env](.env) file  must match with the name of variable supllied.
+> The value of the `OCB_ID_PROCESS` variable inside the [.env](.env) file  must match with the name of variable supllied.
 > 
 > You can indifferently replace the value of the environment variable to match that of your variable, or call your variable as it is defined in the .env file.
 
 #### OPC UA
 If you would use the [OPC UA](https://opcfoundation.org/) interface, in order to connect the IoT-Agent to an [OPC UA](https://opcfoundation.org/) device, you just need to edit the relative section (OPC UA Device Variables) in the beginning of the [.env](.env) file:
 - `OPCUA_ENDPOINT` Endpoint of the [OPC UA](https://opcfoundation.org/) Device to be reached by the IoT Agent (i.e. the PLC adress)
-- `OCB_ID` The name of the Variable which has values about the machine state
-- `IOTA_OPCUA_ID` The [OPC UA](https://opcfoundation.org/) ID of the Variable which hold the machine state values
+- `OCB_ID_PROCESS` The name of the Variable which has values about the machine state
+- `OPCUA_ID_PROCESS` The [OPC UA](https://opcfoundation.org/) ID of the Variable which hold the machine state values
 
 You can check this value with any [OPC UA](https://opcfoundation.org/) Client
 
@@ -59,7 +59,7 @@ In order to compute the [OEE](https://www.oee.com/), the ROSE-AP service must kn
  - The ideal duration of a production cycle.
  - A time step and a starting date and time to group the data.
 
-To do so, please change the `.config` file found in the `oee_service` folder, prior to run the service, setting the following variables:
+To do so, please change the [`.config`](oee_service/.config) file in the `oee_service` folder, prior to run the service, setting the following variables:
 
 > **Warning**
 > 
@@ -112,6 +112,25 @@ The date and time to be considered as the origin of data grouping:
 
 	START_DATE=2023-01-01       [syntax: <YYYY-MM-DD>]
 	START_TIME=08:00:00         [syntax: <hh-mm-ss>]
+
+#### IoT-Agent settings
+For the sake of the simplicity, where possible all the code is driver by enviromental variable.
+To setup the IoT Agent, accordigly to your needs please edit the `OPC-UA Device Variables` section of the [`.env`](.env) file.
+To Edit the endpoint to be reaced by the IoT-Agent, please edit `OPCUA_PORT` and `OPCUA_ENDPOINT`.
+To Edit the variable to be reaced by the IoT-Agent, please edit `OCB_ID_PROCESS` and `OPCUA_ID_PROCESS`.
+
+#### Context
+For the sake of the simplicity, where possible all the code is driver by enviromental variable.
+To setup the Context, accordigly to your needs please edit the `Contexts` section of the [`.env`](.env) file.
+
+> **Warning**
+> 
+> if the DEVICE_TYPE needs to be modified please update with the same values the `types` object inside iot-agent/opcua.js (line 174) any discepancy in this two values will break the code.
+
+To Edit the device type, od the device ID, please edit `DEVICE_TYPE` and `DEVICE_ID` variables.
+To Edit the Fiware service path, please edit `FIWARE_SERVICE` and `FIWARE_SERVICEPATH`.
+To Edit the IoT-Agent entity ID, please edit the `IOTA_OPCUA_MT_ENTITY_ID`.
+
 
 ## Usage
 - Follow the [installation instruction](#install)

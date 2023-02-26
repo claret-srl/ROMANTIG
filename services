@@ -30,8 +30,7 @@ setEnviroment () {
 #   -e FIWARE_SERVICEPATH="${FIWARE_SERVICEPATH}" \
 #   -e DEVICE_ID="${DEVICE_ID}" \
 #   -e DEVICE_TYPE="${DEVICE_TYPE}" \
-#   -e DEVICE_BASE_ID="${DEVICE_BASE_ID}" \
-#   -e OCB_ID="${OCB_ID}" \
+#   -e OCB_ID_PROCESS="${OCB_ID_PROCESS}" \
 #   --entrypoint /bin/ash curlimages/curl provision-devices.sh
 # }
 

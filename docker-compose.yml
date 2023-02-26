@@ -63,8 +63,8 @@ services:
       interval: 5s
 
 
-  # IoT-Agent
-  iot-agent:
+  # IoT-Agent for OPC-UA protocol
+  iot-agent-opcua:
     labels:
       org.fiware: ${ORG_FIWARE}
     image: iotagent4fiware/iotagent-opcua:${OPC_UA_VERSION}
@@ -74,20 +74,13 @@ services:
         condition: service_healthy
     networks:
       - default
-    # healthcheck:
-    #   test: |
-    #     #!/bin/bash
-    #     exec 3<>/dev/tcp/localhost/"$1"
-    #     echo -e "GET /version/ HTTP/1.1
-    #     host: localhost:$1
-    #     " >&3
-    #     timeout 1 cat <&3 | grep status | grep UP || exit 1
+
 
     ports:
       - ${IOTA_NORTH_PORT}:4041
       - ${IOTA_SOUTH_PORT}:9229
     volumes:
-      - ./iot-agent/opcua-plc.js:/opt/iotagent-opcua/conf/config.js
+      - ./iot-agent/opcua.js:/opt/iotagent-opcua/conf/config.js
     environment:
       - LOGLEVEL=${LOG_LEVEL}
       - FIWARE_SERVICE=${FIWARE_SERVICE}
@@ -96,14 +89,12 @@ services:
       - DEVICE_TYPE=${DEVICE_TYPE}
 
       - OCB_ID_PROCESS=${OCB_ID_PROCESS}
-      - OCB_ID_MACHINE=${OCB_ID_MACHINE}
 
       - OPCUA_ID_PROCESS=${OPCUA_ID_PROCESS}
-      - OPCUA_ID_MACHINE=${OPCUA_ID_MACHINE}
 
       - IOTA_OPCUA_ENDPOINT=opc.tcp://${OPCUA_ENDPOINT}:${OPCUA_PORT}/         # Endpoint of OPC UA Server
-
-      - IOTA_OPCUA_MT_ENTITY_ID=${CONTEXTS_ID}
+  
+      - IOTA_OPCUA_MT_ENTITY_ID=${IOTA_OPCUA_MT_ENTITY_ID}
       - IOTA_FALLBACK_TENANT=${FIWARE_SERVICE}
       - IOTA_FALLBACK_PATH=${FIWARE_SERVICEPATH}
       - IOTA_OPCUA_SECURITY_MODE=None						              # Security mode for OPC UA connection
@@ -143,24 +134,24 @@ services:
       interval: 5s
   
   
-  # Mongo GUI, to chek if Mongo it's working just for dev purpose
-  mongo-express:
-    image: mongo-express:1.0.0-alpha
-    labels:
-      org.fiware: ${ORG_FIWARE}
-    container_name: mongo-express
-    environment:
-      # ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      # ME_CONFIG_MONGODB_ADMINPASSWORD: admin
-      ME_CONFIG_MONGODB_SERVER: "${MONGO}"
-      ME_CONFIG_MONGODB_PORT: "${MONGO_PORT}"
-    ports:
-      - "8081:8081"
-    networks:
-      - default
-    depends_on:
-      db-mongo:
-        condition: service_healthy
+  # # Mongo GUI, to chek if Mongo it's working just for dev purpose
+  # mongo-express:
+  #   image: mongo-express:1.0.0-alpha
+  #   labels:
+  #     org.fiware: ${ORG_FIWARE}
+  #   container_name: mongo-express
+  #   environment:
+  #     # ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+  #     # ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+  #     ME_CONFIG_MONGODB_SERVER: "${MONGO}"
+  #     ME_CONFIG_MONGODB_PORT: "${MONGO_PORT}"
+  #   ports:
+  #     - "8081:8081"
+  #   networks:
+  #     - default
+  #   depends_on:
+  #     db-mongo:
+  #       condition: service_healthy
 
 
   db-crate:
@@ -221,11 +212,6 @@ services:
       org.fiware: ${ORG_FIWARE}
     image: grafana/grafana:${GRAFANA_VERSION}
     container_name: ${GRAFANA}
-    # depends_on:
-    #   db-crate:
-    #     condition: service_healthy
-    #   oee-service: 
-    #     condition: service_healthy
     ports:
       - "${GRAFANA_PORT}:3000"
     environment:
@@ -255,7 +241,7 @@ services:
         condition: service_healthy
       orion:
         condition: service_healthy
-      iot-agent:
+      iot-agent-opcua:
         condition: service_started
     volumes:
       - ./${ROSEAP_OEE}/.config:/app/.config
@@ -264,8 +250,8 @@ services:
       - ${ROSEAP_OEE_PORT}:8008
     networks:
       - default
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
+    stdin_open: true
+    tty: true
     # healthcheck:
     #   test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/version" == 200 || exit 1
     #   interval: 5s
@@ -274,16 +260,16 @@ services:
   opc-ua-demo-server:
     labels:
       org.fiware: ${ORG_FIWARE}
-    image: ${DEMO_SERVER}
-    container_name: ${DEMO_SERVER}
+    image: ${OPCUA_ENDPOINT}
+    container_name: ${OPCUA_ENDPOINT}
     volumes:
       - ./.env:/app/.env
     ports:
-      - ${DEMO_SERVER_PORT}:${DEMO_SERVER_PORT}
+      - ${OPCUA_PORT}:${OPCUA_PORT}
     networks:
       - default
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
+    stdin_open: true
+    tty: true
     profiles:
         - demo
 
