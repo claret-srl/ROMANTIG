@@ -4,21 +4,15 @@
 - [ ] Restore docker scan in ./services
 - [ ] Step-by-Step video tutorial
 	- Could be only screen capture.
-- [ ] Github docs
-    - Specificare la necessità di modificare il type nel config.js
 
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
-<!-- 
-[![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
-[![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Time-Series-Data.svg)](https://opensource.org/licenses/MIT)
-[<img src="https://ramp.eu/assets/logo/ramp_logo_white.png" alt="RAMP" width="auto" height="20">](https://github.com/ramp-eu)
- -->
 [<img src="https://ramp-eu.github.io/RAMP/img/ramp.png" alt="RAMP" width="auto" height="30">](https://github.com/ramp-eu)
 
 
 # ROMANTIG ROSE-AP [OEE](https://www.oee.com/) Calculator
-This ROSE-AP is intended as a microservice for automatic [OEE](https://www.oee.com/), and related metrics, calculation. The service works by connecting to a [CrateDB](https://crate.io/) database, where information about the context of your target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) through [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) services.
+
+This ROSE-AP is intended as a microservice for automatic [OEE](https://www.oee.com/), and related metrics, calculation. The service works creating the appropiete vtable views in a [CrateDB](https://crate.io/) database, where information about the context of the target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) through a [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) subscription.
 
 ## Table of Contents
 
