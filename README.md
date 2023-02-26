@@ -2,9 +2,6 @@
 
 # Dev
 - [ ] Restore docker scan in ./services
-- [ ] Undesired behavior:
- - Since the stats keep updating at each variable state changes, if the machine goes to idle the stat do not updates anymore, solutions:
-    - [x] Check the shif production from plc
 - [ ] Step-by-Step video tutorial
 	- Could be only screen capture.
 - [ ] Github docs
@@ -77,12 +74,12 @@ To do so, please change the `.config` file found in the `oee_service` folder, pr
 #### Good ends
 The machine states to be considered as a successful conclusion of the production cycle (i.e. an item is successfully created):
 
-	ENDS_GOOD=In Placing                                [syntax: State 01,State 02, ... ,State nn]
+	ENDS_GOOD=In Placing        [syntax: State 01,State 02, ... ,State nn]
 
 #### Bad ends
 The machine states to be considered as a bad conclusion of the production cycle (i.e. an item is defective or faulty and has to be discarded):
 
-	ENDS_BAD=In Trashing                                [syntax: State 01,State 02, ... ,State nn]
+	ENDS_BAD=In Trashing        [syntax: State 01,State 02, ... ,State nn]
 
 #### Up time
 The machine states to be considered as productive times:
@@ -96,12 +93,12 @@ The machine states to be considered as downtime:
 > 
 > To avoid unexpected behavior (i.e., not updating statistics if the machine stops for any reason), a `Timeout` variable should be provided that fires cyclically when each new timeout is reached.
 
-	TIMES_DOWN=Idle,In Reworking,In QC from rework,In Trashing,Timeout	[syntax: State 01,State 02,...,State nn]
+	TIMES_DOWN=Idle,In Reworking,In QC from rework,In Trashing,Timeout      [syntax: State 01,State 02,...,State nn]
 
 #### Not planned roduction time
 The machine states in which production has not been planned, in these states, availability does not decrease, unlike in TIMES_DOWN states.
 
-    TIMES_PRODUCTION_NOT_PLANNED=Offline                [syntax: State 01,State 02,...,State nn]
+    TIMES_PRODUCTION_NOT_PLANNED=Offline        [syntax: State 01,State 02,...,State nn]
 
 #### Time step
 The timestep to group [OEE](https://www.oee.com/) stats:
@@ -109,18 +106,18 @@ The timestep to group [OEE](https://www.oee.com/) stats:
 > 
 > Since OEE values are calculated from the data stored in the database, it is possible to increase or decrease the timestep value by updating the data grouping over the entire stored range without losing any information.
 
-	TIME_STEP=5 minute	                                [syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
+	TIME_STEP=5 minute      [syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
 
 #### Ideal time
 The duration of the process in ideal condition, this represents a theoretical lower bound.
 
-	TIME_IDEAL=20 second	                            [syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
+	TIME_IDEAL=20 second        [syntax: <quantity> <[second|minute|hour|day|week|month|year]>]
 
 #### Initial date and time
 The date and time to be considered as the origin of data grouping:
 
-	START_DATE=2023-01-01	                            [syntax: <YYYY-MM-DD>]
-	START_TIME=08:00:00                                 [syntax: <hh-mm-ss>]
+	START_DATE=2023-01-01       [syntax: <YYYY-MM-DD>]
+	START_TIME=08:00:00         [syntax: <hh-mm-ss>]
 
 ## Usage
 - Follow the [installation instruction](#install)
