@@ -1,10 +1,5 @@
 [<img src="img/logo.png" alt="RAMP" width="250" height="auto">](https://github.com/ramp-eu)
 
-# Dev
-- [ ] Restore docker scan in ./services
-- [ ] Step-by-Step video tutorial
-	- Could be only screen capture.
-
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
 [<img src="https://ramp-eu.github.io/RAMP/img/ramp.png" alt="RAMP" width="auto" height="30">](https://github.com/ramp-eu)

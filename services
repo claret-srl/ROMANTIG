@@ -158,7 +158,7 @@ case "${command}" in
         cd $ARG
         docker image rm -f $ARG
         docker build -t $ARG .
-        # docker scan $ARG
+        docker scan $ARG
         cd ..
         echo -e "\t \033[1;32m Done \033[0m\n"
     ;;
