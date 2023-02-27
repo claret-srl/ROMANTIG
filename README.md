@@ -126,51 +126,76 @@ To Edit the device type, od the device ID, please edit `DEVICE_TYPE` and `DEVICE
 To Edit the Fiware service path, please edit `FIWARE_SERVICE` and `FIWARE_SERVICEPATH`.
 To Edit the IoT-Agent entity ID, please edit the `IOTA_OPCUA_MT_ENTITY_ID`.
 
-
 ## Usage
 - Follow the [installation instruction](#install)
 - Star the Docker daemon.
 - Make the `./services` script executable
-`sudo chmod +x ./services`
+
+```sh
+sudo chmod +x ./services
+```
 
 - Build the Docker image for the OEE microservice (Remove the old image if any, build the new image and performs a vulnerability scan):
-`./services --build`
+
+```sh
+./services --build
+```
 
 - To apply required settings to the host, and start up all the services in the containers run:
-`sudo ./services up`
+
+```sh
+sudo ./services up
+```
 
 ### Demo
 For demo purspose only, add `demo` after the flag `--build` and `up` in order to build and startup also the demo OPC-UA server.
 
 - To build the Docker image for the OPC-UA Server demo (Remove the old image if any, build the new image and performs a vulnerability scan):
 
-`./services --build demo`
+```sh
+./services --build demo
+```
 
 - To apply the required settings to the host and start all services in the containers, including the OPC/UA demo server, run:
 
-`sudo ./services up demo`
+```sh
+sudo ./services up demo
+```
 
 - Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`dashboard.json`](.\grafana\dashboards\dashboard.json) file in `.\grafana\dashboards\` directory to persist the changes after rebooting the container or the Grafana service.
 
 - To stop all the services in the containers execute:
 
-`./services down`
+```sh
+./services down
+```
+
 - To only pull all images from Docker Hub without start the services in the Docker Container:
 
-`./services --pull`
+```sh
+./services --pull
+```
+
 - To stop, build and start the services in the Docker Container:
 
-`sudo ./services --debug`
+```sh
+sudo ./services --debug
+```
+
 - To see the help function of the service script:
 
-`./services --help`
+```sh
+./services --help
+```
 
 > **Warning**
 > 
 > Teh following operation will **erase** all the Docker Volumes and **all the data stored in the databases!**
 - To delete the Volumes and the Networks
 
-`./services --remove`
+```sh
+./services --remove
+```
 
 ## Example
 ![Dashboard](./img/dashboard.png)
@@ -259,14 +284,15 @@ As it can be seen in the chart, the PLC responsible for controlling our process 
 
 The provisioned device holding the Process Status information, it get a call back of the OEE values, because of that enquiring the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) about the entity, with the GET request to `v2/entities/<device-id>` endpoint:
 
-```
+```sh
 curl -X GET \
 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001' \
 -H 'fiware-service: opcua_plc' \
 -H 'fiware-servicepath: /demo'
 ```
 Will result in the following output:
-```
+
+```json
 {
   "id": "urn:ngsiv2:I40Asset:PLC:001",
   "type": "PLC",
@@ -299,14 +325,17 @@ Will result in the following output:
 ```
 
 Atrributes can be filtered, with the GET request to `v2/entities/<device-id>/attrs/<atrribute>` endpoint:
-```
+
+```sh
 curl -X GET \
 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/oee' \
 -H 'fiware-service: opcua_plc' \
 -H 'fiware-servicepath: /demo'
 ```
+
 Will result in the following output:
-```
+
+```json
 {
   "type": "Float",
   "value": 0.226730018,
@@ -315,14 +344,19 @@ Will result in the following output:
 ```
 
 Or to get just the value of an attribute, with the GET request to `v2/entities/<device-id>/attrs/<attribute>/value` endpoint:
-```
+
+```sh
 curl -X GET \
 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/oee/value' \
 -H 'fiware-service: opcua_plc' \
 -H 'fiware-servicepath: /demo'
 ```
+
 Will result in the following output:
-`0.359682661`
+
+```json
+0.359682661
+```
 
 The attribute it's updated each time the processStatus values change.
 
@@ -332,11 +366,13 @@ the service has two endpoint:
  - /version: which can be used to run health check
 
 [docker-compose.yml](./docker-compose.yml)
-```
+
+```sh
 healthcheck:
    test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/version" == 200 || exit 1
    interval: 5s
 ```
+
  - /v2/update: used to point the subscription on value change, to trigger the updates of the OEE related attributes.
 
 ## Prerequisites
@@ -358,7 +394,7 @@ will need to follow the instructions found [here](https://docs.docker.com/compos
 
 You can check your current **Docker** and **Docker Compose** versions using the following commands:
 
-```console
+```sh
 docker-compose -v
 docker version
 ```
@@ -371,21 +407,26 @@ necessary.
 ### /bin/bash^M: bad interpreter: No such file or directory
 
 If the following error will appear creating or starting the container:
-```
-/bin/bash^M: bad interpreter: No such file or directory
-```
+
+`/bin/bash^M: bad interpreter: No such file or directory`
+
 Please use the utility `dos2unix` to convert the text files from DOS/Mac to Unix environment, install `dos2unix` on CentOS/Fedora/RHEL
-```
+
+```sh
 sudo yum update
 sudo yum install dos2unix
 ```
+
 or in Ubuntu/Debian:
-```
+
+```sh
 sudo apt update
 sudo apt install dos2unix
 ```
-Then run the utility `dos2unix_Recursively.sh`, in the root directory, to convert all the text files from DOS/Mac to Unix environment, with the following command>
-```
+
+Then run the utility `dos2unix_Recursively.sh`, in the root directory, to convert all the text files from DOS/Mac to Unix environment, with the following command:
+
+```sh
 ./utility/dos2unix_Recursively.sh
 ```
 
@@ -393,16 +434,18 @@ Then run the utility `dos2unix_Recursively.sh`, in the root directory, to conver
 To debug entity, device, registration, subscription, and any other Context data, please use [Mongo Express](#Mongo), as described in the [Mongo](#Mongo) section.
 
 ### Mongo
-To debug the MongoDB container, check Orion, the `docker-compose` has an entry for Mongo Express, please remove the comments to enable the service.
+To debug the MongoDB container, check Orion, the [`docker-compose`](docker-compose.yml) has an entry for Mongo Express, please remove the comments to enable the service.
 The GUI is accessible from the service exposed at the `port: 8081`.
 
 
 ### CrateDB
 
 If the CrateDB container crashes after startup, run the following command:
-```
+
+```sh
 sudo sysctl vm.max_map_count=262144
 ```
+
 This setting in included in the script case `sudo ./services up`.
 
 To debug the CrateDB container, is embedded a web GUI accessible from the exposed admin `port: 4200`.
@@ -410,10 +453,10 @@ To debug the CrateDB container, is embedded a web GUI accessible from the expose
 ### Redis
 
 If the Redis container crashes after startup, run the following command:
-```
-sudo sysctl vm.overcommit_memory=1
-```
+
+`sudo sysctl vm.overcommit_memory=1`
+
 This setting in included in the script case `sudo ./services up`.
 
-To debug the Redis container, the `docker-compose` has an entry for Redis Insight, please remove the comments to enable the service. The GUI is accessible from the service exposed port `8001`.
+To debug the Redis container, the [`docker-compose`](docker-compose.yml) has an entry for Redis Insight, please remove the comments to enable the service, also in the volumes section. The GUI is accessible from the service exposed port `8001`.
 To add the database, insert `host: db-redis` `port: 6379` and any name you prefer.

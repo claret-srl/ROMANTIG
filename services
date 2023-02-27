@@ -67,7 +67,7 @@ startingServices () {
     echo -e "- Mongo-DB is the Orion Context Broker and IoT-Agent database to hold context data information such as data entities, subscriptions and registrations."
     echo -e "- Crate-DB as a data sink to hold time-based historical context data and HTTP endpoint to interpret time-based data queries."
     echo -e "- Grafana is a time series analytics tool will visualize data from CrateDB."
-    echo -e "- ${ROSEAP_OEE} is a ROSE-AP module to calculate OEE data from CrateDB."
+    echo -e "- Claret ${ROSEAP_OEE} is a ROSE-AP module to calculate OEE data from CrateDB."
     echo ""
     ARG=""
     if [[ $1 = 'demo' ]]
@@ -83,7 +83,7 @@ startingServices () {
 }
 
 stoppingServices () {
-    SERVICES=$(docker ps --filter "label=org.fiware=${ORG_FIWARE}" -aq)
+    SERVICES=$(docker ps --filter "label=org.label=${ORG}" -aq)
     if [[ -n $SERVICES ]]
     then
         echo "Stopping Services:"
@@ -100,7 +100,7 @@ deletingVolumesNetwork () {
         echo "Removing all the Volumes of Docker:"
         sudo docker volume rm $VOLUMES || true
     fi
-    NETWORKS=$(docker network ls --filter "label=org.fiware=${ORG_FIWARE}" -q)
+    NETWORKS=$(docker network ls --filter "label=org.label=${ORG}" -q)
     if [[ -n $NETWORKS ]]
     then
         echo "Removing all Networks of Docker:"
@@ -110,7 +110,7 @@ deletingVolumesNetwork () {
 }
 
 displayServices () {
-    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter "label=org.fiware=${ORG_FIWARE}"
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter "label=org.label=${ORG}"
     (gp ports list 2> /dev/null) || true
     echo ""
 }
@@ -118,13 +118,13 @@ displayServices () {
 setEnviroment
 
 usage="usage: ./services <flag>
--h  | --help   Show this usage message.
--b  | --build  Builds the Docker Images for the ${ROSEAP_OEE}.
--p  | --pull   Pulls images from Docker Hub.
--u  | --up     Startup the services in a Docker Container (require 'sudo' to apply settings to the host).
--d  | --down   Shoutdown the running services of the Docker Container.
--rm | --remove Remove the Docker Volumes and the Docker Networks. This will cause the loss of data stored in the databases.
--d  | --debug  Convenient script to Shoutdown, Builds and Startup the services."
+-h   | --help   Show this usage message.
+-b   | --build  Builds the Docker Images for the ${ROSEAP_OEE}. Add demo, to build also the OPC-UA demo server.
+-p   | --pull   Pulls images from Docker Hub. Running the pull command, without building the local images before, will result in an error.
+up   | --up     Startup the services in a Docker Container (require 'sudo' to apply settings to the host). Add demo, to sturtup also the OPC-UA demo server.
+down | --down   Shoutdown the running services of the Docker Container.
+-rm  | --remove Remove the Docker Volumes and the Docker Networks. This will cause the loss of data stored in the databases.
+-d   | --debug  Convenient script to Shoutdown, Builds and Startup the services. Add demo, to debug also the OPC-UA demo server." 
 
 dockerCmd="docker compose"
 if (( $# == 2 ))
@@ -162,12 +162,6 @@ case "${command}" in
         cd ..
         echo -e "\t \033[1;32m Done \033[0m\n"
     ;;
-    "-d"|"--debug")
-        ./services --down
-        ./services --build
-        ./services --build $2
-        sudo ./services --up $2
-    ;;
     "-p"|"--pull")
         ./services --build
         ./services --build demo
@@ -202,6 +196,12 @@ case "${command}" in
                 echo "Continer removal skipped."
             ;;
         esac
+    ;;
+    "-d"|"--debug")
+        ./services --down
+        ./services --build
+        ./services --build $2
+        sudo ./services --up $2
     ;;
     *)
         echo "Command not Found."

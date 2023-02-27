@@ -19,13 +19,13 @@ load_dotenv(script_dir + "//" + ".env")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL")  # debug
 
-COMPOSE_PROJECT_NAME = os.getenv("COMPOSE_PROJECT_NAME")  # fiware
-ORG_FIWARE = os.getenv("ORG_FIWARE")  # claret-romantig
-
 IOTA_OPCUA_MT_ENTITY_ID = os.getenv("IOTA_OPCUA_MT_ENTITY_ID")  # age01_PLC
 
-DEVICE_ID = os.getenv("DEVICE_ID")  # urn:ngsiv2:I40Asset:PLC:001
+DEVICE_ID_BASE = os.getenv("DEVICE_ID_BASE")  # urn:ngsiv2:I40Asset:PLC:001
 DEVICE_TYPE = os.getenv("DEVICE_TYPE")  # PLC
+# DEVICE_ID = os.getenv("DEVICE_ID")  # urn:ngsiv2:I40Asset:PLC:001
+DEVICE_ID = f"{DEVICE_ID_BASE}:{DEVICE_TYPE}:001"
+
 OCB_ID_PROCESS = os.getenv("OCB_ID_PROCESS")  # processStatus
 # OCB_ID_MACHINE = os.getenv("OCB_ID_MACHINE")  # machineStatus
 
