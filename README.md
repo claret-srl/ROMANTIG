@@ -28,7 +28,7 @@ Availability refers to the percentage of time a machine is available to run, tak
 Measuring [OEE](https://www.oee.com/) is important in industrial applications as it provides a comprehensive view of the efficiency of the manufacturing process. By understanding the factors that contribute to inefficiencies, organizations can identify areas for improvement, increase production, and reduce costs. Additionally, [OEE](https://www.oee.com/) is a key indicator of the overall competitiveness of a company, as it is directly tied to production output and profitability.
 
 ## Install
-### Video Tuttorial
+### Video Tutorial
 A [Step by Step video tutorial](https://youtu.be/EMEBSqtTPPo) is available to check the steps illustrated in the following section.
 
 ### Data Interface
