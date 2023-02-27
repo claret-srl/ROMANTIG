@@ -213,8 +213,8 @@ flowchart LR
     QC <--> Rework(Rework)
     QC -- &nbspBad Part&nbsp--> Trashing(Trashing)
     Placing & Trashing --> Idle(Idle) --> Production{Production\nis planned?}
-    Production{Production\nis planned?} --> Picking & Offline(Offline)
-    Offline(Offline) --> Production
+    Production{Production\nis planned?} --> Picking
+    Production <--> Offline(Offline)
 
 classDef Gainsboro fill:Gainsboro,stroke:#333,color:#333
 
