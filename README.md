@@ -272,9 +272,8 @@ The overall architecture can be seen below:
     ROSE-AP <--&nbsp1026:1026&nbsp--> Orion
     Quantumleap <--&nbsp6379:6379&nbsp--> Redis
     Welder & Robot & QC & Actuator <--&nbspPROFINET&nbsp--> PLC <--&nbspOPC UA&nbsp--> IoT-Agent <--&nbsp4041:4041&nbsp--> Orion <--&nbsp8668:8668&nbsp--> Quantumleap
-    Grafana <--&nbsp4200:4200&nbsp--> Crate
+    Browser <--&nbsp3000:3000&nbsp--> Grafana <--&nbsp4200:4200&nbsp--> Crate
     ROSE-AP  & Quantumleap <--&nbsp4200:4200&nbsp--> Crate
-    Grafana <--> Browser
     
 classDef DarkBlue fill:#233C68,stroke:#333,color:#FFF
 classDef Cyan fill:#45D3DD,stroke:#333,color:#333
