@@ -1,5 +1,5 @@
 # Build the service from the base image
-FROM python:3.9.16-alpine3.17
+FROM python:alpine3.17
 
 # Set the work directory
 WORKDIR /app
