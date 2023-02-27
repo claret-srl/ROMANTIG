@@ -1,5 +1,5 @@
 # Build the service from the base image
-FROM python:3.9.16-alpine3.17
+FROM python:alpine3.17
 
 # During building, run the following commands to update, upgrade and install the required dependecies
 RUN 	apk update \
