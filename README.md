@@ -266,6 +266,7 @@ The overall architecture can be seen below:
     Mongo[(MongoDB)]
     Crate[(CrateDB)]
     Grafana(Grafana):::Grafana
+    Browser(Browser)
 
     Orion & IoT-Agent <--&nbsp27017:27017&nbsp---> Mongo
     ROSE-AP <--&nbsp1026:1026&nbsp--> Orion
@@ -273,6 +274,7 @@ The overall architecture can be seen below:
     Welder & Robot & QC & Actuator <--&nbspPROFINET&nbsp--> PLC <--&nbspOPC UA&nbsp--> IoT-Agent <--&nbsp4041:4041&nbsp--> Orion <--&nbsp8668:8668&nbsp--> Quantumleap
     Grafana <--&nbsp4200:4200&nbsp--> Crate
     ROSE-AP  & Quantumleap <--&nbsp4200:4200&nbsp--> Crate
+    Grafana <--> Browser
     
 classDef DarkBlue fill:#233C68,stroke:#333,color:#FFF
 classDef Cyan fill:#45D3DD,stroke:#333,color:#333
@@ -280,7 +282,7 @@ classDef Gainsboro fill:Gainsboro,stroke:#333,color:#333
 classDef Grafana fill:#333,Stroke:#282828,color:#FCB35F
 classDef Claret fill:#0999D0,Stroke:#F8F8F8,color:#F8F8F8
 
-class Crate,Mongo,Redis,Welder,Robot,QC,Actuator,PLC Gainsboro
+class Crate,Mongo,Redis,Welder,Robot,QC,Actuator,PLC,Browser Gainsboro
 ```
 As it can be seen in the chart, the PLC responsible for controlling our process is connected to [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) through the [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/), which is used to write the process states on the CrateDB (through [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/)) where they will processed and read by our [OEE](https://www.oee.com/) calculator.
 
