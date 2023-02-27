@@ -88,9 +88,8 @@ The machine states to be considered as downtime:
 	TIMES_DOWN=Idle,In Reworking,In QC from rework,In Trashing,Timeout      [syntax: State 01,State 02,...,State nn]
 
 #### Not planned roduction time
-The machine states in which production has not been planned, in these states, availability does not decrease, unlike in TIMES_DOWN states.
-
-    TIMES_PRODUCTION_NOT_PLANNED=Offline        [syntax: State 01,State 02,...,State nn]
+Any extra state wich is not declared in `TIMES_UP` or in `TIMES_DOWN` provided by the OPC-UA server will be interpreted as a states in which production has not been planned, and for these reason, in these extra states, availability will not decrease unlike in `TIMES_DOWN` states.
+e.g. in the themo server an `Offline` state, is fired each 10 cycle.
 
 #### Time step
 The timestep to group [OEE](https://www.oee.com/) stats:

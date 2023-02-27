@@ -23,11 +23,9 @@ IOTA_OPCUA_MT_ENTITY_ID = os.getenv("IOTA_OPCUA_MT_ENTITY_ID")  # age01_PLC
 
 DEVICE_ID_BASE = os.getenv("DEVICE_ID_BASE")  # urn:ngsiv2:I40Asset:PLC:001
 DEVICE_TYPE = os.getenv("DEVICE_TYPE")  # PLC
-# DEVICE_ID = os.getenv("DEVICE_ID")  # urn:ngsiv2:I40Asset:PLC:001
 DEVICE_ID = f"{DEVICE_ID_BASE}:{DEVICE_TYPE}:001"
 
 OCB_ID_PROCESS = os.getenv("OCB_ID_PROCESS")  # processStatus
-# OCB_ID_MACHINE = os.getenv("OCB_ID_MACHINE")  # machineStatus
 
 FIWARE_SERVICE = os.getenv("FIWARE_SERVICE")  # opcua_plc
 FIWARE_SERVICEPATH = os.getenv("FIWARE_SERVICEPATH")  # /demo
@@ -64,8 +62,6 @@ REDIS_PORT = os.getenv("REDIS_PORT")  # 6379
 
 GRAFANA = os.getenv("GRAFANA")  # grafana
 GRAFANA_PORT = os.getenv("GRAFANA_PORT")  # 3000
-
-# ROSEAP_OEE_CONTAINER = os.getenv('ROSEAP_OEE_CONTAINER')
 
 # Docker -->
 
@@ -134,20 +130,15 @@ config.read(script_dir + "//" + ".config")
 TIMES_UP = envArrayToString(config["MACHINE_STATES"]["TIMES_UP"], ", ", "'")
 TIMES_DOWN = envArrayToString(config["MACHINE_STATES"]["TIMES_DOWN"], ", ", "'")
 
-TIMES_PRODUCTION_NOT_PLANNED = envArrayToString(config["MACHINE_STATES"]["TIMES_PRODUCTION_NOT_PLANNED"], ", ", "'")
-
-TIMES_UP_GRAFANA = envArrayToString(config["MACHINE_STATES"]["TIMES_UP"], "|")
-TIMES_DOWN_GRAFANA = envArrayToString(config["MACHINE_STATES"]["TIMES_DOWN"], "|")
-TIMES_PRODUCTION_NOT_PLANNED_GRAFANA = envArrayToString(config["MACHINE_STATES"]["TIMES_PRODUCTION_NOT_PLANNED"], "|")
-
 ENDS_GOOD = envArrayToString(config["MACHINE_STATES"]["ENDS_GOOD"], ", ", "'")
 ENDS_BAD = envArrayToString(config["MACHINE_STATES"]["ENDS_BAD"], ", ", "'")
-START_DATE_TIME = (config["TIMING"]["START_DATE"] + "T" + config["TIMING"]["START_TIME"] + "Z")
+
 TIME_IDEAL = str(convert_to_seconds(sStrip(config["TIMING"]["TIME_IDEAL"])))
 TIME_STEP = str(sStrip(config["TIMING"]["TIME_STEP"]))
 
-
 print(f"[INFO] Timestep is {TIME_STEP}.")
+
+START_DATE_TIME = (config["TIMING"]["START_DATE"] + "T" + config["TIMING"]["START_TIME"] + "Z")
 
 # Configuration -->
 # <-- nickjj Web server https://github.com/nickjj/webserver
@@ -331,8 +322,8 @@ for sub in subscriptions:
 
 ## Set CrateDB Stmt
 varTableDrop = f"DROP TABLE IF EXISTS {CRATE_SCHEMA.lower()}.etvars;"
-varTableCreate = f"CREATE TABLE {CRATE_SCHEMA.lower()}.etvars (timeBin text, green text, orange text, red text);"
-varTableValue = f"INSERT INTO {CRATE_SCHEMA.lower()}.etvars (timeBin, green, orange, red) VALUES ('{TIME_STEP}', '({TIMES_UP_GRAFANA})', '({TIMES_DOWN_GRAFANA})', '({TIMES_PRODUCTION_NOT_PLANNED_GRAFANA})') ON CONFLICT DO NOTHING;"
+varTableCreate = f"CREATE TABLE {CRATE_SCHEMA.lower()}.etvars (timeBin text);"
+varTableValue = f"INSERT INTO {CRATE_SCHEMA.lower()}.etvars (timeBin) VALUES ('{TIME_STEP}');"
 
 processDuration = f"""CREATE OR REPLACE VIEW {CRATE_SCHEMA.lower()}.{CRATE_TABLE_DURATION.lower()} AS SELECT {OCB_ID_PROCESS.lower()}, time_index, lag(time_index, 1, now()) OVER (ORDER BY time_index DESC) - time_index AS duration FROM {CRATE_SCHEMA.lower()}.{CRATE_TABLE_DEVICE.lower()} WHERE entity_id='{DEVICE_ID}' ORDER BY time_index DESC;"""
 
@@ -372,6 +363,7 @@ oee = f"""CREATE OR REPLACE VIEW {CRATE_SCHEMA.lower()}.{CRATE_TABLE_OEE.lower()
 	FROM
 		subquery_03;"""
 
+oee = oee.replace("\t","").replace("\n"," ").replace("( ","(").replace(" )",")").replace(" (","(").replace(") ",")")
 
 Health = f"""SELECT processstatus FROM "{CRATE_SCHEMA.lower()}"."{CRATE_TABLE_DEVICE.lower()}" LIMIT 1;"""
 

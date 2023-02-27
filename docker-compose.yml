@@ -104,8 +104,6 @@ services:
       - IOTA_PROVIDER_URL=http://${IOTA}:${IOTA_NORTH_PORT}		# URL passed to the Context Broker when commands are registered, used as a forwarding URL location when the Context Broker issues a command to a device
       - IOTA_OPCUA_UNIQUE_SUBSCRIPTION=false				          # Boolean property to assess whether subscribe once for multiple OPC UA nodes or not
       - LOGLEVEL=${LOG_LEVEL}
-    healthcheck:
-      test: curl --fail -s http://localhost:${IOTA_NORTH_PORT}/version || exit 1
 
 
   # Databases

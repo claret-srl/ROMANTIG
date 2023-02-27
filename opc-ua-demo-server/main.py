@@ -11,7 +11,6 @@ load_dotenv(script_dir + "//" + ".env")
 OPCUA_PORT = os.getenv("OPCUA_PORT")  # 4840
 
 OCB_ID_PROCESS = os.getenv("OCB_ID_PROCESS")  # processStatus
-
 OPCUA_ID_PROCESS = os.getenv("OPCUA_ID_PROCESS")  # ns=4;i=198
 
 async def main():
@@ -34,13 +33,9 @@ async def main():
     processStatusVar = await parentObj.add_variable(
         OPCUA_ID_PROCESS, OCB_ID_PROCESS, "Idle"
     )
-    # machineStatusVar = await parentObj.add_variable(
-    #     OPCUA_ID_MACHINE, OCB_ID_MACHINE, True
-    # )
 
     # Set variable to be writable by clients
     await processStatusVar.set_writable()
-    # await machineStatusVar.set_writable()
 
     async with server:
 
