@@ -5,7 +5,6 @@ FROM python:alpine3.17
 RUN 	apk update \
 	&&	apk add --upgrade apk-tools \
 	&&	apk upgrade
-	# &&	apk --no-cache add openssl-dev curl curl-dev gcc g++ libgcc
 
 RUN		pip install --upgrade pip \
 	&&	pip install asyncio asyncua python-dotenv
