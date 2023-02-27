@@ -342,7 +342,7 @@ Will result in the following output:
 ```json
 {
   "type": "Float",
-  "value": 0.226730018,
+  "value": 0.280455057,
   "metadata": {}
 }
 ```
@@ -359,7 +359,7 @@ curl -X GET \
 Will result in the following output:
 
 ```json
-0.359682661
+0.280455057
 ```
 
 The attribute it's updated each time the processStatus values change.
