@@ -131,19 +131,19 @@ To Edit the IoT-Agent entity ID, please edit the `IOTA_OPCUA_MT_ENTITY_ID`.
 - Star the Docker daemon.
 - Make the `./services` script executable
 
-```s
+```sh
 sudo chmod +x ./services
 ```
 
 - Build the Docker image for the OEE microservice (Remove the old image if any, build the new image and performs a vulnerability scan):
 
-```s
+```sh
 ./services --build
 ```
 
 - To apply required settings to the host, and start up all the services in the containers run:
 
-```s
+```sh
 sudo ./services up
 ```
 
@@ -152,13 +152,13 @@ For demo purspose only, add `demo` after the flag `--build` and `up` in order to
 
 - To build the Docker image for the OPC-UA Server demo (Remove the old image if any, build the new image and performs a vulnerability scan):
 
-```s
+```sh
 ./services --build demo
 ```
 
 - To apply the required settings to the host and start all services in the containers, including the OPC/UA demo server, run:
 
-```s
+```sh
 sudo ./services up demo
 ```
 
@@ -166,25 +166,25 @@ sudo ./services up demo
 
 - To stop all the services in the containers execute:
 
-```s
+```sh
 ./services down
 ```
 
 - To only pull all images from Docker Hub without start the services in the Docker Container:
 
-```s
+```sh
 ./services --pull
 ```
 
 - To stop, build and start the services in the Docker Container:
 
-```s
+```sh
 sudo ./services --debug
 ```
 
 - To see the help function of the service script:
 
-```s
+```sh
 ./services --help
 ```
 
@@ -193,7 +193,7 @@ sudo ./services --debug
 > Teh following operation will **erase** all the Docker Volumes and **all the data stored in the databases!**
 - To delete the Volumes and the Networks
 
-```s
+```sh
 ./services --remove
 ```
 
@@ -284,7 +284,7 @@ As it can be seen in the chart, the PLC responsible for controlling our process 
 
 The provisioned device holding the Process Status information, it get a call back of the OEE values, because of that enquiring the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) about the entity, with the GET request to `v2/entities/<device-id>` endpoint:
 
-```s
+```sh
 curl -X GET \
 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001' \
 -H 'fiware-service: opcua_plc' \
@@ -326,7 +326,7 @@ Will result in the following output:
 
 Atrributes can be filtered, with the GET request to `v2/entities/<device-id>/attrs/<atrribute>` endpoint:
 
-```s
+```sh
 curl -X GET \
 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/oee' \
 -H 'fiware-service: opcua_plc' \
@@ -345,7 +345,7 @@ Will result in the following output:
 
 Or to get just the value of an attribute, with the GET request to `v2/entities/<device-id>/attrs/<attribute>/value` endpoint:
 
-```s
+```sh
 curl -X GET \
 'http://localhost:1026/v2/entities/urn:ngsiv2:I40Asset:PLC:001/attrs/oee/value' \
 -H 'fiware-service: opcua_plc' \
@@ -367,7 +367,7 @@ the service has two endpoint:
 
 [docker-compose.yml](./docker-compose.yml)
 
-```s
+```sh
 healthcheck:
    test: curl -s -o /dev/null -w %{http_code} "http://${ROSEAP_OEE}:${ROSEAP_OEE_PORT}/version" == 200 || exit 1
    interval: 5s
@@ -394,7 +394,7 @@ will need to follow the instructions found [here](https://docs.docker.com/compos
 
 You can check your current **Docker** and **Docker Compose** versions using the following commands:
 
-```s
+```sh
 docker-compose -v
 docker version
 ```
@@ -412,21 +412,21 @@ If the following error will appear creating or starting the container:
 
 Please use the utility `dos2unix` to convert the text files from DOS/Mac to Unix environment, install `dos2unix` on CentOS/Fedora/RHEL
 
-```s
+```sh
 sudo yum update
 sudo yum install dos2unix
 ```
 
 or in Ubuntu/Debian:
 
-```s
+```sh
 sudo apt update
 sudo apt install dos2unix
 ```
 
 Then run the utility `dos2unix_Recursively.sh`, in the root directory, to convert all the text files from DOS/Mac to Unix environment, with the following command:
 
-```s
+```sh
 ./utility/dos2unix_Recursively.sh
 ```
 
@@ -442,7 +442,7 @@ The GUI is accessible from the service exposed at the `port: 8081`.
 
 If the CrateDB container crashes after startup, run the following command:
 
-```s
+```sh
 sudo sysctl vm.max_map_count=262144
 ```
 
