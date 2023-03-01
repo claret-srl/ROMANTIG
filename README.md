@@ -7,7 +7,7 @@
 
 # ROMANTIG ROSE-AP [OEE](https://www.oee.com/) Calculator
 
-This ROSE-AP is intended as a microservice for automatic [OEE](https://www.oee.com/), and related metrics, calculation. The service works creating the appropiete vtable views in a [CrateDB](https://crate.io/) database, where information about the context of the target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) through a [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) subscription.
+This ROSE-AP is intended as a microservice for automatic [OEE](https://www.oee.com/), and related metrics, calculation. The service works creating the appropiete table views in a [CrateDB](https://crate.io/) database, where information about the context of the target process are stored by [Orion](https://fiware-orion.readthedocs.io/en/master/) through a [QuantumLeap](https://quantumleap.readthedocs.io/en/latest/) subscription.
 
 ## Table of Contents
 
