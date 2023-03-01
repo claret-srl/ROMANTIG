@@ -57,7 +57,7 @@ In order to compute the [OEE](https://www.oee.com/), the ROSE-AP service must kn
  - The ideal duration of a production cycle.
  - A time step and a starting date and time to group the data.
 
-To do so, please change the [`.config`](oee_service/.config) file in the `oee_service` folder, prior to run the service, setting the following variables:
+To do so, please change the [.config](oee-service/.config) file in the `oee_service` folder, prior to run the service, setting the following variables:
 
 > **Warning**
 > 
