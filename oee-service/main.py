@@ -1,6 +1,6 @@
-import json, os, configparser, pycurl, time
+import os, json, time, configparser, pycurl
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv # python-dotenv
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 from sys import argv
@@ -19,8 +19,6 @@ load_dotenv(script_dir + "//" + ".env")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL")  # debug
 
-IOTA_OPCUA_MT_ENTITY_ID = os.getenv("IOTA_OPCUA_MT_ENTITY_ID")  # age01_PLC
-
 DEVICE_ID_BASE = os.getenv("DEVICE_ID_BASE")  # urn:ngsiv2:I40Asset:PLC:001
 DEVICE_TYPE = os.getenv("DEVICE_TYPE")  # PLC
 DEVICE_ID = f"{DEVICE_ID_BASE}:{DEVICE_TYPE}:001"
@@ -29,11 +27,6 @@ OCB_ID_PROCESS = os.getenv("OCB_ID_PROCESS")  # processStatus
 
 FIWARE_SERVICE = os.getenv("FIWARE_SERVICE")  # opcua_plc
 FIWARE_SERVICEPATH = os.getenv("FIWARE_SERVICEPATH")  # /demo
-
-IOTA = os.getenv("IOTA")  # iot-agent
-IOTA_NORTH_PORT = os.getenv("IOTA_NORTH_PORT")  # 4041
-IOTA_SOUTH_PORT = os.getenv("IOTA_SOUTH_PORT")  # 9229
-OPCUA_ID = os.getenv("OPCUA_ID")  # "ns=4;i=198"
 
 ORION = os.getenv("ORION")  # orion
 ORION_PORT = os.getenv("ORION_PORT")  # 1026
@@ -46,27 +39,36 @@ ROSEAP_OEE_PORT = os.getenv("ROSEAP_OEE_PORT")  # 8008
 
 CRATE = os.getenv("CRATE")  # db-crate
 CRATE_PORT_ADMIN = os.getenv("CRATE_PORT_ADMIN")  # 4200
-CRATE_PORT_POSTGRES = os.getenv("CRATE_PORT_POSTGRES")  # 5432
-CRATE_PORT_TRANSPORT_PROTOCOL = os.getenv("CRATE_PORT_TRANSPORT_PROTOCOL")  # 4300
+
+# CRATE_PORT_POSTGRES = os.getenv("CRATE_PORT_POSTGRES")  # 5432
+# CRATE_PORT_TRANSPORT_PROTOCOL = os.getenv("CRATE_PORT_TRANSPORT_PROTOCOL")  # 4300
+
 CRATE_SCHEMA = os.getenv("CRATE_SCHEMA")  # mtopcua_plc
-CRATE_TABLE = os.getenv("CRATE_TABLE")  # etdevice
+# CRATE_TABLE = os.getenv("CRATE_TABLE")  # etdevice
 CRATE_TABLE_DEVICE = os.getenv("CRATE_TABLE_DEVICE")  # etdevice
 CRATE_TABLE_DURATION = os.getenv("CRATE_TABLE_DURATION")  # etprocessduration
 CRATE_TABLE_OEE = os.getenv("CRATE_TABLE_OEE")  # etoee
 
-MONGO = os.getenv("MONGO")  # db-mongo
-MONGO_PORT = os.getenv("MONGO_PORT")  # 27017
+# IOTA_OPCUA_MT_ENTITY_ID = os.getenv("IOTA_OPCUA_MT_ENTITY_ID")  # age01_PLC
 
-REDIS = os.getenv("REDIS")  # db-redis
-REDIS_PORT = os.getenv("REDIS_PORT")  # 6379
+# IOTA = os.getenv("IOTA")  # iot-agent
+# IOTA_NORTH_PORT = os.getenv("IOTA_NORTH_PORT")  # 4041
+# IOTA_SOUTH_PORT = os.getenv("IOTA_SOUTH_PORT")  # 9229
+# OPCUA_ID = os.getenv("OPCUA_ID")  # "ns=4;i=198"
 
-GRAFANA = os.getenv("GRAFANA")  # grafana
-GRAFANA_PORT = os.getenv("GRAFANA_PORT")  # 3000
+# MONGO = os.getenv("MONGO")  # db-mongo
+# MONGO_PORT = os.getenv("MONGO_PORT")  # 27017
+
+# REDIS = os.getenv("REDIS")  # db-redis
+# REDIS_PORT = os.getenv("REDIS_PORT")  # 6379
+
+# GRAFANA = os.getenv("GRAFANA")  # grafana
+# GRAFANA_PORT = os.getenv("GRAFANA_PORT")  # 3000
 
 # Docker -->
 
 if Docker == False:
-    ORION = IOTA = CRATE = BIND_HOST = "localhost"
+    ORION = CRATE = BIND_HOST = "localhost"
 else:
     BIND_HOST = "0.0.0.0"
 
