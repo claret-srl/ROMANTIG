@@ -1,4 +1,4 @@
-import os, time, random, asyncio
+import os, random, asyncio
 
 from asyncua import Server
 from dotenv import load_dotenv
