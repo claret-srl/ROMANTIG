@@ -388,7 +388,6 @@ healthcheck:
 In order to provide the results of the calculation of the oee and its sub-components, in the [`dataset/oee_output.csv`](dataset/oee_output.csv) file is provided with a minimum dataset on which to carry out any analysis or base further calculations obtained using the demo server, where by chance the machine is placed in the "Offline" state in which production is not planned: for this reason in some time steps the data are present in a partial way (the machine has reached the Offline state during the timestep), or the entire timestep is not present (during that time step the machine has always been in the "Offline" state) 
 Times are expressed in milliseconds
 
-Translated with www.DeepL.com/Translator (free version)
 
 ## Prerequisites
 
