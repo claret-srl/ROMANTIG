@@ -2,7 +2,7 @@
 
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
-[<img src="https://ramp-eu.github.io/RAMP/img/ramp.png" alt="RAMP" width="auto" height="30">](https://github.com/ramp-eu)
+[<img src="https://ramp-eu.github.io/RAMP/img/ramp.png" alt="RAMP" width="auto" height="22">](https://github.com/ramp-eu)
 
 
 # ROMANTIG ROSE-AP [OEE](https://www.oee.com/) Calculator
@@ -11,13 +11,16 @@ This ROSE-AP is intended as a microservice for automatic [OEE](https://www.oee.c
 
 ## Table of Contents
 
-- [Background](#background)
-- [Install](#install)
-- [Usage](#usage)
-- [Example](#example)
+- [Background](#Background)
+- [Install](#Install)
+- [Usage](#Usage)
+- [Example](#Example)
 - [Architecture](#Architecture)
+- [Context](#Context)
+- [Dataset](#Dataset)
 - [Prerequisites](#Prerequisites)
-- [Troubleshooting](#troubleshooting)
+- [Troubleshooting](#Troubleshooting)
+
 
 ## Background
 
@@ -57,7 +60,7 @@ In order to compute the [OEE](https://www.oee.com/), the ROSE-AP service must kn
  - The ideal duration of a production cycle.
  - A time step and a starting date and time to group the data.
 
-To do so, please change the [.config](oee-service/.config) file in the `oee_service` folder, prior to run the service, setting the following variables:
+To do so, please change the [oee-service/.config](oee-service/.config) file in the `oee_service` folder, prior to run the service, setting the following variables:
 
 > **Warning**
 > 
@@ -164,7 +167,7 @@ For demo purspose only, add `demo` after the flag `--build` and `up` in order to
 sudo ./services up demo
 ```
 
-- Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`dashboard.json`](grafana/dashboards/dashboard.json) file in `.\grafana\dashboards\` directory to persist the changes after rebooting the container or the Grafana service.
+- Now you can open Grafana on [localhost:3000](localhost:3000) `user:admin` `password:admin` and select predefined "RomanTIG Overall Equipment Effectiveness" dashboard to visualize [OEE](https://www.oee.com/) live data. You can freely add plots and other tables by using the "add new panel" function of Grafana, than save as a [`grafana/dashboards/dashboard.json`](grafana/dashboards/dashboard.json) file to persist the changes after rebooting the container or the Grafana service.
 
 - To stop all the services in the containers execute:
 
@@ -380,6 +383,13 @@ healthcheck:
 
  - /v2/update: used to point the subscription on value change, to trigger the updates of the OEE related attributes.
 
+## Dataset
+
+In order to provide the results of the calculation of the oee and its sub-components, in the [`dataset/oee_output.csv`](dataset/oee_output.csv) file is provided with a minimum dataset on which to carry out any analysis or base further calculations obtained using the demo server, where by chance the machine is placed in the "Offline" state in which production is not planned: for this reason in some time steps the data are present in a partial way (the machine has reached the Offline state during the timestep), or the entire timestep is not present (during that time step the machine has always been in the "Offline" state) 
+Times are expressed in milliseconds
+
+Translated with www.DeepL.com/Translator (free version)
+
 ## Prerequisites
 
 ### Docker and Docker Compose
@@ -391,8 +401,8 @@ technology which allows to different components isolated into their respective e
 -   To install Docker on Mac follow the instructions [here](https://docs.docker.com/docker-for-mac/)
 -   To install Docker on Linux follow the instructions [here](https://docs.docker.com/install/)
 
-**Docker Compose** is a tool for defining and running multi-container Docker applications. A series of
-[YAML files](https://raw.githubusercontent.com/Fiware/tutorials.Time-Series-Data/master/docker-compose.yml) are used to
+**Docker Compose** is a tool for defining and running multi-container Docker applications. A 
+[YAML file](https://raw.githubusercontent.com/Fiware/tutorials.Time-Series-Data/master/docker-compose.yml) is used to
 configure the required services for the application. This means all container services can be brought up in a single
 command. Docker Compose is installed by default as part of Docker for Windows and Docker for Mac, however Linux users
 will need to follow the instructions found [here](https://docs.docker.com/compose/install/)
@@ -438,8 +448,10 @@ Then run the utility `dos2unix_Recursively.sh`, in the root directory, to conver
 ### [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), [QuantumLeap](https://smartsdk.github.io/ngsi-timeseries-api/), [IoT Agent for OPC UA](https://iotagent-opcua.readthedocs.io/en/latest/)
 To debug entity, device, registration, subscription, and any other Context data, please use [Mongo Express](#Mongo), as described in the [Mongo](#Mongo) section.
 
+
 ### Mongo
-To debug the MongoDB container, check Orion, the [`docker-compose`](docker-compose.yml) has an entry for Mongo Express, please remove the comments to enable the service.
+
+To debug the MongoDB container, check Orion, the [`docker-compose.yml`](docker-compose.yml) has an entry for Mongo Express, please remove the comments to enable the service.
 The GUI is accessible from the service exposed at the `port: 8081`.
 
 
@@ -455,6 +467,7 @@ This setting in included in the script case `sudo ./services up`.
 
 To debug the CrateDB container, is embedded a web GUI accessible from the exposed admin `port: 4200`.
 
+
 ### Redis
 
 If the Redis container crashes after startup, run the following command:
@@ -463,5 +476,5 @@ If the Redis container crashes after startup, run the following command:
 
 This setting in included in the script case `sudo ./services up`.
 
-To debug the Redis container, the [`docker-compose`](docker-compose.yml) has an entry for Redis Insight, please remove the comments to enable the service, also in the volumes section. The GUI is accessible from the service exposed port `8001`.
+To debug the Redis container, the [`docker-compose.yml`](docker-compose.yml) has an entry for Redis Insight, please remove the comments to enable the service, also in the volumes section. The GUI is accessible from the service exposed port `8001`.
 To add the database, insert `host: db-redis` `port: 6379` and any name you prefer.
