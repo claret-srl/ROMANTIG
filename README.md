@@ -84,7 +84,7 @@ The machine states to be considered as productive times:
 #### Down time
 The machine states to be considered as downtime:
 
-> [!NOTE]
+> [!TIP]
 > 
 > To avoid unexpected behavior (i.e., not updating statistics if the machine stops for any reason), a `Timeout` variable should be provided that fires cyclically when each new timeout is reached.
 
