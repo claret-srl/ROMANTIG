@@ -212,9 +212,9 @@ The process cycle and the respective up and down time states are shown below:
 ```mermaid
 flowchart LR
     Picking(Picking) --> Welding(Welding) --> QC(QC)
-    QC -- &nbspGood Part&nbsp--> Placing(Placing)
+    QC -- Good Part--> Placing(Placing)
     QC <--> Rework(Rework)
-    QC -- &nbspBad Part&nbsp--> Trashing(Trashing)
+    QC -- Bad Part--> Trashing(Trashing)
     Placing & Trashing --> Idle(Idle) --> Production{Production\nis planned?}
     Production{Production\nis planned?} --> Picking
     Production <--> Offline(Offline)
@@ -271,12 +271,12 @@ The overall architecture can be seen below:
     Grafana(Grafana):::Grafana
     Browser(Browser)
 
-    Orion & IoT-Agent <--&nbsp27017:27017&nbsp---> Mongo
-    ROSE-AP <--&nbsp1026:1026&nbsp--> Orion
-    Quantumleap <--&nbsp6379:6379&nbsp--> Redis
-    Welder & Robot & QC & Actuator <--&nbspPROFINET&nbsp--> PLC <--&nbspOPC UA&nbsp--> IoT-Agent <--&nbsp4041:4041&nbsp--> Orion <--&nbsp8668:8668&nbsp--> Quantumleap
-    Browser <--&nbsp3000:3000&nbsp--> Grafana <--&nbsp4200:4200&nbsp--> Crate
-    ROSE-AP  & Quantumleap <--&nbsp4200:4200&nbsp--> Crate
+    Orion & IoT-Agent <--27017:27017---> Mongo
+    ROSE-AP <--1026:1026--> Orion
+    Quantumleap <--6379:6379--> Redis
+    Welder & Robot & QC & Actuator <--PROFINET--> PLC <--OPC UA--> IoT-Agent <--4041:4041--> Orion <--8668:8668--> Quantumleap
+    Browser <--3000:3000--> Grafana <--4200:4200--> Crate
+    ROSE-AP  & Quantumleap <--4200:4200--> Crate
     
 classDef DarkBlue fill:#233C68,stroke:#333,color:#FFF
 classDef Cyan fill:#45D3DD,stroke:#333,color:#333
