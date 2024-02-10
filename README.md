@@ -36,7 +36,7 @@ A [Step by Step video tutorial](https://youtu.be/EMEBSqtTPPo) is available to ch
 
 ### Data Interface
 
-> **Warning**
+> [!WARNING]
 > 
 > The value of the `OCB_ID_PROCESS` variable inside the [.env](.env) file  must match with the name of variable supllied.
 > 
@@ -62,7 +62,7 @@ In order to compute the [OEE](https://www.oee.com/), the ROSE-AP service must kn
 
 To do so, please change the [oee-service/.config](oee-service/.config) file in the `oee_service` folder, prior to run the service, setting the following variables:
 
-> **Warning**
+> [!WARNING]
 > 
 > Be sure that the name of the states written in the config file perfectly match those that are written by your process, so that the microservice can correctly identify them
 
@@ -84,7 +84,7 @@ The machine states to be considered as productive times:
 #### Down time
 The machine states to be considered as downtime:
 
-> **Note**
+> [!NOTE]
 > 
 > To avoid unexpected behavior (i.e., not updating statistics if the machine stops for any reason), a `Timeout` variable should be provided that fires cyclically when each new timeout is reached.
 
@@ -96,7 +96,7 @@ e.g. in the themo server an `Offline` state, is fired each 10 cycle.
 
 #### Time step
 The timestep to group [OEE](https://www.oee.com/) stats:
-> **Note**
+> [!NOTE]
 > 
 > Since OEE values are calculated from the data stored in the database, it is possible to increase or decrease the timestep value by updating the data grouping over the entire stored range without losing any information.
 
@@ -123,7 +123,7 @@ To Edit the variable to be reaced by the IoT-Agent, please edit `OCB_ID_PROCESS`
 For the sake of the simplicity, where possible all the code is driver by enviromental variable.
 To setup the Context, accordigly to your needs please edit the `Contexts` section of the [`.env`](.env) file.
 
-> **Warning**
+> [!WARNING]
 > 
 > if the DEVICE_TYPE needs to be modified please update with the same values the `types` object inside iot-agent/opcua.js (line 174) any discepancy in this two values will break the code.
 
@@ -193,7 +193,7 @@ sudo ./services --debug
 ./services --help
 ```
 
-> **Warning**
+> [!WARNING]
 > 
 > Teh following operation will **erase** all the Docker Volumes and **all the data stored in the databases!**
 - To delete the Volumes and the Networks
